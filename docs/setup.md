@@ -95,6 +95,22 @@ Run infrastructure validation:
 python scripts/check_postgres.py
 ```
 
+Apply database migrations after PostgreSQL is running and healthy:
+
+```powershell
+python scripts/apply_migrations.py
+```
+
+The migration runner creates and uses `schema_migrations` to track successfully applied SQL migration files. It is safe to run repeatedly; once all migrations are applied, it reports that there are no pending migrations.
+
+Validate the operational schema:
+
+```powershell
+python scripts/check_schema.py
+```
+
+The schema validator is read-only. It checks that the expected operational tables, constraints, foreign keys, indexes, and migration record exist, and that no raw telemetry history table has been created in PostgreSQL.
+
 View PostgreSQL logs when troubleshooting:
 
 ```powershell
@@ -120,6 +136,8 @@ docker compose down
 ```
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL development volume and all database data stored in that volume.
+
+No seed or demo database records have been inserted yet. PostgreSQL currently contains the migration tracking table and the initial operational schema only.
 
 ## Validate The Environment
 

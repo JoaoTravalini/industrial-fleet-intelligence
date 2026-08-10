@@ -18,6 +18,9 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Local PostgreSQL infrastructure through Docker Compose using the official `postgres:18.4` image.
 - PostgreSQL persistence through a named Docker volume, not a host bind mount.
 - PostgreSQL health validation through a Compose health check and `scripts/check_postgres.py`.
+- Initial PostgreSQL operational relational schema for structured platform entities.
+- SQL migration execution through `scripts/apply_migrations.py`.
+- Read-only schema validation through `scripts/check_schema.py`.
 
 ## Planned Component Areas
 
@@ -41,7 +44,11 @@ This document describes the high-level architecture for the Industrial Fleet Int
 
 The local PostgreSQL service is implemented in `docker-compose.yml` as the only Docker Compose service for this phase. It binds to `127.0.0.1` with a configurable host port, stores database files in the named Docker volume `industrial_fleet_postgres18_data` mounted at `/var/lib/postgresql`, and uses `pg_isready` for container health checks.
 
-No application database schema, tables, migrations, or business data are implemented yet.
+## Implemented PostgreSQL Operational Schema
+
+The initial operational schema is implemented through versioned SQL migrations in `db/migrations`. It defines structured relational tables for machines, maintenance records, model predictions, anomaly detections, operational alerts, and the latest machine health state.
+
+PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; future telemetry events are planned to flow through Kafka and Spark into local Bronze, Silver, and Gold data lake layers.
 
 ## Planned Data Flow
 
@@ -62,7 +69,7 @@ No application database schema, tables, migrations, or business data are impleme
 - Node.js 24 LTS
 - FastAPI
 - React, TypeScript, and Vite
-- PostgreSQL local infrastructure is implemented; application schema and data access are planned.
+- PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
 - Apache Kafka
 - PySpark
 - scikit-learn and XGBoost
@@ -75,4 +82,4 @@ No application database schema, tables, migrations, or business data are impleme
 
 ## Current Phase Scope
 
-This phase implements local PostgreSQL infrastructure only. It does not implement application database tables, schemas, migrations, Kafka, Spark, machine learning, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements the initial PostgreSQL operational database schema only. It does not implement application database access code, seed data, Kafka, Spark, machine learning, API routes, frontend components, GenAI behavior, or Databricks integration.
