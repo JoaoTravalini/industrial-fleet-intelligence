@@ -65,6 +65,62 @@ python -m ruff format .
 
 The `.venv` directory must never be committed. Developers should activate `.venv` before running project Python commands. No application or runtime dependencies have been introduced yet.
 
+## PostgreSQL Local Infrastructure
+
+Docker Desktop provides PostgreSQL for local development, so developers do not need to install PostgreSQL directly on Windows.
+
+Ensure Docker Desktop is running, then create local environment configuration from the example:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+The local `.env` values may then be edited for development. The `.env` file must never be committed.
+
+Start only PostgreSQL:
+
+```powershell
+docker compose up -d postgres
+```
+
+Check service status:
+
+```powershell
+docker compose ps
+```
+
+Run infrastructure validation:
+
+```powershell
+python scripts/check_postgres.py
+```
+
+View PostgreSQL logs when troubleshooting:
+
+```powershell
+docker compose logs postgres
+```
+
+Stop the container without deleting data:
+
+```powershell
+docker compose stop postgres
+```
+
+Start it again:
+
+```powershell
+docker compose start postgres
+```
+
+Stop and remove containers while preserving the named volume:
+
+```powershell
+docker compose down
+```
+
+Use `docker compose down -v` only intentionally. It deletes the PostgreSQL development volume and all database data stored in that volume.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
