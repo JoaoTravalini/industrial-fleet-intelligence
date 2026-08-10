@@ -21,11 +21,15 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Initial PostgreSQL operational relational schema for structured platform entities.
 - SQL migration execution through `scripts/apply_migrations.py`.
 - Read-only schema validation through `scripts/check_schema.py`.
+- Fictional operational fleet seed for 100 generic simulated industrial machines.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
+- Maintenance history generation is planned for a later phase.
+- Telemetry generation is planned for a later phase.
+- AI4I dataset usage is planned for a later phase.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -49,6 +53,10 @@ The local PostgreSQL service is implemented in `docker-compose.yml` as the only 
 The initial operational schema is implemented through versioned SQL migrations in `db/migrations`. It defines structured relational tables for machines, maintenance records, model predictions, anomaly detections, operational alerts, and the latest machine health state.
 
 PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; future telemetry events are planned to flow through Kafka and Spark into local Bronze, Silver, and Gold data lake layers.
+
+## Implemented Development Seed Data
+
+A deterministic fictional development seed populates `machines` with 100 generic simulated industrial assets identified as `MCH-0001` through `MCH-0100`. It does not use real manufacturer, proprietary, telemetry, maintenance, prediction, anomaly, alert, or machine-health data.
 
 ## Planned Data Flow
 
@@ -82,4 +90,4 @@ PostgreSQL must not become the primary store for high-volume raw telemetry histo
 
 ## Current Phase Scope
 
-This phase implements the initial PostgreSQL operational database schema only. It does not implement application database access code, seed data, Kafka, Spark, machine learning, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements deterministic fictional development seed data for `machines` only. It does not implement application database access code, maintenance history, telemetry generation, AI4I data, Kafka, Spark, machine learning, API routes, frontend components, GenAI behavior, or Databricks integration.

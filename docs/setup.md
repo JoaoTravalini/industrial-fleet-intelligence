@@ -117,6 +117,20 @@ Validate the operational schema:
 
 The schema validator is read-only. It checks that the expected operational tables, constraints, foreign keys, indexes, and migration record exist, and that no raw telemetry history table has been created in PostgreSQL.
 
+Seed the fictional development fleet after PostgreSQL is running and migrations have already been applied:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/seed_database.py
+```
+
+The development seed is deterministic and safe to run repeatedly. It creates 100 fictional generic machines in `machines` only and does not create maintenance, telemetry, prediction, anomaly, alert, or health-summary records.
+
+Validate the seed data:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_seed_data.py
+```
+
 View PostgreSQL logs when troubleshooting:
 
 ```powershell
@@ -143,7 +157,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL development volume and all database data stored in that volume.
 
-No seed or demo database records have been inserted yet. PostgreSQL currently contains the migration tracking table and the initial operational schema only.
+A deterministic fictional development fleet seed is available for `machines` only. PostgreSQL must be running and schema migrations must already be applied before running the seed.
 
 ## Validate The Environment
 

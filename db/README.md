@@ -23,3 +23,11 @@ Versioned SQL migrations live in `db/migrations` and use the naming pattern:
 ```
 
 The migration runner in `scripts/apply_migrations.py` discovers migration files in filename order, creates `schema_migrations` when needed, applies only pending migrations, and records a migration only after its SQL succeeds. This makes the runner safe to execute repeatedly.
+
+## Development Seed Data
+
+Development seed data is separate from schema migrations. It lives in `db/seeds` and is applied by `scripts/seed_database.py`; seed execution is not tracked in `schema_migrations`.
+
+The current development seed creates a deterministic fictional fleet of 100 generic simulated industrial machines in `machines` only. Identifiers use the `MCH-XXXX` format from `MCH-0001` through `MCH-0100`.
+
+The seed uses generic equipment categories and fictional model families only. It contains no real manufacturer, product, proprietary, personal, telemetry, maintenance, prediction, anomaly, alert, or machine-health data.
