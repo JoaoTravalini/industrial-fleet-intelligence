@@ -33,37 +33,43 @@ Activate the virtual environment in PowerShell:
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install the declared development dependencies:
+Verify the virtual environment interpreter before running automated Python project commands:
 
 ```powershell
-python -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe --version
+```
+
+Install the declared development dependencies into `.venv` only:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
 Run the Python test suite with pytest:
 
 ```powershell
-python -m pytest
+.\.venv\Scripts\python.exe -m pytest
 ```
 
 Run Ruff lint checks:
 
 ```powershell
-python -m ruff check .
+.\.venv\Scripts\python.exe -m ruff check .
 ```
 
 Run the Ruff formatter check:
 
 ```powershell
-python -m ruff format --check .
+.\.venv\Scripts\python.exe -m ruff format --check .
 ```
 
 Apply Ruff formatting:
 
 ```powershell
-python -m ruff format .
+.\.venv\Scripts\python.exe -m ruff format .
 ```
 
-The `.venv` directory must never be committed. Developers should activate `.venv` before running project Python commands. No application or runtime dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No application or runtime dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -92,13 +98,13 @@ docker compose ps
 Run infrastructure validation:
 
 ```powershell
-python scripts/check_postgres.py
+.\.venv\Scripts\python.exe scripts/check_postgres.py
 ```
 
 Apply database migrations after PostgreSQL is running and healthy:
 
 ```powershell
-python scripts/apply_migrations.py
+.\.venv\Scripts\python.exe scripts/apply_migrations.py
 ```
 
 The migration runner creates and uses `schema_migrations` to track successfully applied SQL migration files. It is safe to run repeatedly; once all migrations are applied, it reports that there are no pending migrations.
@@ -106,7 +112,7 @@ The migration runner creates and uses `schema_migrations` to track successfully 
 Validate the operational schema:
 
 ```powershell
-python scripts/check_schema.py
+.\.venv\Scripts\python.exe scripts/check_schema.py
 ```
 
 The schema validator is read-only. It checks that the expected operational tables, constraints, foreign keys, indexes, and migration record exist, and that no raw telemetry history table has been created in PostgreSQL.
@@ -144,17 +150,17 @@ No seed or demo database records have been inserted yet. PostgreSQL currently co
 Run the read-only environment validator from the repository root:
 
 ```powershell
-py -3.12 scripts/check_environment.py
+.\.venv\Scripts\python.exe scripts/check_environment.py
 ```
 
 The validator uses only the Python standard library. It checks whether each required tool is available, reads installed versions where possible, reports `PASS`, `WARN`, or `FAIL`, and exits with a non-zero status when a mandatory requirement fails.
 
 ## Run Unit Tests
 
-The project uses pytest for Python tests:
+The project uses pytest for Python tests from the project virtual environment:
 
 ```powershell
-python -m pytest
+.\.venv\Scripts\python.exe -m pytest
 ```
 
 The current tests cover pure version-parsing and requirement-checking logic. They do not depend on the developer machine's installed tools and do not mock or execute system software checks.

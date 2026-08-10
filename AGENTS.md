@@ -34,6 +34,15 @@ These instructions apply to the entire repository.
 - Fail clearly instead of silently swallowing exceptions.
 - Follow established project formatting and linting rules once configured.
 
+### 3.1 Python Environment On Windows
+
+- Once `.venv` exists, all automated project Python commands on Windows must use the project virtual environment explicitly.
+- The preferred interpreter for automated or Codex-run project commands is `.venv\Scripts\python.exe`.
+- An activated `.venv` may use `python` for interactive developer commands.
+- Never use the global Anaconda Python for this project.
+- Never install project dependencies into Anaconda or any global Python environment.
+- Before executing Python project commands, automation should verify the interpreter when practical with `.venv\Scripts\python.exe --version`.
+
 ### 4. Security
 
 - Never commit credentials, API keys, passwords, tokens, or personal secrets.
