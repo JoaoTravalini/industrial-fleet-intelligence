@@ -42,7 +42,7 @@ class VersionParsingTests(unittest.TestCase):
 
     def test_parse_docker_ostype(self):
         self.assertEqual(env.parse_docker_ostype("linux"), "linux")
-        self.assertEqual(env.parse_docker_ostype('Server:\n OSType: windows'), "windows")
+        self.assertEqual(env.parse_docker_ostype("Server:\n OSType: windows"), "windows")
         self.assertIsNone(env.parse_docker_ostype("unknown"))
 
     def test_infer_wsl2_from_default_version(self):

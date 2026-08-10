@@ -19,6 +19,52 @@ Use a local Windows development environment with the following tools:
 
 WSL2 is required because Docker Desktop uses it internally for Linux containers on Windows. Developers do not need to work inside Ubuntu or another Linux distribution for this project, and the environment validator does not require any manually installed Linux distribution.
 
+## Python Development Environment
+
+Create the project virtual environment from the repository root:
+
+```powershell
+py -3.12 -m venv .venv
+```
+
+Activate the virtual environment in PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install the declared development dependencies:
+
+```powershell
+python -m pip install -e ".[dev]"
+```
+
+Run the Python test suite with pytest:
+
+```powershell
+python -m pytest
+```
+
+Run Ruff lint checks:
+
+```powershell
+python -m ruff check .
+```
+
+Run the Ruff formatter check:
+
+```powershell
+python -m ruff format --check .
+```
+
+Apply Ruff formatting:
+
+```powershell
+python -m ruff format .
+```
+
+The `.venv` directory must never be committed. Developers should activate `.venv` before running project Python commands. No application or runtime dependencies have been introduced yet.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -31,10 +77,10 @@ The validator uses only the Python standard library. It checks whether each requ
 
 ## Run Unit Tests
 
-Run the unit tests with Python 3.12 and the standard library `unittest` module:
+The project uses pytest for Python tests:
 
 ```powershell
-py -3.12 -m unittest discover -s tests -p "test_*.py"
+python -m pytest
 ```
 
-These tests cover pure version-parsing and requirement-checking logic. They do not depend on the developer machine's installed tools and do not mock or execute system software checks.
+The current tests cover pure version-parsing and requirement-checking logic. They do not depend on the developer machine's installed tools and do not mock or execute system software checks.

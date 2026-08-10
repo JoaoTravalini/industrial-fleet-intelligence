@@ -7,16 +7,16 @@ import re
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from enum import Enum
-from typing import Callable, Sequence
+from enum import StrEnum
 
 DEFAULT_TIMEOUT_SECONDS = 10
 DOCKER_TIMEOUT_SECONDS = 15
 WINDOWS_NPM_CANDIDATES = ("npm.cmd", "npm.exe", "npm.bat", "npm.com")
 
 
-class Status(str, Enum):
+class Status(StrEnum):
     """Validation status values printed by the environment checker."""
 
     PASS = "PASS"
@@ -172,35 +172,64 @@ def infer_wsl2_available(version_output: str, status_output: str = "") -> bool |
     return None
 
 
-def require_exact_major(name: str, version: ParsedVersion | None, expected_major: int) -> CheckResult:
+def require_exact_major(
+    name: str, version: ParsedVersion | None, expected_major: int
+) -> CheckResult:
     if version is None:
-        return CheckResult(name, Status.FAIL, f"Could not parse a version; expected major version {expected_major}.")
+        return CheckResult(
+            name,
+            Status.FAIL,
+            f"Could not parse a version; expected major version {expected_major}.",
+        )
     if version.major == expected_major:
         return CheckResult(name, Status.PASS, f"Detected version {version.display()}.")
-    return CheckResult(name, Status.FAIL, f"Expected major version {expected_major}, detected {version.display()}.")
+    return CheckResult(
+        name, Status.FAIL, f"Expected major version {expected_major}, detected {version.display()}."
+    )
 
 
-def require_minimum_major(name: str, version: ParsedVersion | None, minimum_major: int) -> CheckResult:
+def require_minimum_major(
+    name: str, version: ParsedVersion | None, minimum_major: int
+) -> CheckResult:
     if version is None:
-        return CheckResult(name, Status.FAIL, f"Could not parse a version; expected major version {minimum_major} or newer.")
+        return CheckResult(
+            name,
+            Status.FAIL,
+            f"Could not parse a version; expected major version {minimum_major} or newer.",
+        )
     if version.major >= minimum_major:
         return CheckResult(name, Status.PASS, f"Detected version {version.display()}.")
-    return CheckResult(name, Status.FAIL, f"Expected major version {minimum_major} or newer, detected {version.display()}.")
+    return CheckResult(
+        name,
+        Status.FAIL,
+        f"Expected major version {minimum_major} or newer, detected {version.display()}.",
+    )
 
 
 def evaluate_python_312(version: ParsedVersion | None) -> CheckResult:
     if version is None:
-        return CheckResult("Python", Status.FAIL, "Could not determine the Python version running this validator.")
+        return CheckResult(
+            "Python", Status.FAIL, "Could not determine the Python version running this validator."
+        )
     if version.major == 3 and version.minor == 12:
-        return CheckResult("Python", Status.PASS, f"Validator is running with Python {version.display()}.")
-    return CheckResult("Python", Status.FAIL, f"Validator must run with Python 3.12.x; detected {version.display()}.")
+        return CheckResult(
+            "Python", Status.PASS, f"Validator is running with Python {version.display()}."
+        )
+    return CheckResult(
+        "Python",
+        Status.FAIL,
+        f"Validator must run with Python 3.12.x; detected {version.display()}.",
+    )
 
 
 def evaluate_npm_version(version: ParsedVersion | None) -> CheckResult:
     if version is None:
-        return CheckResult("npm", Status.WARN, "npm is available, but its version output could not be parsed.")
-    return CheckResult("npm", Status.PASS, f"Detected version {version.display()}; no patch-level pin is required.")
-
+        return CheckResult(
+            "npm", Status.WARN, "npm is available, but its version output could not be parsed."
+        )
+    return CheckResult(
+        "npm", Status.PASS, f"Detected version {version.display()}; no patch-level pin is required."
+    )
 
 
 def resolve_npm_command(
@@ -220,26 +249,48 @@ def resolve_npm_command(
 
 def evaluate_git_version(version: ParsedVersion | None) -> CheckResult:
     if version is None:
-        return CheckResult("Git", Status.WARN, "Git is available, but its version output could not be parsed.")
+        return CheckResult(
+            "Git", Status.WARN, "Git is available, but its version output could not be parsed."
+        )
     if version.major >= 2:
         return CheckResult("Git", Status.PASS, f"Detected version {version.display()}.")
-    return CheckResult("Git", Status.FAIL, f"Expected a reasonably modern Git 2.x version; detected {version.display()}.")
+    return CheckResult(
+        "Git",
+        Status.FAIL,
+        f"Expected a reasonably modern Git 2.x version; detected {version.display()}.",
+    )
 
 
 def evaluate_wsl2_availability(is_available: bool | None) -> CheckResult:
     if is_available is True:
-        return CheckResult("WSL2", Status.PASS, "WSL2 availability was confirmed; no Linux distribution is required by this check.")
+        return CheckResult(
+            "WSL2",
+            Status.PASS,
+            "WSL2 availability was confirmed; no Linux distribution is required by this check.",
+        )
     if is_available is False:
-        return CheckResult("WSL2", Status.FAIL, "WSL is available, but the default WSL version appears to be 1.")
-    return CheckResult("WSL2", Status.FAIL, "Could not confirm WSL2 availability from read-only WSL commands.")
+        return CheckResult(
+            "WSL2", Status.FAIL, "WSL is available, but the default WSL version appears to be 1."
+        )
+    return CheckResult(
+        "WSL2", Status.FAIL, "Could not confirm WSL2 availability from read-only WSL commands."
+    )
 
 
 def evaluate_docker_ostype(os_type: str | None) -> CheckResult:
     if os_type == "linux":
         return CheckResult("Docker Containers", Status.PASS, "Docker is using Linux containers.")
     if os_type == "windows":
-        return CheckResult("Docker Containers", Status.FAIL, "Docker is using Windows containers; Linux containers are required.")
-    return CheckResult("Docker Containers", Status.WARN, "Docker Engine is running, but the container mode could not be detected.")
+        return CheckResult(
+            "Docker Containers",
+            Status.FAIL,
+            "Docker is using Windows containers; Linux containers are required.",
+        )
+    return CheckResult(
+        "Docker Containers",
+        Status.WARN,
+        "Docker Engine is running, but the container mode could not be detected.",
+    )
 
 
 def _coerce_output(value: str | bytes | None) -> str:
@@ -296,7 +347,9 @@ def check_operating_system(system_name: str | None = None) -> CheckResult:
     detected = system_name or platform.system()
     if detected == "Windows":
         return CheckResult("Operating System", Status.PASS, "Detected Windows.")
-    return CheckResult("Operating System", Status.FAIL, f"Expected Windows, detected {detected or 'unknown'}.")
+    return CheckResult(
+        "Operating System", Status.FAIL, f"Expected Windows, detected {detected or 'unknown'}."
+    )
 
 
 def check_python() -> CheckResult:
@@ -341,7 +394,11 @@ def check_java_runtime() -> CheckResult:
 def check_java_compiler() -> CheckResult:
     result = run_command(["javac", "-version"])
     if not result.succeeded:
-        return CheckResult("Java Compiler", Status.FAIL, f"JDK compiler check failed: {command_failure_message(result)}")
+        return CheckResult(
+            "Java Compiler",
+            Status.FAIL,
+            f"JDK compiler check failed: {command_failure_message(result)}",
+        )
     return require_minimum_major("Java Compiler", parse_java_version(result.output), 17)
 
 
@@ -356,19 +413,35 @@ def check_wsl() -> list[CheckResult]:
     version_result = run_command(["wsl", "--version"])
     if not version_result.succeeded:
         return [
-            CheckResult("WSL", Status.FAIL, f"wsl --version failed: {command_failure_message(version_result)}"),
-            CheckResult("WSL2", Status.FAIL, "WSL2 could not be checked because wsl --version failed."),
+            CheckResult(
+                "WSL",
+                Status.FAIL,
+                f"wsl --version failed: {command_failure_message(version_result)}",
+            ),
+            CheckResult(
+                "WSL2", Status.FAIL, "WSL2 could not be checked because wsl --version failed."
+            ),
         ]
 
     wsl_version = parse_version(version_result.output)
     if wsl_version is None:
-        wsl_check = CheckResult("WSL", Status.WARN, "wsl --version executed, but its version output could not be parsed.")
+        wsl_check = CheckResult(
+            "WSL",
+            Status.WARN,
+            "wsl --version executed, but its version output could not be parsed.",
+        )
     else:
-        wsl_check = CheckResult("WSL", Status.PASS, f"wsl --version executed successfully; detected WSL version {wsl_version.display()}.")
+        wsl_check = CheckResult(
+            "WSL",
+            Status.PASS,
+            f"wsl --version executed successfully; detected WSL version {wsl_version.display()}.",
+        )
 
     status_result = run_command(["wsl", "--status"])
     status_output = status_result.output if status_result.succeeded else ""
-    wsl2_check = evaluate_wsl2_availability(infer_wsl2_available(version_result.output, status_output))
+    wsl2_check = evaluate_wsl2_availability(
+        infer_wsl2_available(version_result.output, status_output)
+    )
     return [wsl_check, wsl2_check]
 
 
@@ -381,14 +454,38 @@ def check_docker() -> list[CheckResult]:
     else:
         docker_version = parse_docker_version(cli_result.output)
         if docker_version is None:
-            results.append(CheckResult("Docker CLI", Status.WARN, "Docker CLI is available, but its version output could not be parsed."))
+            results.append(
+                CheckResult(
+                    "Docker CLI",
+                    Status.WARN,
+                    "Docker CLI is available, but its version output could not be parsed.",
+                )
+            )
         else:
-            results.append(CheckResult("Docker CLI", Status.PASS, f"Detected version {docker_version.display()}."))
+            results.append(
+                CheckResult(
+                    "Docker CLI", Status.PASS, f"Detected version {docker_version.display()}."
+                )
+            )
 
-    info_result = run_command(["docker", "info", "--format", "{{.OSType}}"], timeout=DOCKER_TIMEOUT_SECONDS)
+    info_result = run_command(
+        ["docker", "info", "--format", "{{.OSType}}"], timeout=DOCKER_TIMEOUT_SECONDS
+    )
     if not info_result.succeeded:
-        results.append(CheckResult("Docker Engine", Status.FAIL, f"Docker Engine is not available: {command_failure_message(info_result)}"))
-        results.append(CheckResult("Docker Containers", Status.WARN, "Container mode was not checked because Docker Engine is unavailable."))
+        results.append(
+            CheckResult(
+                "Docker Engine",
+                Status.FAIL,
+                f"Docker Engine is not available: {command_failure_message(info_result)}",
+            )
+        )
+        results.append(
+            CheckResult(
+                "Docker Containers",
+                Status.WARN,
+                "Container mode was not checked because Docker Engine is unavailable.",
+            )
+        )
         return results
 
     results.append(CheckResult("Docker Engine", Status.PASS, "docker info executed successfully."))
