@@ -22,6 +22,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - SQL migration execution through `scripts/apply_migrations.py`.
 - Read-only schema validation through `scripts/check_schema.py`.
 - Fictional operational fleet seed for 100 generic simulated industrial machines.
+- AI4I external dataset acquisition from the UCI Machine Learning Repository.
+- AI4I structural validation and factual profile reporting.
 
 ## Planned Component Areas
 
@@ -29,7 +31,9 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
 - Telemetry generation is planned for a later phase.
-- AI4I dataset usage is planned for a later phase.
+- EDA is planned for a later phase.
+- Preprocessing and feature engineering are planned for a later phase.
+- AI4I dataset usage beyond acquisition and structural validation is planned for a later phase.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -57,6 +61,14 @@ PostgreSQL must not become the primary store for high-volume raw telemetry histo
 ## Implemented Development Seed Data
 
 A deterministic fictional development seed populates `machines` with 100 generic simulated industrial assets identified as `MCH-0001` through `MCH-0100`. It does not use real manufacturer, proprietary, telemetry, maintenance, prediction, anomaly, alert, or machine-health data.
+
+## Data Concept Boundaries
+
+1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
+2. AI4I dataset: external public synthetic dataset used for future Data Science and ML development.
+3. Future telemetry simulator: generated streaming data that will eventually flow through Kafka and Spark.
+
+AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
 ## Planned Data Flow
 
@@ -90,4 +102,4 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 ## Current Phase Scope
 
-This phase implements deterministic fictional development seed data for `machines` only. It does not implement application database access code, maintenance history, telemetry generation, AI4I data, Kafka, Spark, machine learning, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements AI4I external dataset acquisition, attribution, and structural validation only. It does not implement EDA, preprocessing, feature engineering, machine learning, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

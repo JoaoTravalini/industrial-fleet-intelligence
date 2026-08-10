@@ -159,6 +159,29 @@ Use `docker compose down -v` only intentionally. It deletes the PostgreSQL devel
 
 A deterministic fictional development fleet seed is available for `machines` only. PostgreSQL must be running and schema migrations must already be applied before running the seed.
 
+## AI4I Dataset
+
+The AI4I 2020 Predictive Maintenance Dataset is a public synthetic dataset from the UCI Machine Learning Repository. Internet access is required only for the download step; subsequent validation is local.
+
+Download the dataset from the official UCI archive:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/download_ai4i.py
+```
+
+Validate the local raw CSV:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i.py
+```
+
+Force an official re-download when intentionally refreshing the local raw file:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/download_ai4i.py --force
+```
+
+Raw AI4I files are stored under `data/raw/ai4i/` and are ignored by Git. This phase uses only the Python standard library; no pandas, dataset client, plotting, or machine-learning dependency is required.
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
