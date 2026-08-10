@@ -11,6 +11,11 @@ dev = [
     "pytest",
     "ruff",
 ]
+data = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+]
 
 [tool.setuptools]
 packages = []

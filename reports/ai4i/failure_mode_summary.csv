@@ -1,0 +1,13 @@
+section,label,count,percentage_of_rows,percentage_of_machine_failure_positives
+failure_mode,TWF,46,0.460000,13.569322
+failure_mode,HDF,115,1.150000,33.923304
+failure_mode,PWF,95,0.950000,28.023599
+failure_mode,OSF,98,0.980000,28.908555
+failure_mode,RNF,19,0.190000,5.604720
+failure_mode_overlap,zero_active_failure_mode_flags,9652,96.520000,
+failure_mode_overlap,exactly_one_active_failure_mode_flag,324,3.240000,
+failure_mode_overlap,more_than_one_active_failure_mode_flag,24,0.240000,
+target_flag_relationship,machine_failure_1_with_any_failure_mode_flag,330,3.300000,
+target_flag_relationship,machine_failure_1_with_no_failure_mode_flags,9,0.090000,
+target_flag_relationship,machine_failure_0_with_any_failure_mode_flag,18,0.180000,
+target_flag_relationship,machine_failure_0_with_no_failure_mode_flags,9643,96.430000,

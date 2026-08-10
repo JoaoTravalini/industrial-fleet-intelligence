@@ -1,0 +1,339 @@
+{
+  "correlations": {
+    "matrix": {
+      "Air temperature [K]": {
+        "Air temperature [K]": 1.0,
+        "Machine failure": 0.082556,
+        "Process temperature [K]": 0.876107,
+        "Rotational speed [rpm]": 0.02267,
+        "Tool wear [min]": 0.013853,
+        "Torque [Nm]": -0.013778
+      },
+      "Machine failure": {
+        "Air temperature [K]": 0.082556,
+        "Machine failure": 1.0,
+        "Process temperature [K]": 0.035946,
+        "Rotational speed [rpm]": -0.044188,
+        "Tool wear [min]": 0.105448,
+        "Torque [Nm]": 0.191321
+      },
+      "Process temperature [K]": {
+        "Air temperature [K]": 0.876107,
+        "Machine failure": 0.035946,
+        "Process temperature [K]": 1.0,
+        "Rotational speed [rpm]": 0.019277,
+        "Tool wear [min]": 0.013488,
+        "Torque [Nm]": -0.014061
+      },
+      "Rotational speed [rpm]": {
+        "Air temperature [K]": 0.02267,
+        "Machine failure": -0.044188,
+        "Process temperature [K]": 0.019277,
+        "Rotational speed [rpm]": 1.0,
+        "Tool wear [min]": 0.000223,
+        "Torque [Nm]": -0.875027
+      },
+      "Tool wear [min]": {
+        "Air temperature [K]": 0.013853,
+        "Machine failure": 0.105448,
+        "Process temperature [K]": 0.013488,
+        "Rotational speed [rpm]": 0.000223,
+        "Tool wear [min]": 1.0,
+        "Torque [Nm]": -0.003093
+      },
+      "Torque [Nm]": {
+        "Air temperature [K]": -0.013778,
+        "Machine failure": 0.191321,
+        "Process temperature [K]": -0.014061,
+        "Rotational speed [rpm]": -0.875027,
+        "Tool wear [min]": -0.003093,
+        "Torque [Nm]": 1.0
+      }
+    },
+    "strongest_machine_failure_associations": [
+      {
+        "correlation": 0.191321,
+        "variable": "Torque [Nm]"
+      },
+      {
+        "correlation": 0.105448,
+        "variable": "Tool wear [min]"
+      },
+      {
+        "correlation": 0.082556,
+        "variable": "Air temperature [K]"
+      }
+    ]
+  },
+  "dataset": {
+    "columns": 14,
+    "doi": "10.24432/C5HS5C",
+    "name": "AI4I 2020 Predictive Maintenance Dataset",
+    "rows": 10000,
+    "source": "UCI Machine Learning Repository",
+    "uci_dataset_id": 601
+  },
+  "descriptive_statistics": [
+    {
+      "25%": 298.3,
+      "75%": 301.5,
+      "count": 10000.0,
+      "max": 304.5,
+      "mean": 300.00493,
+      "median": 300.1,
+      "min": 295.3,
+      "std": 2.000259,
+      "variable": "Air temperature [K]"
+    },
+    {
+      "25%": 308.8,
+      "75%": 311.1,
+      "count": 10000.0,
+      "max": 313.8,
+      "mean": 310.00556,
+      "median": 310.1,
+      "min": 305.7,
+      "std": 1.483734,
+      "variable": "Process temperature [K]"
+    },
+    {
+      "25%": 1423.0,
+      "75%": 1612.0,
+      "count": 10000.0,
+      "max": 2886.0,
+      "mean": 1538.7761,
+      "median": 1503.0,
+      "min": 1168.0,
+      "std": 179.284096,
+      "variable": "Rotational speed [rpm]"
+    },
+    {
+      "25%": 33.2,
+      "75%": 46.8,
+      "count": 10000.0,
+      "max": 76.6,
+      "mean": 39.98691,
+      "median": 40.1,
+      "min": 3.8,
+      "std": 9.968934,
+      "variable": "Torque [Nm]"
+    },
+    {
+      "25%": 53.0,
+      "75%": 162.0,
+      "count": 10000.0,
+      "max": 253.0,
+      "mean": 107.951,
+      "median": 108.0,
+      "min": 0.0,
+      "std": 63.654147,
+      "variable": "Tool wear [min]"
+    }
+  ],
+  "failure_modes": {
+    "observed_target_flag_relationship": {
+      "machine_failure_0_with_any_failure_mode_flag": 18,
+      "machine_failure_0_with_no_failure_mode_flags": 9643,
+      "machine_failure_1_with_any_failure_mode_flag": 330,
+      "machine_failure_1_with_no_failure_mode_flags": 9
+    },
+    "overlap": {
+      "exactly_one_active_failure_mode_flag": 324,
+      "more_than_one_active_failure_mode_flag": 24,
+      "zero_active_failure_mode_flags": 9652
+    },
+    "positive_counts": {
+      "HDF": 115,
+      "OSF": 98,
+      "PWF": 95,
+      "RNF": 19,
+      "TWF": 46
+    }
+  },
+  "machine_failure": {
+    "distribution": {
+      "0": {
+        "count": 9661,
+        "percentage": 96.61
+      },
+      "1": {
+        "count": 339,
+        "percentage": 3.39
+      }
+    },
+    "failure_percentage": 3.39,
+    "is_class_imbalanced": true,
+    "negative_count": 9661,
+    "positive_count": 339,
+    "positive_to_negative_ratio": 0.03509
+  },
+  "numeric_by_machine_failure": [
+    {
+      "count": 9661,
+      "machine_failure": 0,
+      "mean": 299.973999,
+      "median": 300.0,
+      "std": 1.990748,
+      "variable": "Air temperature [K]"
+    },
+    {
+      "count": 339,
+      "machine_failure": 1,
+      "mean": 300.886431,
+      "median": 301.6,
+      "std": 2.071473,
+      "variable": "Air temperature [K]"
+    },
+    {
+      "count": 9661,
+      "machine_failure": 0,
+      "mean": 309.99557,
+      "median": 310.0,
+      "std": 1.486846,
+      "variable": "Process temperature [K]"
+    },
+    {
+      "count": 339,
+      "machine_failure": 1,
+      "mean": 310.290265,
+      "median": 310.4,
+      "std": 1.363686,
+      "variable": "Process temperature [K]"
+    },
+    {
+      "count": 9661,
+      "machine_failure": 0,
+      "mean": 1540.260014,
+      "median": 1507.0,
+      "std": 167.394734,
+      "variable": "Rotational speed [rpm]"
+    },
+    {
+      "count": 339,
+      "machine_failure": 1,
+      "mean": 1496.486726,
+      "median": 1365.0,
+      "std": 384.943547,
+      "variable": "Rotational speed [rpm]"
+    },
+    {
+      "count": 9661,
+      "machine_failure": 0,
+      "mean": 39.629655,
+      "median": 39.9,
+      "std": 9.47208,
+      "variable": "Torque [Nm]"
+    },
+    {
+      "count": 339,
+      "machine_failure": 1,
+      "mean": 50.168142,
+      "median": 53.7,
+      "std": 16.374498,
+      "variable": "Torque [Nm]"
+    },
+    {
+      "count": 9661,
+      "machine_failure": 0,
+      "mean": 106.693717,
+      "median": 107.0,
+      "std": 62.94579,
+      "variable": "Tool wear [min]"
+    },
+    {
+      "count": 339,
+      "machine_failure": 1,
+      "mean": 143.781711,
+      "median": 165.0,
+      "std": 72.759876,
+      "variable": "Tool wear [min]"
+    }
+  ],
+  "numeric_ranges": {
+    "Air temperature [K]": {
+      "maximum": 304.5,
+      "minimum": 295.3
+    },
+    "Process temperature [K]": {
+      "maximum": 313.8,
+      "minimum": 305.7
+    },
+    "Rotational speed [rpm]": {
+      "maximum": 2886.0,
+      "minimum": 1168.0
+    },
+    "Tool wear [min]": {
+      "maximum": 253.0,
+      "minimum": 0.0
+    },
+    "Torque [Nm]": {
+      "maximum": 76.6,
+      "minimum": 3.8
+    }
+  },
+  "quality": {
+    "column_count": 14,
+    "data_types": {
+      "Air temperature [K]": "float64",
+      "HDF": "int64",
+      "Machine failure": "int64",
+      "OSF": "int64",
+      "PWF": "int64",
+      "Process temperature [K]": "float64",
+      "Product ID": "str",
+      "RNF": "int64",
+      "Rotational speed [rpm]": "int64",
+      "TWF": "int64",
+      "Tool wear [min]": "int64",
+      "Torque [Nm]": "float64",
+      "Type": "str",
+      "UDI": "int64"
+    },
+    "duplicated_full_rows": 0,
+    "missing_value_counts": {
+      "Air temperature [K]": 0,
+      "HDF": 0,
+      "Machine failure": 0,
+      "OSF": 0,
+      "PWF": 0,
+      "Process temperature [K]": 0,
+      "Product ID": 0,
+      "RNF": 0,
+      "Rotational speed [rpm]": 0,
+      "TWF": 0,
+      "Tool wear [min]": 0,
+      "Torque [Nm]": 0,
+      "Type": 0,
+      "UDI": 0
+    },
+    "row_count": 10000,
+    "unique_product_id_count": 10000,
+    "unique_udi_count": 10000
+  },
+  "types": {
+    "H": {
+      "failure_count": 21,
+      "failure_rate": 2.093719,
+      "non_failure_count": 982,
+      "percentage_of_dataset": 10.03,
+      "row_count": 1003,
+      "type": "H"
+    },
+    "L": {
+      "failure_count": 235,
+      "failure_rate": 3.916667,
+      "non_failure_count": 5765,
+      "percentage_of_dataset": 60.0,
+      "row_count": 6000,
+      "type": "L"
+    },
+    "M": {
+      "failure_count": 83,
+      "failure_rate": 2.769436,
+      "non_failure_count": 2914,
+      "percentage_of_dataset": 29.97,
+      "row_count": 2997,
+      "type": "M"
+    }
+  }
+}

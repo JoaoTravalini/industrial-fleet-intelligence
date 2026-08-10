@@ -181,7 +181,22 @@ Force an official re-download when intentionally refreshing the local raw file:
 .\.venv\Scripts\python.exe scripts/download_ai4i.py --force
 ```
 
-Raw AI4I files are stored under `data/raw/ai4i/` and are ignored by Git. This phase uses only the Python standard library; no pandas, dataset client, plotting, or machine-learning dependency is required.
+Raw AI4I files are stored under `data/raw/ai4i/` and are ignored by Git. Dataset download and structural validation use only the Python standard library.
+
+Install Data Analysis dependencies into `.venv` before running EDA:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data]"
+```
+
+Run reproducible AI4I EDA after the raw dataset has been downloaded and validated:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_ai4i_eda.py
+```
+
+EDA uses the optional `data` dependency group (`pandas`, `numpy`, and `matplotlib`) and produces deterministic derived reports under `reports/ai4i/` plus static plots under `docs/assets/ai4i/`. It does not train models or modify the raw CSV.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:

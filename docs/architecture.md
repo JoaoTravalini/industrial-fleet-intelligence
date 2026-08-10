@@ -24,6 +24,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Fictional operational fleet seed for 100 generic simulated industrial machines.
 - AI4I external dataset acquisition from the UCI Machine Learning Repository.
 - AI4I structural validation and factual profile reporting.
+- Reproducible AI4I exploratory data analysis with derived reports and static Matplotlib plots.
 
 ## Planned Component Areas
 
@@ -31,8 +32,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
 - Telemetry generation is planned for a later phase.
-- EDA is planned for a later phase.
-- Preprocessing and feature engineering are planned for a later phase.
+- Preprocessing and production feature engineering are planned for a later phase.
+- Train/test splitting is planned for a later phase.
 - AI4I dataset usage beyond acquisition and structural validation is planned for a later phase.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
@@ -102,4 +103,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements AI4I external dataset acquisition, attribution, and structural validation only. It does not implement EDA, preprocessing, feature engineering, machine learning, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements reproducible AI4I exploratory data analysis only. It does not implement preprocessing, production feature engineering, train/test splitting, machine learning, MLflow, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

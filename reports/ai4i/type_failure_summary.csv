@@ -1,0 +1,4 @@
+type,row_count,percentage_of_dataset,failure_count,non_failure_count,failure_rate
+L,6000,60.000000,235,5765,3.916667
+M,2997,29.970000,83,2914,2.769436
+H,1003,10.030000,21,982,2.093719

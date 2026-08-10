@@ -1,0 +1,7 @@
+,Air temperature [K],Process temperature [K],Rotational speed [rpm],Torque [Nm],Tool wear [min],Machine failure
+Air temperature [K],1.000000,0.876107,0.022670,-0.013778,0.013853,0.082556
+Process temperature [K],0.876107,1.000000,0.019277,-0.014061,0.013488,0.035946
+Rotational speed [rpm],0.022670,0.019277,1.000000,-0.875027,0.000223,-0.044188
+Torque [Nm],-0.013778,-0.014061,-0.875027,1.000000,-0.003093,0.191321
+Tool wear [min],0.013853,0.013488,0.000223,-0.003093,1.000000,0.105448
+Machine failure,0.082556,0.035946,-0.044188,0.191321,0.105448,1.000000
