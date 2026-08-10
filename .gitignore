@@ -60,6 +60,12 @@ data/bronze/*
 data/silver/*
 data/gold/*
 ml/artifacts/*
+!data/raw/.gitkeep
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
+!data/sample/.gitkeep
+!ml/artifacts/.gitkeep
 mlruns/
 
 # Notebook checkpoints
