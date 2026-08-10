@@ -1,0 +1,11 @@
+[project]
+name = "industrial-fleet-intelligence"
+version = "0.1.0"
+description = "Local-first industrial Data and AI platform portfolio project."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
