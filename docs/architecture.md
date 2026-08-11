@@ -27,6 +27,10 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Reproducible AI4I exploratory data analysis with derived reports and static Matplotlib plots.
 - AI4I leakage-safe modeling feature policy through `ml/config/ai4i_modeling.json`.
 - AI4I deterministic stratified train/validation/test split preparation and validation.
+- AI4I training-only preprocessing fit for baseline classifiers.
+- AI4I Dummy classification baseline for a trivial validation benchmark.
+- AI4I Logistic Regression baseline as the first predictive model.
+- AI4I validation-only baseline evaluation with the locked test split unused.
 
 ## Planned Component Areas
 
@@ -35,10 +39,11 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Maintenance history generation is planned for a later phase.
 - Telemetry generation is planned for a later phase.
 - Preprocessing fit and production feature engineering are planned for a later phase.
-- Baseline classification model training is planned for a later phase.
-- Model evaluation is planned for a later phase.
 - Class imbalance strategy is planned for a later phase.
-- Advanced ML, MLflow tracking, and explainability workflows are planned for later phases.
+- Threshold optimization is planned for a later phase.
+- Advanced classifiers and model selection are planned for later phases.
+- Final locked test evaluation is planned for a later phase.
+- MLflow tracking and explainability workflows are planned for later phases.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -69,9 +74,9 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 ## Implemented AI4I Dataset Work
 
-AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, and read-only validation of generated modeling artifacts.
+AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, and validation-only baseline reporting.
 
-The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. No model, fitted transformer, class balancing, feature selection, or evaluation has been implemented.
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline preprocessing is fitted on training data only, validation data is transformed through the fitted pipelines, and the locked test split remains unused. No class balancing, threshold optimization, model selection, final test evaluation, feature selection, or model persistence has been implemented.
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the planned `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
@@ -116,4 +121,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements the leakage-safe AI4I modeling dataset definition and deterministic stratified train/validation/test split only. It does not implement fitted preprocessing, production feature engineering, classifier training, model evaluation, class imbalance handling, MLflow, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements the first AI4I validation-only baseline classification experiment using DummyClassifier and Logistic Regression. It fits preprocessing on training data only and evaluates validation data only. It does not implement class imbalance handling, threshold optimization, advanced classifiers, model selection, final locked test evaluation, MLflow, SHAP, anomaly detection, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

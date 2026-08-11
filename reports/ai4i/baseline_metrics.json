@@ -1,0 +1,105 @@
+{
+  "data": {
+    "categorical_features": [
+      "Type"
+    ],
+    "excluded_identifiers": [
+      "Product ID"
+    ],
+    "excluded_leakage_sensitive_fields": [
+      "TWF",
+      "HDF",
+      "PWF",
+      "OSF",
+      "RNF"
+    ],
+    "numerical_features": [
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "predictive_feature_list": [
+      "Type",
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "splits_used": [
+      "train",
+      "validation"
+    ],
+    "target_column": "Machine failure",
+    "test_data_used": false,
+    "traceability_field": "source_udi",
+    "training_positive_count": 237,
+    "training_rows": 7000,
+    "validation_positive_count": 51,
+    "validation_positive_percentage": 3.4,
+    "validation_rows": 1500
+  },
+  "decision_threshold_policy": "Default estimator decision behavior; no threshold tuning.",
+  "dummy_classifier": {
+    "accuracy": 0.966,
+    "average_precision": 0.034,
+    "balanced_accuracy": 0.5,
+    "confusion_matrix": [
+      [
+        1449,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    "f1": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "roc_auc": 0.5
+  },
+  "experiment": {
+    "models": [
+      "DummyClassifier(strategy=\"prior\")",
+      "LogisticRegression"
+    ],
+    "name": "AI4I baseline classification",
+    "objective": "Binary classification of Machine failure",
+    "phase": "validation-only baseline",
+    "test_set_status": "LOCKED / NOT USED"
+  },
+  "logistic_regression": {
+    "accuracy": 0.968,
+    "average_precision": 0.38438,
+    "balanced_accuracy": 0.567247,
+    "configuration": {
+      "class_weight": null,
+      "max_iter": 1000,
+      "solver": "lbfgs"
+    },
+    "confusion_matrix": [
+      [
+        1445,
+        4
+      ],
+      [
+        44,
+        7
+      ]
+    ],
+    "f1": 0.225806,
+    "precision": 0.636364,
+    "recall": 0.137255,
+    "roc_auc": 0.862177
+  },
+  "preprocessing": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_split": "train",
+    "numerical": "Five process variables -> StandardScaler()",
+    "validation_policy": "Validation data transformed only by the fitted training pipeline."
+  },
+  "random_seed": 42
+}

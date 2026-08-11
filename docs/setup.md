@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, and modeling-preparation dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling-preparation, and baseline modeling dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -217,7 +217,20 @@ Validate the generated modeling datasets:
 
 AI4I must already be downloaded before modeling-data preparation. Generated files under `data/processed/ai4i/` are ignored by Git and can always be reconstructed from the raw AI4I CSV plus the tracked modeling configuration. This directory contains modeling data derived from the external AI4I dataset and is separate from the future `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
-No preprocessing transformers are fitted in this phase. Future model pipelines must fit encoders, scalers, or other preprocessing steps on training data only.
+Train the first validation-only AI4I baselines after modeling data preparation is complete:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/train_ai4i_baseline.py
+```
+
+Validate generated baseline artifacts without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_baseline.py
+```
+
+No new dependency installation should be necessary if `.[dev,data,ml]` is already installed. The baseline phase fits preprocessing only on training data, evaluates only on validation data, and keeps `test.csv` locked for future final evaluation.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -236,4 +249,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, and AI4I modeling-data preparation logic. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, and AI4I baseline modeling helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
