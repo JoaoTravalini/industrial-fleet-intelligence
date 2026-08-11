@@ -58,6 +58,7 @@ zookeeper_data/
 data/raw/*
 data/processed/ai4i/*
 data/generated/
+data/checkpoints/*
 data/bronze/*
 data/silver/*
 data/gold/*

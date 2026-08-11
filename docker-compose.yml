@@ -49,6 +49,27 @@ services:
       retries: 12
       start_period: 30s
 
+  spark:
+    image: apache/spark:4.0.4-scala2.13-java17-python3-ubuntu
+    container_name: industrial-fleet-spark
+    depends_on:
+      kafka:
+        condition: service_healthy
+    working_dir: /workspace
+    command: ["sh", "-c", "sleep infinity"]
+    volumes:
+      - ./pipelines:/workspace/pipelines:ro
+      - ./services:/workspace/services:ro
+      - ./scripts:/workspace/scripts:ro
+      - ./data/bronze:/workspace/data/bronze
+      - ./data/checkpoints:/workspace/data/checkpoints
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/spark/bin/spark-submit --version >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
 volumes:
   postgres_data:
     name: industrial_fleet_postgres18_data

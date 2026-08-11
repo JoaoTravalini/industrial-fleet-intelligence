@@ -1,0 +1,24 @@
+{
+  "bronze_format": "parquet",
+  "bronze_relative_path": "data/bronze/telemetry",
+  "checkpoint_relative_path": "data/checkpoints/spark/bronze_telemetry",
+  "duplicate_event_policy": "Bronze preserves every Kafka record; duplicate business event_id values are allowed and are handled later in a curated layer.",
+  "execution_mode": "available-now structured streaming on local[2]",
+  "fail_on_data_loss": true,
+  "kafka_bootstrap_servers": "kafka:29092",
+  "kafka_connector": "org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.4",
+  "kafka_topic": "industrial.telemetry.v1",
+  "output_mode": "append",
+  "preserved_kafka_metadata_fields": [
+    "topic",
+    "partition",
+    "offset",
+    "timestamp",
+    "key",
+    "value"
+  ],
+  "schema_version": "1.0",
+  "spark_docker_image": "apache/spark:4.0.4-scala2.13-java17-python3-ubuntu",
+  "spark_version": "4.0.4",
+  "starting_offsets": "earliest"
+}

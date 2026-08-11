@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, and streaming dependency groups are installed only into the project `.venv`; no API, frontend, Spark, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, and Kafka streaming dependency groups are installed only into the project `.venv`. Spark runs inside the pinned Docker image, so no host `pyspark` dependency is installed. No API, frontend, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The streaming client dependency is optional and belongs only in `.venv`; no API, frontend, Spark, or remote model-serving dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The Kafka client dependency is optional and belongs only in `.venv`; Spark/PySpark execution is provided by Docker, not the host Python environment. No API, frontend, or remote model-serving dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -235,7 +235,53 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code`. This phase does not implement Spark Structured Streaming, Bronze/Silver/Gold writes, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. This phase does not implement Silver, Gold, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+
+## Spark Bronze Streaming
+
+Spark runs locally through Docker using `apache/spark:4.0.4-scala2.13-java17-python3-ubuntu`. This phase uses `local[2]` inside the Spark container, not a Spark master/worker cluster. The host project does not install `pyspark`.
+
+Start Kafka and Spark:
+
+```powershell
+docker compose up -d kafka spark
+```
+
+Check services:
+
+```powershell
+docker compose ps
+```
+
+Run Bronze available-now ingestion:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_spark_bronze_docker.py
+```
+
+Inspect Bronze:
+
+```powershell
+docker compose exec -T spark /opt/spark/bin/spark-submit /workspace/scripts/inspect_spark_bronze.py
+```
+
+Validate end-to-end Bronze ingestion:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_spark_bronze.py
+```
+
+View Spark logs:
+
+```powershell
+docker compose logs spark
+```
+
+The first Spark execution may download the pinned Kafka connector dependency `org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.4`, so it can take longer. Downloaded connector caches are runtime state and must not be committed.
+
+Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
+
+This phase does not implement Silver, Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Synthetic Telemetry Simulator
 

@@ -79,14 +79,22 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Finite Kafka telemetry consumer with explicit consumer groups, disabled auto-commit, payload validation, and separate Kafka metadata.
 - Kafka integration validation through `scripts/check_kafka.py`.
 - Deterministic Kafka integration configuration summary.
+- Local Apache Spark runtime through Docker Compose using `apache/spark:4.0.4-scala2.13-java17-python3-ubuntu`.
+- PySpark Structured Streaming available-now ingestion from Kafka to Bronze.
+- Spark Kafka connector integration through `org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.4`.
+- Bronze telemetry Parquet ingestion at `data/bronze/telemetry/`.
+- Bronze preservation of Kafka topic, partition, offset, timestamp, key, raw value, ingestion timestamp, and payload SHA-256.
+- Structured Streaming checkpointing at `data/checkpoints/spark/bronze_telemetry/`.
+- Spark Bronze inspection through `scripts/inspect_spark_bronze.py`.
+- Spark Bronze integration validation through `scripts/check_spark_bronze.py`.
+- Deterministic Spark Bronze static configuration summary.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Spark Structured Streaming telemetry jobs are planned for a later phase.
-- Bronze, Silver, and Gold telemetry processing is planned for a later phase.
+- Silver and Gold telemetry processing are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Drift monitoring is planned for a later phase.
 - Anomaly detection is planned for a later phase.
@@ -98,7 +106,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
 - `pipelines/batch`: Planned PySpark batch processing jobs for historical data preparation.
-- `pipelines/streaming`: Planned PySpark streaming processing jobs for real-time telemetry.
+- `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion; Silver/Gold streaming jobs are planned.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
 - `ml/inference`: Implemented local AI4I inference utilities; service integration is planned.
 - `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
@@ -116,7 +124,7 @@ The local PostgreSQL service is implemented in `docker-compose.yml` as the only 
 
 The initial operational schema is implemented through versioned SQL migrations in `db/migrations`. It defines structured relational tables for machines, maintenance records, model predictions, anomaly detections, operational alerts, and the latest machine health state.
 
-PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; telemetry events now flow through local Kafka, while Spark processing into local Bronze, Silver, and Gold data lake layers remains planned.
+PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; telemetry events now flow through local Kafka into Spark-managed Bronze Parquet, while Silver and Gold data lake layers remain planned.
 
 ## Implemented Development Seed Data
 
@@ -128,14 +136,14 @@ AI4I is an external public synthetic dataset used for data-science and predictiv
 
 The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, drift monitoring, API integration, dashboard integration, or explanation exposure through API has been implemented.
 
-Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the planned `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
+Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze` telemetry ingestion layer and the planned `data/silver` and `data/gold` telemetry lakehouse layers.
 
 ## Data Concept Boundaries
 
 1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
 2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
 3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
-4. Synthetic telemetry simulator: deterministic generated telemetry observations that can flow through local Kafka and are planned to feed Spark later.
+4. Synthetic telemetry simulator: deterministic generated telemetry observations that can flow through local Kafka into Spark-managed Bronze Parquet.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
@@ -143,13 +151,14 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 1. The implemented local simulator generates deterministic synthetic fleet telemetry samples.
 2. Telemetry events can now flow through the implemented local Apache Kafka broker.
-3. Streaming jobs will process telemetry into curated local storage layers in a planned future phase.
-4. Batch jobs will prepare historical features for analytics and machine learning.
-5. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
-6. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-7. The FastAPI backend will expose local platform capabilities to the web dashboard.
-8. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
-9. The copilot service will use a local Ollama model for natural-language assistance.
+3. The implemented Spark available-now Structured Streaming job ingests Kafka telemetry into local Bronze Parquet.
+4. Future streaming jobs will parse, validate, deduplicate, and curate telemetry into Silver and Gold layers.
+5. Batch jobs will prepare historical features for analytics and machine learning.
+6. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
+7. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
+8. The FastAPI backend will expose local platform capabilities to the web dashboard.
+9. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
+10. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
 
@@ -159,8 +168,8 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - FastAPI
 - React, TypeScript, and Vite
 - PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
-- Apache Kafka local infrastructure is implemented; Spark streaming integration is planned.
-- PySpark
+- Apache Kafka local infrastructure is implemented.
+- Apache Spark local Docker runtime and PySpark Structured Streaming Bronze ingestion are implemented.
 - scikit-learn and XGBoost
 - SHAP
 - MLflow
@@ -171,4 +180,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements local Apache Kafka infrastructure and deterministic simulator integration: a single-node KRaft broker in Docker Compose, static Kafka configuration, an idempotent topic setup script, finite telemetry producer and consumer CLIs, reusable Kafka streaming helpers, integration validation, and focused mocked tests. It does not implement Spark Structured Streaming, Bronze/Silver/Gold telemetry processing, streaming ML inference, drift monitoring, anomaly detection, PostgreSQL telemetry writes, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements local Apache Spark Structured Streaming Bronze ingestion from the existing Kafka telemetry topic: a pinned Spark Docker runtime, local[2] available-now execution, the official Spark Kafka connector coordinate, raw Kafka metadata projection, Bronze Parquet output, Structured Streaming checkpointing, read-only Bronze inspection, end-to-end validation, and focused unit/source tests. It does not implement Silver telemetry parsing, Spark business validation, event_id deduplication, malformed telemetry quarantine, Gold analytics, streaming ML inference, drift monitoring, anomaly detection, PostgreSQL telemetry writes, API routes, frontend components, GenAI behavior, or Databricks integration.

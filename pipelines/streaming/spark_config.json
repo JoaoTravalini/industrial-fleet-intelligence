@@ -1,0 +1,18 @@
+{
+  "application_name": "industrial-fleet-bronze-ingestion",
+  "bronze_output_path": "data/bronze/telemetry",
+  "checkpoint_path": "data/checkpoints/spark/bronze_telemetry",
+  "fail_on_data_loss": true,
+  "kafka_bootstrap_servers": "kafka:29092",
+  "kafka_connector": "org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.4",
+  "kafka_topic": "industrial.telemetry.v1",
+  "master": "local[2]",
+  "output_format": "parquet",
+  "output_mode": "append",
+  "spark_docker_image": "apache/spark:4.0.4-scala2.13-java17-python3-ubuntu",
+  "spark_sql_shuffle_partitions": 3,
+  "spark_timezone": "UTC",
+  "spark_version": "4.0.4",
+  "starting_offsets": "earliest",
+  "telemetry_schema_version": "1.0"
+}

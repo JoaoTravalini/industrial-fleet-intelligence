@@ -1,6 +1,6 @@
 # Local Kafka Streaming
 
-This document describes the implemented local Apache Kafka infrastructure for deterministic synthetic telemetry streaming. It is local-first, uses only Docker Desktop with Linux containers, and does not require paid services, cloud accounts, ZooKeeper, Confluent Platform images, Bitnami images, Redpanda, Schema Registry, Spark, PostgreSQL telemetry writes, or model inference.
+This document describes the implemented local Apache Kafka infrastructure for deterministic synthetic telemetry streaming. It is local-first, uses only Docker Desktop with Linux containers, and does not require paid services, cloud accounts, ZooKeeper, Confluent Platform images, Bitnami images, Redpanda, Schema Registry, PostgreSQL telemetry writes, or model inference. Kafka now feeds the implemented local Spark Structured Streaming Bronze ingestion path.
 
 ## Implemented Scope
 
@@ -17,6 +17,7 @@ This document describes the implemented local Apache Kafka infrastructure for de
 - Finite telemetry producer through `scripts/produce_telemetry_kafka.py`.
 - Finite telemetry consumer through `scripts/consume_telemetry_kafka.py`.
 - Integration validation through `scripts/check_kafka.py`.
+- Downstream local Spark Structured Streaming ingestion into Bronze Parquet through `scripts/run_spark_bronze_docker.py` and `scripts/check_spark_bronze.py`.
 
 ## Configuration Files
 
@@ -65,7 +66,7 @@ docker compose ps
 The Compose health check uses Kafka's own CLI inside the container:
 
 ```text
-kafka-broker-api-versions.sh --bootstrap-server localhost:9092
+/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092
 ```
 
 ## Create Or Verify The Topic
@@ -148,4 +149,4 @@ docker compose down -v
 
 ## Current Boundaries
 
-Kafka currently transports complete synthetic telemetry events only. This phase does not implement Spark Structured Streaming, Bronze/Silver/Gold table writes, ML inference on Kafka messages, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry events into the implemented downstream flow: Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet. Silver, Gold, ML inference on Kafka messages, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, and Databricks integration are not implemented.
