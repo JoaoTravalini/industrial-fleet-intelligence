@@ -1,0 +1,26 @@
+[
+  {
+    "Type": "L",
+    "Air temperature [K]": 298.1,
+    "Process temperature [K]": 308.6,
+    "Rotational speed [rpm]": 1450,
+    "Torque [Nm]": 42.8,
+    "Tool wear [min]": 92
+  },
+  {
+    "Type": "M",
+    "Air temperature [K]": 300.4,
+    "Process temperature [K]": 310.2,
+    "Rotational speed [rpm]": 1320,
+    "Torque [Nm]": 53.5,
+    "Tool wear [min]": 148
+  },
+  {
+    "Type": "H",
+    "Air temperature [K]": 296.8,
+    "Process temperature [K]": 306.9,
+    "Rotational speed [rpm]": 1680,
+    "Torque [Nm]": 31.4,
+    "Tool wear [min]": 38
+  }
+]

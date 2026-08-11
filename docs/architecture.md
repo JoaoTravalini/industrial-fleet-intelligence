@@ -49,6 +49,11 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - AI4I frozen final classifier specification for the retained fixed Random Forest.
 - AI4I final train + validation refit using the frozen classifier specification.
 - AI4I locked test holdout evaluation and final test performance reporting.
+- AI4I frozen model packaging as a local joblib artifact.
+- AI4I local model artifact integrity metadata.
+- AI4I reusable local inference module.
+- AI4I strict inference feature contract.
+- AI4I single-record and batch local inference CLI.
 
 ## Planned Component Areas
 
@@ -66,8 +71,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `pipelines/batch`: Planned PySpark batch processing jobs for historical data preparation.
 - `pipelines/streaming`: Planned PySpark streaming processing jobs for real-time telemetry.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
-- `ml/inference`: Planned model inference utilities and service integration code.
-- `ml/artifacts`: Planned local output location for generated model artifacts, excluded from version control.
+- `ml/inference`: Implemented local AI4I inference utilities; service integration is planned.
+- `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
 - `data`: Local storage for external raw data, generated modeling data, and planned lakehouse layers.
 - `docs`: Project documentation.
 - `tests`: Python test suite.
@@ -90,9 +95,9 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 ## Implemented AI4I Dataset Work
 
-AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, train-only 5-fold OOF model development, class-weight imbalance comparison, threshold trade-off analysis, fixed-configuration Logistic Regression, Random Forest, and XGBoost model-family comparison, deterministic train OOF Average Precision-based candidate selection, targeted Random Forest hyperparameter tuning with nested train-only cross-validation, train-derived tuned threshold strategy, validation-only reporting, frozen final classifier specification, final train + validation refit, locked test holdout evaluation, and final test performance reporting.
+AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, train-only 5-fold OOF model development, class-weight imbalance comparison, threshold trade-off analysis, fixed-configuration Logistic Regression, Random Forest, and XGBoost model-family comparison, deterministic train OOF Average Precision-based candidate selection, targeted Random Forest hyperparameter tuning with nested train-only cross-validation, train-derived tuned threshold strategy, validation-only reporting, frozen final classifier specification, final train + validation refit, locked test holdout evaluation, final test performance reporting, local final model packaging, artifact integrity metadata, strict inference input/output contracts, and single/batch local inference.
 
-The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. No feature selection, model persistence, MLflow tracking, or SHAP explainability has been implemented.
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow tracking, SHAP explainability, drift monitoring, API integration, or dashboard integration has been implemented.
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the planned `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
@@ -137,4 +142,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements the AI4I final holdout evaluation: a frozen fixed Random Forest classifier specification, final train + validation refit, locked test split evaluation, final prediction and metrics reporting, descriptive plots, and a read-only final evaluation validator. It does not implement model serialization, MLflow, SHAP, anomaly detection, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements AI4I local model packaging and inference: a joblib artifact for the frozen fixed Random Forest, local artifact integrity metadata, a strict inference feature contract, single/batch inference helpers, a sample inference payload, and local CLI prediction. It does not implement MLflow, SHAP explainability, drift monitoring, anomaly detection, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

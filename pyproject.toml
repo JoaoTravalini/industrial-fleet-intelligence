@@ -19,6 +19,7 @@ data = [
 ml = [
     "scikit-learn",
     "xgboost",
+    "joblib",
 ]
 
 [tool.setuptools]

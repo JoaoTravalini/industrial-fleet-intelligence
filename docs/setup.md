@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling-preparation, and baseline modeling dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, and local model-packaging dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No API, frontend, streaming, or model-serving dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No API, frontend, streaming, or remote model-serving dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -293,6 +293,38 @@ Validate generated final evaluation artifacts without retraining:
 
 The test split is a final holdout. It must never be used to modify model choices, feature policy, hyperparameters, preprocessing, or decision thresholds.
 
+Install declared development, data, and modeling dependencies after `joblib` is added to the `ml` group:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml]"
+```
+
+Package the frozen final AI4I model as a local joblib artifact:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/package_ai4i_final_model.py
+```
+
+Validate the local model artifact without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_model_artifact.py
+```
+
+Run sample inference with the tracked fictional AI4I payload:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/predict_ai4i.py
+```
+
+Run custom inference with one JSON object or an array of objects:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/predict_ai4i.py --input path\to\input.json
+```
+
+The packaging command uses train + validation only. The final test split is not used for model packaging or inference.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -311,4 +343,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, and final holdout evaluation helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, and local AI4I packaging/inference helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
