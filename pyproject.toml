@@ -16,6 +16,9 @@ data = [
     "numpy",
     "matplotlib",
 ]
+ml = [
+    "scikit-learn",
+]
 
 [tool.setuptools]
 packages = []

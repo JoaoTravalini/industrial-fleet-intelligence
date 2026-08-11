@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is currently in its repository-initialization stage. No project application dependencies have been installed yet.
+This project is in incremental local-first development. Optional development, data-analysis, and modeling-preparation dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No application or runtime dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No API, frontend, streaming, or model-serving dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -161,7 +161,7 @@ A deterministic fictional development fleet seed is available for `machines` onl
 
 ## AI4I Dataset
 
-The AI4I 2020 Predictive Maintenance Dataset is a public synthetic dataset from the UCI Machine Learning Repository. Internet access is required only for the download step; subsequent validation is local.
+The AI4I 2020 Predictive Maintenance Dataset is a public synthetic dataset from the UCI Machine Learning Repository. Internet access is required only for the download step; subsequent validation, EDA, and modeling-data preparation are local.
 
 Download the dataset from the official UCI archive:
 
@@ -197,6 +197,27 @@ Run reproducible AI4I EDA after the raw dataset has been downloaded and validate
 
 EDA uses the optional `data` dependency group (`pandas`, `numpy`, and `matplotlib`) and produces deterministic derived reports under `reports/ai4i/` plus static plots under `docs/assets/ai4i/`. It does not train models or modify the raw CSV.
 
+Install the declared development, data, and modeling-preparation dependency groups before preparing modeling datasets:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml]"
+```
+
+Prepare the leakage-safe deterministic modeling datasets:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/prepare_ai4i_modeling_data.py
+```
+
+Validate the generated modeling datasets:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_modeling_data.py
+```
+
+AI4I must already be downloaded before modeling-data preparation. Generated files under `data/processed/ai4i/` are ignored by Git and can always be reconstructed from the raw AI4I CSV plus the tracked modeling configuration. This directory contains modeling data derived from the external AI4I dataset and is separate from the future `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
+
+No preprocessing transformers are fitted in this phase. Future model pipelines must fit encoders, scalers, or other preprocessing steps on training data only.
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -215,4 +236,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover pure version-parsing and requirement-checking logic. They do not depend on the developer machine's installed tools and do not mock or execute system software checks.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, and AI4I modeling-data preparation logic. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.

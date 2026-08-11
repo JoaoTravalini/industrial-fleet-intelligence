@@ -1,0 +1,90 @@
+{
+  "categorical_features": [
+    "Type"
+  ],
+  "excluded_identifiers": [
+    "Product ID"
+  ],
+  "excluded_leakage_sensitive_fields": [
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "feature_list": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "future_preprocessing": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_policy": "Fit preprocessing transformations on training data only inside a pipeline.",
+    "numerical": "Five process variables -> preprocessing determined during modeling"
+  },
+  "modeling_frame_columns": [
+    "source_udi",
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]",
+    "Machine failure"
+  ],
+  "modeling_objective": "Binary classification of Machine failure",
+  "numerical_features": [
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "random_seed": 42,
+  "source_traceability_field": "UDI",
+  "split_fractions": {
+    "test": 0.15,
+    "train": 0.7,
+    "validation": 0.15
+  },
+  "split_rows": {
+    "test": 1500,
+    "train": 7000,
+    "validation": 1500
+  },
+  "stratify_on": "Machine failure",
+  "target_column": "Machine failure",
+  "target_counts_per_split": {
+    "test": {
+      "0": 1449,
+      "1": 51
+    },
+    "train": {
+      "0": 6763,
+      "1": 237
+    },
+    "validation": {
+      "0": 1449,
+      "1": 51
+    }
+  },
+  "target_percentages_per_split": {
+    "test": {
+      "0": 96.6,
+      "1": 3.4
+    },
+    "train": {
+      "0": 96.614286,
+      "1": 3.385714
+    },
+    "validation": {
+      "0": 96.6,
+      "1": 3.4
+    }
+  },
+  "total_rows": 10000,
+  "traceability_field": "source_udi"
+}

@@ -25,6 +25,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - AI4I external dataset acquisition from the UCI Machine Learning Repository.
 - AI4I structural validation and factual profile reporting.
 - Reproducible AI4I exploratory data analysis with derived reports and static Matplotlib plots.
+- AI4I leakage-safe modeling feature policy through `ml/config/ai4i_modeling.json`.
+- AI4I deterministic stratified train/validation/test split preparation and validation.
 
 ## Planned Component Areas
 
@@ -32,9 +34,11 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
 - Telemetry generation is planned for a later phase.
-- Preprocessing and production feature engineering are planned for a later phase.
-- Train/test splitting is planned for a later phase.
-- AI4I dataset usage beyond acquisition and structural validation is planned for a later phase.
+- Preprocessing fit and production feature engineering are planned for a later phase.
+- Baseline classification model training is planned for a later phase.
+- Model evaluation is planned for a later phase.
+- Class imbalance strategy is planned for a later phase.
+- Advanced ML, MLflow tracking, and explainability workflows are planned for later phases.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -43,7 +47,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
 - `ml/inference`: Planned model inference utilities and service integration code.
 - `ml/artifacts`: Planned local output location for generated model artifacts, excluded from version control.
-- `data`: Planned local data lake zones for raw, bronze, silver, gold, and sample data.
+- `data`: Local storage for external raw data, generated modeling data, and planned lakehouse layers.
 - `docs`: Project documentation.
 - `tests`: Python test suite.
 - `scripts`: Local developer automation and validation scripts.
@@ -63,11 +67,20 @@ PostgreSQL must not become the primary store for high-volume raw telemetry histo
 
 A deterministic fictional development seed populates `machines` with 100 generic simulated industrial assets identified as `MCH-0001` through `MCH-0100`. It does not use real manufacturer, proprietary, telemetry, maintenance, prediction, anomaly, alert, or machine-health data.
 
+## Implemented AI4I Dataset Work
+
+AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, and read-only validation of generated modeling artifacts.
+
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. No model, fitted transformer, class balancing, feature selection, or evaluation has been implemented.
+
+Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the planned `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
+
 ## Data Concept Boundaries
 
 1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
-2. AI4I dataset: external public synthetic dataset used for future Data Science and ML development.
-3. Future telemetry simulator: generated streaming data that will eventually flow through Kafka and Spark.
+2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
+3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
+4. Future telemetry simulator: generated streaming data that will eventually flow through Kafka and Spark.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
@@ -103,4 +116,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements reproducible AI4I exploratory data analysis only. It does not implement preprocessing, production feature engineering, train/test splitting, machine learning, MLflow, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements the leakage-safe AI4I modeling dataset definition and deterministic stratified train/validation/test split only. It does not implement fitted preprocessing, production feature engineering, classifier training, model evaluation, class imbalance handling, MLflow, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

@@ -1,0 +1,62 @@
+{
+  "dataset_name": "AI4I 2020 Predictive Maintenance Dataset",
+  "modeling_objective": "Binary classification of Machine failure",
+  "target_column": "Machine failure",
+  "categorical_features": [
+    "Type"
+  ],
+  "numerical_features": [
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "traceability_fields": [
+    "UDI"
+  ],
+  "derived_traceability_field": "source_udi",
+  "excluded_identifiers": [
+    "Product ID"
+  ],
+  "excluded_leakage_sensitive_columns": [
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "forbidden_feature_sources": [
+    "Machine failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "random_seed": 42,
+  "split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "stratify_on": "Machine failure",
+  "future_preprocessing_design": {
+    "categorical": {
+      "features": [
+        "Type"
+      ],
+      "planned_transformer": "OneHotEncoder(handle_unknown=\"ignore\")"
+    },
+    "numerical": {
+      "features": [
+        "Air temperature [K]",
+        "Process temperature [K]",
+        "Rotational speed [rpm]",
+        "Torque [Nm]",
+        "Tool wear [min]"
+      ],
+      "planned_transformer": "To be determined during modeling and fitted on training data only"
+    }
+  }
+}
