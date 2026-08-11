@@ -245,6 +245,26 @@ Validate generated imbalance strategy artifacts without retraining:
 
 No dependency installation should be required for this phase. The imbalance strategy uses train-only out-of-fold probabilities for model and threshold development, evaluates validation once after selection, and keeps `test.csv` locked.
 
+Install the declared development, data, and modeling dependency groups after the non-linear model comparison phase adds XGBoost to the `ml` group:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml]"
+```
+
+Run the AI4I fixed-configuration model-family comparison:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/train_ai4i_model_comparison.py
+```
+
+Validate generated model-comparison artifacts without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_model_comparison.py
+```
+
+The model comparison uses train-only out-of-fold probabilities to compare standard Logistic Regression, Random Forest, and XGBoost. Validation is evaluated only after the train-derived model and threshold are selected, and `test.csv` remains locked for a later final evaluation.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:

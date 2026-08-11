@@ -18,6 +18,7 @@ data = [
 ]
 ml = [
     "scikit-learn",
+    "xgboost",
 ]
 
 [tool.setuptools]

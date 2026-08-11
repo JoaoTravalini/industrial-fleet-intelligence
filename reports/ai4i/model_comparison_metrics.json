@@ -1,0 +1,427 @@
+{
+  "candidate_selection_policy": {
+    "ap_tie_tolerance": 0.01,
+    "highest_ap_model": "xgboost",
+    "model_average_precision": {
+      "random_forest": 0.749231,
+      "standard_logistic": 0.465735,
+      "xgboost": 0.752493
+    },
+    "models_within_tie_tolerance": [
+      "random_forest",
+      "xgboost"
+    ],
+    "policy": [
+      "Compare standard_logistic, random_forest, and xgboost by TRAIN OOF Average Precision.",
+      "If the best model and another candidate differ in AP by less than 0.01, prefer the simpler model.",
+      "The explicit simplicity order is standard_logistic, random_forest, xgboost.",
+      "For the selected model, use its TRAIN OOF max-F2 threshold."
+    ],
+    "primary_metric": "train_oof_average_precision",
+    "reason": "Random Forest is within 0.01 train OOF AP of the best candidate and is simpler under the predefined order.",
+    "selected_model": "random_forest",
+    "selected_threshold": 0.14,
+    "simplicity_order": [
+      "standard_logistic",
+      "random_forest",
+      "xgboost"
+    ],
+    "threshold_source": "train_oof_max_f2",
+    "validation_may_change_selection": false
+  },
+  "cv_configuration": {
+    "method": "StratifiedKFold",
+    "n_splits": 5,
+    "probability_policy": "Each training observation receives exactly one out-of-fold probability from a pipeline not fitted on that observation.",
+    "random_state": 42,
+    "shared_folds_for_all_models": true,
+    "shuffle": true
+  },
+  "data": {
+    "splits_used": [
+      "train",
+      "validation"
+    ],
+    "test_data_used": false,
+    "training_positive_count": 237,
+    "training_rows": 7000,
+    "validation_positive_count": 51,
+    "validation_positive_percentage": 3.4,
+    "validation_rows": 1500
+  },
+  "experiment": {
+    "name": "AI4I non-linear model comparison",
+    "objective": "Binary classification of Machine failure",
+    "phase": "train-oof model-family comparison with validation-only evaluation",
+    "test_set_status": "LOCKED / NOT USED"
+  },
+  "f2_note": "F2 gives recall more weight than precision, but it is exploratory and not a confirmed business cost function.",
+  "feature_policy": {
+    "categorical_features": [
+      "Type"
+    ],
+    "excluded_identifiers": [
+      "Product ID"
+    ],
+    "excluded_leakage_sensitive_fields": [
+      "TWF",
+      "HDF",
+      "PWF",
+      "OSF",
+      "RNF"
+    ],
+    "numerical_features": [
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "predictive_feature_list": [
+      "Type",
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "traceability_field": "source_udi"
+  },
+  "model_configurations": {
+    "random_forest": {
+      "class_weight": "balanced_subsample",
+      "family": "sklearn.ensemble.RandomForestClassifier",
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "random_state": 42
+    },
+    "standard_logistic": {
+      "class_weight": null,
+      "family": "sklearn.linear_model.LogisticRegression",
+      "max_iter": 1000,
+      "random_state": 42
+    },
+    "xgboost": {
+      "colsample_bytree": 0.9,
+      "device": "cpu",
+      "eval_metric": "logloss",
+      "family": "xgboost.XGBClassifier",
+      "full_train_scale_pos_weight_if_selected": 28.535865,
+      "learning_rate": 0.05,
+      "max_depth": 4,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "objective": "binary:logistic",
+      "oof_fold_scale_pos_weights": [
+        28.473684,
+        28.473684,
+        28.473684,
+        28.62963,
+        28.62963
+      ],
+      "random_state": 42,
+      "scale_pos_weight_policy": "Calculated from the labels available to each fitted model only.",
+      "subsample": 0.9,
+      "tree_method": "hist",
+      "xgboost_version": "3.4.0"
+    }
+  },
+  "preprocessing": {
+    "fit_policy": "Preprocessing is fitted inside each fold or final pipeline on its corresponding training rows only.",
+    "random_forest": {
+      "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+      "numerical": "Five process variables -> passthrough"
+    },
+    "standard_logistic": {
+      "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+      "numerical": "Five process variables -> StandardScaler()"
+    },
+    "xgboost": {
+      "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+      "numerical": "Five process variables -> passthrough"
+    }
+  },
+  "selected_model": "random_forest",
+  "selected_threshold": 0.14,
+  "threshold_candidates": {
+    "random_forest": {
+      "max_f1": {
+        "balanced_accuracy": 0.807095,
+        "f1": 0.691765,
+        "f2": 0.647007,
+        "false_negative": 90,
+        "false_positive": 41,
+        "model": "random_forest",
+        "precision": 0.781915,
+        "predicted_positive_count": 188,
+        "recall": 0.620253,
+        "threshold": 0.33,
+        "true_negative": 6722,
+        "true_positive": 147
+      },
+      "max_f2": {
+        "balanced_accuracy": 0.89879,
+        "f1": 0.620253,
+        "f2": 0.72971,
+        "false_negative": 41,
+        "false_positive": 199,
+        "model": "random_forest",
+        "precision": 0.496203,
+        "predicted_positive_count": 395,
+        "recall": 0.827004,
+        "threshold": 0.14,
+        "true_negative": 6564,
+        "true_positive": 196
+      },
+      "recall_70": {
+        "balanced_accuracy": 0.849221,
+        "f1": 0.669307,
+        "f2": 0.694901,
+        "false_negative": 68,
+        "false_positive": 99,
+        "model": "random_forest",
+        "precision": 0.630597,
+        "predicted_positive_count": 268,
+        "recall": 0.71308,
+        "threshold": 0.24,
+        "true_negative": 6664,
+        "true_positive": 169
+      }
+    },
+    "standard_logistic": {
+      "max_f1": {
+        "balanced_accuracy": 0.749143,
+        "f1": 0.492,
+        "f2": 0.507845,
+        "false_negative": 114,
+        "false_positive": 140,
+        "model": "standard_logistic",
+        "precision": 0.467681,
+        "predicted_positive_count": 263,
+        "recall": 0.518987,
+        "threshold": 0.2,
+        "true_negative": 6623,
+        "true_positive": 123
+      },
+      "max_f2": {
+        "balanced_accuracy": 0.783353,
+        "f1": 0.455414,
+        "f2": 0.533981,
+        "false_negative": 94,
+        "false_positive": 248,
+        "model": "standard_logistic",
+        "precision": 0.365729,
+        "predicted_positive_count": 391,
+        "recall": 0.603376,
+        "threshold": 0.14,
+        "true_negative": 6515,
+        "true_positive": 143
+      },
+      "recall_70": {
+        "balanced_accuracy": 0.80253,
+        "f1": 0.303523,
+        "f2": 0.462046,
+        "false_negative": 69,
+        "false_positive": 702,
+        "model": "standard_logistic",
+        "precision": 0.193103,
+        "predicted_positive_count": 870,
+        "recall": 0.708861,
+        "threshold": 0.06,
+        "true_negative": 6061,
+        "true_positive": 168
+      }
+    },
+    "xgboost": {
+      "max_f1": {
+        "balanced_accuracy": 0.841999,
+        "f1": 0.720879,
+        "f2": 0.703259,
+        "false_negative": 73,
+        "false_positive": 54,
+        "model": "xgboost",
+        "precision": 0.752294,
+        "predicted_positive_count": 218,
+        "recall": 0.691983,
+        "threshold": 0.81,
+        "true_negative": 6709,
+        "true_positive": 164
+      },
+      "max_f2": {
+        "balanced_accuracy": 0.868282,
+        "f1": 0.693957,
+        "f2": 0.727124,
+        "false_negative": 59,
+        "false_positive": 98,
+        "model": "xgboost",
+        "precision": 0.644928,
+        "predicted_positive_count": 276,
+        "recall": 0.751055,
+        "threshold": 0.67,
+        "true_negative": 6665,
+        "true_positive": 178
+      },
+      "recall_70": {
+        "balanced_accuracy": 0.845923,
+        "f1": 0.720174,
+        "f2": 0.708191,
+        "false_negative": 71,
+        "false_positive": 58,
+        "model": "xgboost",
+        "precision": 0.741071,
+        "predicted_positive_count": 224,
+        "recall": 0.700422,
+        "threshold": 0.8,
+        "true_negative": 6705,
+        "true_positive": 166
+      }
+    }
+  },
+  "threshold_grid": {
+    "maximum": 0.99,
+    "minimum": 0.01,
+    "selection_uses_accuracy": false,
+    "step": 0.01
+  },
+  "train_oof_results": {
+    "random_forest": {
+      "average_precision": 0.749231,
+      "roc_auc": 0.959211,
+      "threshold_0_5": {
+        "accuracy": 0.978571,
+        "balanced_accuracy": 0.697795,
+        "confusion_matrix": [
+          [
+            6756,
+            7
+          ],
+          [
+            143,
+            94
+          ]
+        ],
+        "f1": 0.556213,
+        "f2": 0.448046,
+        "false_negative": 143,
+        "false_positive": 7,
+        "precision": 0.930693,
+        "predicted_positive_count": 101,
+        "recall": 0.396624,
+        "threshold": 0.5,
+        "true_negative": 6756,
+        "true_positive": 94
+      }
+    },
+    "standard_logistic": {
+      "average_precision": 0.465735,
+      "roc_auc": 0.898862,
+      "threshold_0_5": {
+        "accuracy": 0.970714,
+        "balanced_accuracy": 0.602119,
+        "confusion_matrix": [
+          [
+            6746,
+            17
+          ],
+          [
+            188,
+            49
+          ]
+        ],
+        "f1": 0.323432,
+        "f2": 0.241617,
+        "false_negative": 188,
+        "false_positive": 17,
+        "precision": 0.742424,
+        "predicted_positive_count": 66,
+        "recall": 0.206751,
+        "threshold": 0.5,
+        "true_negative": 6746,
+        "true_positive": 49
+      }
+    },
+    "xgboost": {
+      "average_precision": 0.752493,
+      "roc_auc": 0.971056,
+      "threshold_0_5": {
+        "accuracy": 0.968714,
+        "balanced_accuracy": 0.879985,
+        "confusion_matrix": [
+          [
+            6595,
+            168
+          ],
+          [
+            51,
+            186
+          ]
+        ],
+        "f1": 0.629442,
+        "f2": 0.714286,
+        "false_negative": 51,
+        "false_positive": 168,
+        "precision": 0.525424,
+        "predicted_positive_count": 354,
+        "recall": 0.78481,
+        "threshold": 0.5,
+        "true_negative": 6595,
+        "true_positive": 186
+      }
+    }
+  },
+  "validation_results": {
+    "selected_threshold": {
+      "accuracy": 0.966,
+      "balanced_accuracy": 0.868895,
+      "confusion_matrix": [
+        [
+          1410,
+          39
+        ],
+        [
+          12,
+          39
+        ]
+      ],
+      "f1": 0.604651,
+      "f2": 0.691489,
+      "false_negative": 12,
+      "false_positive": 39,
+      "precision": 0.5,
+      "predicted_positive_count": 78,
+      "recall": 0.764706,
+      "threshold": 0.14,
+      "true_negative": 1410,
+      "true_positive": 39
+    },
+    "selection_uses_validation": false,
+    "threshold_0_5": {
+      "accuracy": 0.976667,
+      "balanced_accuracy": 0.704157,
+      "confusion_matrix": [
+        [
+          1444,
+          5
+        ],
+        [
+          30,
+          21
+        ]
+      ],
+      "f1": 0.545455,
+      "f2": 0.456522,
+      "false_negative": 30,
+      "false_positive": 5,
+      "precision": 0.807692,
+      "predicted_positive_count": 26,
+      "recall": 0.411765,
+      "threshold": 0.5,
+      "true_negative": 1444,
+      "true_positive": 21
+    },
+    "threshold_independent": {
+      "average_precision": 0.680945,
+      "roc_auc": 0.974743
+    }
+  }
+}
