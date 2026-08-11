@@ -1,0 +1,103 @@
+{
+  "experiment_name": "industrial-fleet-ai4i",
+  "historical_import_policy": "retrospective_import",
+  "runs": [
+    {
+      "development_stage": "baseline_modeling",
+      "run_key": "baseline_logistic_regression",
+      "run_name": "AI4I baseline Logistic Regression",
+      "source_artifacts": [
+        "reports/ai4i/baseline_metrics.json",
+        "docs/ml/ai4i_baseline.md"
+      ],
+      "source_report": "reports/ai4i/baseline_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "imbalance_threshold_strategy",
+      "run_key": "logistic_imbalance_strategy",
+      "run_name": "AI4I Logistic Regression imbalance strategy",
+      "source_artifacts": [
+        "reports/ai4i/imbalance_strategy_metrics.json",
+        "docs/ml/ai4i_imbalance_strategy.md"
+      ],
+      "source_report": "reports/ai4i/imbalance_strategy_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "model_family_comparison",
+      "run_key": "model_comparison_logistic",
+      "run_name": "AI4I model comparison Logistic Regression",
+      "source_artifacts": [
+        "reports/ai4i/model_comparison_metrics.json",
+        "docs/ml/ai4i_model_comparison.md"
+      ],
+      "source_report": "reports/ai4i/model_comparison_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "model_family_comparison",
+      "run_key": "model_comparison_random_forest",
+      "run_name": "AI4I model comparison Random Forest",
+      "source_artifacts": [
+        "reports/ai4i/model_comparison_metrics.json",
+        "docs/ml/ai4i_model_comparison.md"
+      ],
+      "source_report": "reports/ai4i/model_comparison_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "model_family_comparison",
+      "run_key": "model_comparison_xgboost",
+      "run_name": "AI4I model comparison XGBoost",
+      "source_artifacts": [
+        "reports/ai4i/model_comparison_metrics.json",
+        "docs/ml/ai4i_model_comparison.md"
+      ],
+      "source_report": "reports/ai4i/model_comparison_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "random_forest_tuning",
+      "run_key": "random_forest_targeted_tuning",
+      "run_name": "AI4I Random Forest targeted tuning",
+      "source_artifacts": [
+        "reports/ai4i/random_forest_tuning_metrics.json",
+        "docs/ml/ai4i_random_forest_tuning.md"
+      ],
+      "source_report": "reports/ai4i/random_forest_tuning_metrics.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "final_holdout_evaluation",
+      "run_key": "final_holdout_evaluation",
+      "run_name": "AI4I final holdout evaluation",
+      "source_artifacts": [
+        "reports/ai4i/final_test_metrics.json",
+        "reports/ai4i/final_model_decision.json",
+        "docs/ml/ai4i_final_evaluation.md"
+      ],
+      "source_report": "reports/ai4i/final_test_metrics.json",
+      "test_data_used": true,
+      "tracking_provenance": "retrospective_import"
+    },
+    {
+      "development_stage": "model_packaging",
+      "run_key": "final_model_packaging",
+      "run_name": "AI4I final model packaging",
+      "source_artifacts": [
+        "reports/ai4i/model_packaging_summary.json",
+        "docs/ml/ai4i_model_serving.md"
+      ],
+      "source_report": "reports/ai4i/model_packaging_summary.json",
+      "test_data_used": false,
+      "tracking_provenance": "retrospective_import"
+    }
+  ]
+}

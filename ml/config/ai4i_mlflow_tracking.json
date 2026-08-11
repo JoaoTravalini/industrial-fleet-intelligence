@@ -1,0 +1,8 @@
+{
+  "artifact_root_relative_path": ".mlflow/artifacts",
+  "backend_relative_path": ".mlflow/mlflow.db",
+  "experiment_name": "industrial-fleet-ai4i",
+  "historical_import_policy": "retrospective_import",
+  "project": "industrial-fleet-intelligence",
+  "tracking_mode": "local_sqlite"
+}

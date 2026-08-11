@@ -71,6 +71,7 @@ ml/artifacts/ai4i/*.joblib
 !data/sample/.gitkeep
 !ml/artifacts/.gitkeep
 mlruns/
+.mlflow/
 
 # Notebook checkpoints
 .ipynb_checkpoints/

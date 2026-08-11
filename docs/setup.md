@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, and local model-packaging dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, and local MLOps dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -325,6 +325,32 @@ Run custom inference with one JSON object or an array of objects:
 
 The packaging command uses train + validation only. The final test split is not used for model packaging or inference.
 
+Install declared development, data, modeling, and local MLOps dependencies after MLflow is added:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml,mlops]"
+```
+
+Import completed AI4I history into local MLflow tracking:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/import_ai4i_mlflow_history.py
+```
+
+Validate local MLflow state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_mlflow.py
+```
+
+Open the local MLflow UI on localhost only:
+
+```powershell
+.\.venv\Scripts\mlflow.exe ui --backend-store-uri sqlite:///.mlflow/mlflow.db --default-artifact-root .mlflow/artifacts --host 127.0.0.1 --port 5000
+```
+
+The MLflow UI and runtime state are local. The `.mlflow/` directory is ignored by Git. The historical import is idempotent and does not retrain historical experiments.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -343,4 +369,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, and local AI4I packaging/inference helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, and local AI4I packaging/inference helpers, and local MLflow retrospective tracking helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.

@@ -21,6 +21,9 @@ ml = [
     "xgboost",
     "joblib",
 ]
+mlops = [
+    "mlflow==3.14.0",
+]
 
 [tool.setuptools]
 packages = []
