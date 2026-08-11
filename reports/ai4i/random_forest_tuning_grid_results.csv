@@ -1,0 +1,9 @@
+n_estimators,max_depth,min_samples_leaf,mean_test_average_precision,std_test_average_precision,rank_test_average_precision
+400,None,1,0.753365,0.067424,1
+200,None,1,0.749832,0.067304,2
+200,None,3,0.731262,0.075494,3
+400,None,3,0.730737,0.076824,4
+400,12,3,0.717972,0.081242,5
+200,12,3,0.715471,0.077385,6
+400,12,1,0.709038,0.082693,7
+200,12,1,0.706977,0.082920,8

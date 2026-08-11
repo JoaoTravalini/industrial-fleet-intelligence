@@ -1,0 +1,401 @@
+{
+  "data": {
+    "splits_used": [
+      "train",
+      "validation"
+    ],
+    "test_data_used": false,
+    "training_positive_count": 237,
+    "training_rows": 7000,
+    "validation_positive_count": 51,
+    "validation_positive_percentage": 3.4,
+    "validation_rows": 1500
+  },
+  "experiment": {
+    "name": "AI4I targeted Random Forest tuning",
+    "objective": "Binary classification of Machine failure",
+    "phase": "train-only nested CV tuning with validation-only evaluation",
+    "test_set_status": "LOCKED / NOT USED"
+  },
+  "f2_note": "F2 gives recall more weight than precision, but it is exploratory and not a confirmed business cost function.",
+  "feature_policy": {
+    "categorical_features": [
+      "Type"
+    ],
+    "excluded_identifiers": [
+      "Product ID"
+    ],
+    "excluded_leakage_sensitive_fields": [
+      "TWF",
+      "HDF",
+      "PWF",
+      "OSF",
+      "RNF"
+    ],
+    "numerical_features": [
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "predictive_feature_list": [
+      "Type",
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "traceability_field": "source_udi"
+  },
+  "fixed_random_forest_reference": {
+    "average_precision": 0.749231,
+    "configuration": {
+      "class_weight": "balanced_subsample",
+      "max_depth": "None",
+      "max_features": "sqrt",
+      "min_samples_leaf": 1,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "random_state": 42
+    },
+    "max_f2_threshold": {
+      "balanced_accuracy": 0.89879,
+      "f1": 0.620253,
+      "f2": 0.72971,
+      "false_negative": 41,
+      "false_positive": 199,
+      "model": "random_forest",
+      "precision": 0.496203,
+      "predicted_positive_count": 395,
+      "recall": 0.827004,
+      "threshold": 0.14,
+      "true_negative": 6564,
+      "true_positive": 196
+    },
+    "methodology": "Previous fixed Random Forest ordinary train OOF from model comparison phase.",
+    "roc_auc": 0.959211,
+    "source_artifact": "model_comparison_metrics.json",
+    "threshold_0_5": {
+      "accuracy": 0.978571,
+      "balanced_accuracy": 0.697795,
+      "confusion_matrix": [
+        [
+          6756,
+          7
+        ],
+        [
+          143,
+          94
+        ]
+      ],
+      "f1": 0.556213,
+      "f2": 0.448046,
+      "false_negative": 143,
+      "false_positive": 7,
+      "precision": 0.930693,
+      "predicted_positive_count": 101,
+      "recall": 0.396624,
+      "threshold": 0.5,
+      "true_negative": 6756,
+      "true_positive": 94
+    }
+  },
+  "full_train_grid_search": {
+    "best_hyperparameters": {
+      "class_weight": "balanced_subsample",
+      "max_depth": "None",
+      "max_features": "sqrt",
+      "min_samples_leaf": 1,
+      "n_estimators": 400,
+      "n_jobs": 1,
+      "random_state": 42
+    },
+    "best_mean_average_precision": 0.753365,
+    "best_std_average_precision": 0.067424,
+    "cv_configuration": {
+      "method": "StratifiedKFold",
+      "n_splits": 5,
+      "random_state": 42,
+      "shuffle": true
+    },
+    "scoring": "average_precision"
+  },
+  "nested_cv_configuration": {
+    "inner": {
+      "method": "StratifiedKFold",
+      "n_splits": 3,
+      "random_state": 42,
+      "shuffle": true
+    },
+    "outer": {
+      "method": "StratifiedKFold",
+      "n_splits": 5,
+      "random_state": 42,
+      "shuffle": true
+    },
+    "outer_probability_policy": "Each training observation receives exactly one nested out-of-fold probability from a pipeline whose preprocessing, hyperparameter selection, and model fit exclude that observation.",
+    "refit": true,
+    "scoring": "average_precision"
+  },
+  "parameter_grid": {
+    "candidate_configurations": [
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "None",
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "None",
+        "max_features": "sqrt",
+        "min_samples_leaf": 3,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "12",
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "12",
+        "max_features": "sqrt",
+        "min_samples_leaf": 3,
+        "n_estimators": 200,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "None",
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "n_estimators": 400,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "None",
+        "max_features": "sqrt",
+        "min_samples_leaf": 3,
+        "n_estimators": 400,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "12",
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "n_estimators": 400,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      {
+        "class_weight": "balanced_subsample",
+        "max_depth": "12",
+        "max_features": "sqrt",
+        "min_samples_leaf": 3,
+        "n_estimators": 400,
+        "n_jobs": 1,
+        "random_state": 42
+      }
+    ],
+    "candidate_count": 8,
+    "fixed": {
+      "class_weight": "balanced_subsample",
+      "max_features": "sqrt",
+      "n_jobs": 1,
+      "random_state": 42
+    },
+    "max_depth": [
+      "None",
+      "12"
+    ],
+    "min_samples_leaf": [
+      1,
+      3
+    ],
+    "n_estimators": [
+      200,
+      400
+    ]
+  },
+  "preprocessing": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_policy": "Preprocessing remains inside the scikit-learn Pipeline and is fitted only on the corresponding training rows for each inner CV, outer refit, or final fit.",
+    "numerical": "Five process variables -> passthrough"
+  },
+  "promotion_policy": {
+    "average_precision_delta": 0.003413,
+    "fixed_average_precision": 0.749231,
+    "methodology_caution": "The fixed reference uses ordinary train OOF development estimates, while tuned Random Forest uses nested train OOF estimates. Small numerical differences should be interpreted cautiously.",
+    "policy": [
+      "Compare tuned nested-OOF Average Precision to the previous fixed Random Forest train OOF Average Precision.",
+      "Promote tuned_random_forest only if tuned nested-OOF AP is at least 0.005 higher.",
+      "Otherwise retain fixed_random_forest because added complexity is not justified.",
+      "Validation metrics cannot change the promotion decision or selected threshold."
+    ],
+    "promotion_delta_required": 0.005,
+    "reason": "Tuned nested-OOF Average Precision does not exceed the previous fixed Random Forest OOF AP by at least 0.005, so added complexity is not promoted.",
+    "selected_candidate": "fixed_random_forest",
+    "selected_threshold": 0.14,
+    "threshold_source": "previous_fixed_random_forest_oof_max_f2",
+    "tuned_nested_average_precision": 0.752644,
+    "validation_may_change_selection": false
+  },
+  "selected_candidate": "fixed_random_forest",
+  "selected_candidate_configuration": {
+    "class_weight": "balanced_subsample",
+    "max_depth": "None",
+    "max_features": "sqrt",
+    "min_samples_leaf": 1,
+    "n_estimators": 300,
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "selected_threshold": 0.14,
+  "threshold_candidates": {
+    "max_f1": {
+      "balanced_accuracy": 0.818792,
+      "f1": 0.689189,
+      "f2": 0.662338,
+      "false_negative": 84,
+      "false_positive": 54,
+      "precision": 0.73913,
+      "predicted_positive_count": 207,
+      "recall": 0.64557,
+      "threshold": 0.31,
+      "true_negative": 6709,
+      "true_positive": 153
+    },
+    "max_f2": {
+      "balanced_accuracy": 0.8845,
+      "f1": 0.63837,
+      "f2": 0.723077,
+      "false_negative": 49,
+      "false_positive": 164,
+      "precision": 0.534091,
+      "predicted_positive_count": 352,
+      "recall": 0.793249,
+      "threshold": 0.16,
+      "true_negative": 6599,
+      "true_positive": 188
+    },
+    "recall_70": {
+      "balanced_accuracy": 0.845075,
+      "f1": 0.665339,
+      "f2": 0.688376,
+      "false_negative": 70,
+      "false_positive": 98,
+      "precision": 0.630189,
+      "predicted_positive_count": 265,
+      "recall": 0.704641,
+      "threshold": 0.24,
+      "true_negative": 6665,
+      "true_positive": 167
+    }
+  },
+  "threshold_grid": {
+    "maximum": 0.99,
+    "minimum": 0.01,
+    "selection_uses_accuracy": false,
+    "step": 0.01
+  },
+  "tuned_nested_oof_results": {
+    "average_precision": 0.752644,
+    "roc_auc": 0.95966,
+    "threshold_0_5": {
+      "accuracy": 0.978143,
+      "balanced_accuracy": 0.693501,
+      "confusion_matrix": [
+        [
+          6755,
+          8
+        ],
+        [
+          145,
+          92
+        ]
+      ],
+      "f1": 0.545994,
+      "f2": 0.438931,
+      "false_negative": 145,
+      "false_positive": 8,
+      "precision": 0.92,
+      "predicted_positive_count": 100,
+      "recall": 0.388186,
+      "threshold": 0.5,
+      "true_negative": 6755,
+      "true_positive": 92
+    }
+  },
+  "validation_results": {
+    "selected_threshold": {
+      "accuracy": 0.966,
+      "balanced_accuracy": 0.868895,
+      "confusion_matrix": [
+        [
+          1410,
+          39
+        ],
+        [
+          12,
+          39
+        ]
+      ],
+      "f1": 0.604651,
+      "f2": 0.691489,
+      "false_negative": 12,
+      "false_positive": 39,
+      "precision": 0.5,
+      "predicted_positive_count": 78,
+      "recall": 0.764706,
+      "threshold": 0.14,
+      "true_negative": 1410,
+      "true_positive": 39
+    },
+    "selection_uses_validation": false,
+    "threshold_0_5": {
+      "accuracy": 0.976667,
+      "balanced_accuracy": 0.704157,
+      "confusion_matrix": [
+        [
+          1444,
+          5
+        ],
+        [
+          30,
+          21
+        ]
+      ],
+      "f1": 0.545455,
+      "f2": 0.456522,
+      "false_negative": 30,
+      "false_positive": 5,
+      "precision": 0.807692,
+      "predicted_positive_count": 26,
+      "recall": 0.411765,
+      "threshold": 0.5,
+      "true_negative": 1444,
+      "true_positive": 21
+    },
+    "threshold_independent": {
+      "average_precision": 0.680945,
+      "roc_auc": 0.974743
+    }
+  }
+}

@@ -265,6 +265,20 @@ Validate generated model-comparison artifacts without retraining:
 
 The model comparison uses train-only out-of-fold probabilities to compare standard Logistic Regression, Random Forest, and XGBoost. Validation is evaluated only after the train-derived model and threshold are selected, and `test.csv` remains locked for a later final evaluation.
 
+Tune Random Forest after model-comparison artifacts exist:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/tune_ai4i_random_forest.py
+```
+
+Validate generated Random Forest tuning artifacts without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_random_forest_tuning.py
+```
+
+No dependency installation should be required for this phase. The tuning command may take longer than previous baseline scripts because nested cross-validation trains multiple Random Forest models.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
