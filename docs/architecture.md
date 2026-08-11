@@ -31,6 +31,10 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - AI4I Dummy classification baseline for a trivial validation benchmark.
 - AI4I Logistic Regression baseline as the first predictive model.
 - AI4I validation-only baseline evaluation with the locked test split unused.
+- AI4I train-only 5-fold out-of-fold model development for Logistic Regression variants.
+- AI4I class-weight imbalance experiment comparing standard and balanced Logistic Regression.
+- AI4I threshold trade-off analysis using train OOF probabilities only.
+- AI4I validation evaluation of a train-selected imbalance/threshold candidate.
 
 ## Planned Component Areas
 
@@ -39,9 +43,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Maintenance history generation is planned for a later phase.
 - Telemetry generation is planned for a later phase.
 - Preprocessing fit and production feature engineering are planned for a later phase.
-- Class imbalance strategy is planned for a later phase.
-- Threshold optimization is planned for a later phase.
-- Advanced classifiers and model selection are planned for later phases.
+- Non-linear classifiers are planned for later phases.
+- Advanced model comparison and final model selection are planned for later phases.
 - Final locked test evaluation is planned for a later phase.
 - MLflow tracking and explainability workflows are planned for later phases.
 - `services/simulator`: Planned synthetic industrial telemetry generator.
@@ -74,9 +77,9 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 ## Implemented AI4I Dataset Work
 
-AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, and validation-only baseline reporting.
+AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, train-only 5-fold OOF model development, class-weight imbalance comparison, threshold trade-off analysis, and validation-only reporting.
 
-The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline preprocessing is fitted on training data only, validation data is transformed through the fitted pipelines, and the locked test split remains unused. No class balancing, threshold optimization, model selection, final test evaluation, feature selection, or model persistence has been implemented.
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection, and the locked test split remains unused. No non-linear model comparison, final model selection, final test evaluation, feature selection, or model persistence has been implemented.
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the planned `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
@@ -121,4 +124,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements the first AI4I validation-only baseline classification experiment using DummyClassifier and Logistic Regression. It fits preprocessing on training data only and evaluates validation data only. It does not implement class imbalance handling, threshold optimization, advanced classifiers, model selection, final locked test evaluation, MLflow, SHAP, anomaly detection, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements AI4I Logistic Regression class-weight and threshold strategy investigation using train-only out-of-fold probabilities and a single validation evaluation of the train-selected candidate. It does not implement non-linear classifiers, advanced model comparison, final model selection, final locked test evaluation, MLflow, SHAP, anomaly detection, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.

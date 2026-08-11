@@ -1,0 +1,299 @@
+{
+  "candidate_selection_policy": {
+    "ap_difference": 0.030356,
+    "policy": [
+      "Compare standard_logistic and balanced_logistic by TRAIN OOF Average Precision.",
+      "If their AP difference is less than 0.01, prefer standard_logistic.",
+      "Otherwise prefer the model with higher TRAIN OOF Average Precision.",
+      "For the selected model, use its TRAIN OOF max-F2 threshold."
+    ],
+    "reason": "Standard Logistic Regression has higher train OOF Average Precision.",
+    "selected_model": "standard_logistic",
+    "selected_threshold": 0.14,
+    "threshold_source": "train_oof_max_f2",
+    "validation_may_change_selection": false
+  },
+  "cv_configuration": {
+    "method": "StratifiedKFold",
+    "n_splits": 5,
+    "probability_policy": "Each training observation receives exactly one out-of-fold probability from a pipeline not fitted on that observation.",
+    "random_state": 42,
+    "shuffle": true
+  },
+  "data": {
+    "splits_used": [
+      "train",
+      "validation"
+    ],
+    "test_data_used": false,
+    "training_positive_count": 237,
+    "training_rows": 7000,
+    "validation_positive_count": 51,
+    "validation_positive_percentage": 3.4,
+    "validation_rows": 1500
+  },
+  "experiment": {
+    "name": "AI4I imbalance and threshold strategy",
+    "objective": "Binary classification of Machine failure",
+    "phase": "train-oof model development with validation-only evaluation",
+    "test_set_status": "LOCKED / NOT USED"
+  },
+  "f2_note": "F2 gives recall more weight than precision, but it is exploratory and not a confirmed business cost function.",
+  "feature_policy": {
+    "categorical_features": [
+      "Type"
+    ],
+    "excluded_identifiers": [
+      "Product ID"
+    ],
+    "excluded_leakage_sensitive_fields": [
+      "TWF",
+      "HDF",
+      "PWF",
+      "OSF",
+      "RNF"
+    ],
+    "numerical_features": [
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "predictive_feature_list": [
+      "Type",
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "traceability_field": "source_udi"
+  },
+  "model_variants": {
+    "balanced_logistic": {
+      "class_weight": "balanced",
+      "max_iter": 1000
+    },
+    "standard_logistic": {
+      "class_weight": null,
+      "max_iter": 1000
+    }
+  },
+  "preprocessing": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_policy": "Preprocessing is fitted inside each fold pipeline on fold-training rows only.",
+    "numerical": "Five process variables -> StandardScaler()"
+  },
+  "selected_model": "standard_logistic",
+  "selected_threshold": 0.14,
+  "threshold_candidates": {
+    "balanced_logistic": {
+      "max_f1": {
+        "balanced_accuracy": 0.720051,
+        "f1": 0.454167,
+        "f2": 0.457599,
+        "false_negative": 128,
+        "false_positive": 134,
+        "model": "balanced_logistic",
+        "precision": 0.44856,
+        "predicted_positive_count": 243,
+        "recall": 0.459916,
+        "threshold": 0.88,
+        "true_negative": 6629,
+        "true_positive": 109
+      },
+      "max_f2": {
+        "balanced_accuracy": 0.783511,
+        "f1": 0.395161,
+        "f2": 0.505155,
+        "false_negative": 90,
+        "false_positive": 360,
+        "model": "balanced_logistic",
+        "precision": 0.289941,
+        "predicted_positive_count": 507,
+        "recall": 0.620253,
+        "threshold": 0.78,
+        "true_negative": 6403,
+        "true_positive": 147
+      },
+      "recall_70": {
+        "balanced_accuracy": 0.80356,
+        "f1": 0.321083,
+        "f2": 0.475645,
+        "false_negative": 71,
+        "false_positive": 631,
+        "model": "balanced_logistic",
+        "precision": 0.208281,
+        "predicted_positive_count": 797,
+        "recall": 0.700422,
+        "threshold": 0.67,
+        "true_negative": 6132,
+        "true_positive": 166
+      }
+    },
+    "standard_logistic": {
+      "max_f1": {
+        "balanced_accuracy": 0.749143,
+        "f1": 0.492,
+        "f2": 0.507845,
+        "false_negative": 114,
+        "false_positive": 140,
+        "model": "standard_logistic",
+        "precision": 0.467681,
+        "predicted_positive_count": 263,
+        "recall": 0.518987,
+        "threshold": 0.2,
+        "true_negative": 6623,
+        "true_positive": 123
+      },
+      "max_f2": {
+        "balanced_accuracy": 0.783353,
+        "f1": 0.455414,
+        "f2": 0.533981,
+        "false_negative": 94,
+        "false_positive": 248,
+        "model": "standard_logistic",
+        "precision": 0.365729,
+        "predicted_positive_count": 391,
+        "recall": 0.603376,
+        "threshold": 0.14,
+        "true_negative": 6515,
+        "true_positive": 143
+      },
+      "recall_70": {
+        "balanced_accuracy": 0.80253,
+        "f1": 0.303523,
+        "f2": 0.462046,
+        "false_negative": 69,
+        "false_positive": 702,
+        "model": "standard_logistic",
+        "precision": 0.193103,
+        "predicted_positive_count": 870,
+        "recall": 0.708861,
+        "threshold": 0.06,
+        "true_negative": 6061,
+        "true_positive": 168
+      }
+    }
+  },
+  "threshold_grid": {
+    "maximum": 0.99,
+    "minimum": 0.01,
+    "selection_uses_accuracy": false,
+    "step": 0.01
+  },
+  "train_oof_results": {
+    "balanced_logistic": {
+      "average_precision": 0.435379,
+      "roc_auc": 0.901906,
+      "threshold_0_5": {
+        "accuracy": 0.824571,
+        "balanced_accuracy": 0.817602,
+        "confusion_matrix": [
+          [
+            5580,
+            1183
+          ],
+          [
+            45,
+            192
+          ]
+        ],
+        "f1": 0.238213,
+        "f2": 0.413259,
+        "false_negative": 45,
+        "false_positive": 1183,
+        "precision": 0.139636,
+        "predicted_positive_count": 1375,
+        "recall": 0.810127,
+        "threshold": 0.5,
+        "true_negative": 5580,
+        "true_positive": 192
+      }
+    },
+    "standard_logistic": {
+      "average_precision": 0.465735,
+      "roc_auc": 0.898862,
+      "threshold_0_5": {
+        "accuracy": 0.970714,
+        "balanced_accuracy": 0.602119,
+        "confusion_matrix": [
+          [
+            6746,
+            17
+          ],
+          [
+            188,
+            49
+          ]
+        ],
+        "f1": 0.323432,
+        "f2": 0.241617,
+        "false_negative": 188,
+        "false_positive": 17,
+        "precision": 0.742424,
+        "predicted_positive_count": 66,
+        "recall": 0.206751,
+        "threshold": 0.5,
+        "true_negative": 6746,
+        "true_positive": 49
+      }
+    }
+  },
+  "validation_results": {
+    "selected_threshold": {
+      "accuracy": 0.948667,
+      "balanced_accuracy": 0.7275,
+      "confusion_matrix": [
+        [
+          1398,
+          51
+        ],
+        [
+          26,
+          25
+        ]
+      ],
+      "f1": 0.393701,
+      "f2": 0.446429,
+      "false_negative": 26,
+      "false_positive": 51,
+      "precision": 0.328947,
+      "predicted_positive_count": 76,
+      "recall": 0.490196,
+      "threshold": 0.14,
+      "true_negative": 1398,
+      "true_positive": 25
+    },
+    "selection_uses_validation": false,
+    "threshold_0_5": {
+      "accuracy": 0.968,
+      "balanced_accuracy": 0.567247,
+      "confusion_matrix": [
+        [
+          1445,
+          4
+        ],
+        [
+          44,
+          7
+        ]
+      ],
+      "f1": 0.225806,
+      "f2": 0.162791,
+      "false_negative": 44,
+      "false_positive": 4,
+      "precision": 0.636364,
+      "predicted_positive_count": 11,
+      "recall": 0.137255,
+      "threshold": 0.5,
+      "true_negative": 1445,
+      "true_positive": 7
+    },
+    "threshold_independent": {
+      "average_precision": 0.38438,
+      "roc_auc": 0.862177
+    }
+  }
+}

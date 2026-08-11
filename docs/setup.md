@@ -231,6 +231,20 @@ Validate generated baseline artifacts without retraining:
 
 No new dependency installation should be necessary if `.[dev,data,ml]` is already installed. The baseline phase fits preprocessing only on training data, evaluates only on validation data, and keeps `test.csv` locked for future final evaluation.
 
+Run the AI4I imbalance and threshold strategy experiment after baseline artifacts exist:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/train_ai4i_imbalance.py
+```
+
+Validate generated imbalance strategy artifacts without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_imbalance.py
+```
+
+No dependency installation should be required for this phase. The imbalance strategy uses train-only out-of-fold probabilities for model and threshold development, evaluates validation once after selection, and keeps `test.csv` locked.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -249,4 +263,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, and AI4I baseline modeling helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, and AI4I imbalance/threshold strategy helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
