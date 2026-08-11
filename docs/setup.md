@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, and explainability dependency groups are installed only into the project `.venv`; no API, frontend, Kafka, Spark, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, and streaming dependency groups are installed only into the project `.venv`; no API, frontend, Spark, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. No API, frontend, streaming, or remote model-serving dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The streaming client dependency is optional and belongs only in `.venv`; no API, frontend, Spark, or remote model-serving dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -158,6 +158,84 @@ docker compose down
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL development volume and all database data stored in that volume.
 
 A deterministic fictional development fleet seed is available for `machines` only. PostgreSQL must be running and schema migrations must already be applied before running the seed.
+
+## Kafka Local Streaming
+
+Kafka runs locally through Docker Desktop using the official Apache JVM image `apache/kafka:4.3.1` in single-node KRaft mode. No ZooKeeper, Confluent Platform images, Bitnami images, Redpanda, paid services, cloud accounts, or billing-enabled resources are required.
+
+Install the declared dependency groups, including the Kafka client, into `.venv` only:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml,mlops,explainability,streaming]"
+```
+
+The `streaming` group currently adds exactly `confluent-kafka==2.15.0`.
+
+Start Kafka after Docker Desktop is running with Linux containers:
+
+```powershell
+docker compose up -d kafka
+```
+
+Check service status:
+
+```powershell
+docker compose ps
+```
+
+Create or verify the telemetry topic:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/setup_kafka.py
+```
+
+The setup script is idempotent. Running it repeatedly reuses `industrial.telemetry.v1` when it already has 3 partitions and replication factor 1. If an incompatible topic exists, the script fails and does not mutate it.
+
+Validate Kafka integration with a deterministic smoke produce/consume check:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_kafka.py
+```
+
+Produce a finite deterministic telemetry batch without sleeping between events:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/produce_telemetry_kafka.py
+```
+
+Consume five records from the beginning with an explicit group ID:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/consume_telemetry_kafka.py --group-id manual-validation --from-beginning --max-messages 5 --timeout-seconds 10
+```
+
+View Kafka logs:
+
+```powershell
+docker compose logs kafka
+```
+
+Stop Kafka without deleting data:
+
+```powershell
+docker compose stop kafka
+```
+
+Start it again:
+
+```powershell
+docker compose start kafka
+```
+
+Stop and remove containers while preserving named volumes:
+
+```powershell
+docker compose down
+```
+
+Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
+
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code`. This phase does not implement Spark Structured Streaming, Bronze/Silver/Gold writes, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Synthetic Telemetry Simulator
 

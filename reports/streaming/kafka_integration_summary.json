@@ -1,0 +1,16 @@
+{
+  "bootstrap_servers_docker": "kafka:29092",
+  "bootstrap_servers_host": "localhost:9092",
+  "deployment_mode": "single-node-kraft",
+  "docker_image": "apache/kafka:4.3.1",
+  "kafka_version": "4.3.1",
+  "message_key_policy": "UTF-8 machine_code; never event_id or null",
+  "partition_count": 3,
+  "replication_factor": 1,
+  "serialization": "utf-8 JSON",
+  "smoke_expected_event_count": 6,
+  "smoke_expected_events_per_machine": 3,
+  "smoke_expected_machine_count": 2,
+  "telemetry_schema_version": "1.0",
+  "telemetry_topic": "industrial.telemetry.v1"
+}

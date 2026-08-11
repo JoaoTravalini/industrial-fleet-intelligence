@@ -1,0 +1,13 @@
+{
+  "bootstrap_servers_docker": "kafka:29092",
+  "bootstrap_servers_host": "localhost:9092",
+  "deployment_mode": "single-node-kraft",
+  "docker_image": "apache/kafka:4.3.1",
+  "kafka_version": "4.3.1",
+  "message_key": "machine_code",
+  "partition_count": 3,
+  "replication_factor": 1,
+  "schema_version": "1.0",
+  "serialization": "utf-8 JSON",
+  "telemetry_topic": "industrial.telemetry.v1"
+}

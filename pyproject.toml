@@ -27,6 +27,9 @@ mlops = [
 explainability = [
     "shap==0.52.0",
 ]
+streaming = [
+    "confluent-kafka==2.15.0",
+]
 
 [tool.setuptools]
 packages = []

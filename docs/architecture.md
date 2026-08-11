@@ -70,14 +70,21 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Temporal per-machine telemetry state evolution.
 - Canonical tracked telemetry sample and deterministic summary.
 - Telemetry event and batch schema validation.
+- Local Apache Kafka infrastructure through Docker Compose using the official `apache/kafka:4.3.1` JVM image.
+- Single-node Kafka KRaft broker and controller without ZooKeeper.
+- Kafka host listener for Windows development and Docker-network listener for future Compose clients.
+- Kafka telemetry topic configuration for `industrial.telemetry.v1` with 3 partitions and replication factor 1.
+- Idempotent Kafka topic setup through `scripts/setup_kafka.py`.
+- Deterministic telemetry Kafka producer using UTF-8 JSON payloads and `machine_code` message keys.
+- Finite Kafka telemetry consumer with explicit consumer groups, disabled auto-commit, payload validation, and separate Kafka metadata.
+- Kafka integration validation through `scripts/check_kafka.py`.
+- Deterministic Kafka integration configuration summary.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Kafka producer integration for telemetry delivery is planned for a later phase.
-- Kafka broker and topic configuration are planned for a later phase.
 - Spark Structured Streaming telemetry jobs are planned for a later phase.
 - Bronze, Silver, and Gold telemetry processing is planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
@@ -87,8 +94,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Final model decision and final model selection are planned for later phases.
 - Final locked test evaluation is planned for a later phase.
 - MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
-- `services/simulator`: Implemented deterministic synthetic industrial telemetry generator; Kafka producer integration is planned.
-- `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
+- `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
+- `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
 - `pipelines/batch`: Planned PySpark batch processing jobs for historical data preparation.
 - `pipelines/streaming`: Planned PySpark streaming processing jobs for real-time telemetry.
@@ -109,7 +116,7 @@ The local PostgreSQL service is implemented in `docker-compose.yml` as the only 
 
 The initial operational schema is implemented through versioned SQL migrations in `db/migrations`. It defines structured relational tables for machines, maintenance records, model predictions, anomaly detections, operational alerts, and the latest machine health state.
 
-PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; future telemetry events are planned to flow through Kafka and Spark into local Bronze, Silver, and Gold data lake layers.
+PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; telemetry events now flow through local Kafka, while Spark processing into local Bronze, Silver, and Gold data lake layers remains planned.
 
 ## Implemented Development Seed Data
 
@@ -128,14 +135,14 @@ Generated files under `data/processed/ai4i/` are reproducible modeling artifacts
 1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
 2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
 3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
-4. Synthetic telemetry simulator: deterministic generated telemetry observations that will eventually flow through Kafka and Spark.
+4. Synthetic telemetry simulator: deterministic generated telemetry observations that can flow through local Kafka and are planned to feed Spark later.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
 ## Planned Data Flow
 
 1. The implemented local simulator generates deterministic synthetic fleet telemetry samples.
-2. Telemetry events will flow through a local Apache Kafka broker in a planned future phase.
+2. Telemetry events can now flow through the implemented local Apache Kafka broker.
 3. Streaming jobs will process telemetry into curated local storage layers in a planned future phase.
 4. Batch jobs will prepare historical features for analytics and machine learning.
 5. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
@@ -152,7 +159,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - FastAPI
 - React, TypeScript, and Vite
 - PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
-- Apache Kafka
+- Apache Kafka local infrastructure is implemented; Spark streaming integration is planned.
 - PySpark
 - scikit-learn and XGBoost
 - SHAP
@@ -164,4 +171,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements the synthetic telemetry event contract and deterministic local telemetry simulator: strict JSONL event schema, reproducible per-machine state evolution, canonical tracked sample data, deterministic sample summary, local batch simulation CLI, and read-only telemetry validation. It does not implement Kafka producer integration, Spark Structured Streaming, Bronze/Silver/Gold telemetry processing, streaming ML inference, drift monitoring, anomaly detection, database writes, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements local Apache Kafka infrastructure and deterministic simulator integration: a single-node KRaft broker in Docker Compose, static Kafka configuration, an idempotent topic setup script, finite telemetry producer and consumer CLIs, reusable Kafka streaming helpers, integration validation, and focused mocked tests. It does not implement Spark Structured Streaming, Bronze/Silver/Gold telemetry processing, streaming ML inference, drift monitoring, anomaly detection, PostgreSQL telemetry writes, API routes, frontend components, GenAI behavior, or Databricks integration.
