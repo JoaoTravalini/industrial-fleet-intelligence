@@ -1,0 +1,38 @@
+{
+  "additivity_tolerance": 1e-06,
+  "explained_output": "Machine failure positive-class model output",
+  "explainer_type": "shap.TreeExplainer",
+  "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+  "global_sample_policy": "Deterministic train plus validation development subset selected with random_state=42; target labels are not used for SHAP computation.",
+  "global_sample_size": 1000,
+  "grouped_feature_count": 6,
+  "max_observed_additivity_error": 0.0,
+  "model_name": "ai4i-failure-risk-random-forest",
+  "model_retrained": false,
+  "model_version": "1.0.0",
+  "representative_case_names": [
+    "low_risk",
+    "threshold_near",
+    "high_risk"
+  ],
+  "shap_version": "0.52.0",
+  "test_data_used": false,
+  "top_grouped_features": [
+    {
+      "feature": "Torque [Nm]",
+      "mean_absolute_shap": 0.157084027216,
+      "rank": 1
+    },
+    {
+      "feature": "Rotational speed [rpm]",
+      "mean_absolute_shap": 0.134641969728,
+      "rank": 2
+    },
+    {
+      "feature": "Tool wear [min]",
+      "mean_absolute_shap": 0.096704107072,
+      "rank": 3
+    }
+  ],
+  "transformed_feature_count": 8
+}

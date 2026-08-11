@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, and local MLOps dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, and explainability dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -351,6 +351,32 @@ Open the local MLflow UI on localhost only:
 
 The MLflow UI and runtime state are local. The `.mlflow/` directory is ignored by Git. The historical import is idempotent and does not retrain historical experiments.
 
+Install declared development, data, modeling, local MLOps, and explainability dependencies after SHAP is added:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml,mlops,explainability]"
+```
+
+The packaged final AI4I model must already exist locally before explainability is run. If it is missing, run the packaging command first:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/package_ai4i_final_model.py
+```
+
+Generate SHAP explainability reports and plots for the packaged model:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/explain_ai4i_model.py
+```
+
+Validate SHAP explainability artifacts:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_shap.py
+```
+
+The explainability phase uses the packaged Random Forest and train + validation development data only. It does not retrain the model, does not read the locked final holdout split, and does not change the prediction contract.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -369,4 +395,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, and local AI4I packaging/inference helpers, and local MLflow retrospective tracking helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.

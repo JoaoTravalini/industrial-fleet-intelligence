@@ -24,6 +24,9 @@ ml = [
 mlops = [
     "mlflow==3.14.0",
 ]
+explainability = [
+    "shap==0.52.0",
+]
 
 [tool.setuptools]
 packages = []

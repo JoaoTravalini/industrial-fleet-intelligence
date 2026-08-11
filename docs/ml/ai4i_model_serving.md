@@ -79,4 +79,8 @@ The local model artifact can be regenerated from the frozen configuration and th
 AI4I is a public synthetic dataset. These predictions do not imply production readiness, causality, or performance on real industrial equipment.
 
 ## Future API Integration
-Future phases may expose this inference contract through FastAPI and the web dashboard. That work is planned and is not implemented in this phase.
+Future phases may expose this inference contract through FastAPI and the web dashboard. They may also optionally expose explanation data produced by the SHAP explainability workflow.
+
+Prediction and explanation remain separate concepts. SHAP must not change the prediction probability, binary decision, frozen threshold, or current output contract.
+
+That API work is planned and is not implemented in this phase.

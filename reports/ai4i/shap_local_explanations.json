@@ -1,0 +1,304 @@
+{
+  "cases": [
+    {
+      "additivity_check_error": 0.0,
+      "case_name": "low_risk",
+      "failure_prediction": 0,
+      "failure_probability": 0.0,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "frozen_threshold": 0.14,
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.164228675291,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": -0.164228675291
+        },
+        {
+          "absolute_shap": 0.123850081576,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": -0.123850081576
+        },
+        {
+          "absolute_shap": 0.076074900082,
+          "feature": "Tool wear [min]",
+          "rank": 3,
+          "shap_value": -0.076074900082
+        },
+        {
+          "absolute_shap": 0.069012246751,
+          "feature": "Air temperature [K]",
+          "rank": 4,
+          "shap_value": -0.069012246751
+        },
+        {
+          "absolute_shap": 0.03942354322,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": -0.03942354322
+        },
+        {
+          "absolute_shap": 0.027410553081,
+          "feature": "Type",
+          "rank": 6,
+          "shap_value": -0.027410553081
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "source_udi": 1,
+      "transformed_feature_contributions": [
+        {
+          "absolute_shap": 0.164228675291,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": -0.164228675291
+        },
+        {
+          "absolute_shap": 0.123850081576,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": -0.123850081576
+        },
+        {
+          "absolute_shap": 0.076074900082,
+          "feature": "Tool wear [min]",
+          "rank": 3,
+          "shap_value": -0.076074900082
+        },
+        {
+          "absolute_shap": 0.069012246751,
+          "feature": "Air temperature [K]",
+          "rank": 4,
+          "shap_value": -0.069012246751
+        },
+        {
+          "absolute_shap": 0.03942354322,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": -0.03942354322
+        },
+        {
+          "absolute_shap": 0.018104315286,
+          "feature": "Type_L",
+          "rank": 6,
+          "shap_value": -0.018104315286
+        },
+        {
+          "absolute_shap": 0.009177082057,
+          "feature": "Type_M",
+          "rank": 7,
+          "shap_value": -0.009177082057
+        },
+        {
+          "absolute_shap": 0.000129155738,
+          "feature": "Type_H",
+          "rank": 8,
+          "shap_value": -0.000129155738
+        }
+      ]
+    },
+    {
+      "additivity_check_error": 0.0,
+      "case_name": "threshold_near",
+      "failure_prediction": 1,
+      "failure_probability": 0.14,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "frozen_threshold": 0.14,
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.162722162192,
+          "feature": "Tool wear [min]",
+          "rank": 1,
+          "shap_value": -0.162722162192
+        },
+        {
+          "absolute_shap": 0.136934631932,
+          "feature": "Process temperature [K]",
+          "rank": 2,
+          "shap_value": -0.136934631932
+        },
+        {
+          "absolute_shap": 0.122337856897,
+          "feature": "Torque [Nm]",
+          "rank": 3,
+          "shap_value": -0.122337856897
+        },
+        {
+          "absolute_shap": 0.071908585163,
+          "feature": "Rotational speed [rpm]",
+          "rank": 4,
+          "shap_value": 0.071908585163
+        },
+        {
+          "absolute_shap": 0.006671863699,
+          "feature": "Air temperature [K]",
+          "rank": 5,
+          "shap_value": -0.006671863699
+        },
+        {
+          "absolute_shap": 0.003242070443,
+          "feature": "Type",
+          "rank": 6,
+          "shap_value": -0.003242070443
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "source_udi": 3756,
+      "transformed_feature_contributions": [
+        {
+          "absolute_shap": 0.162722162192,
+          "feature": "Tool wear [min]",
+          "rank": 1,
+          "shap_value": -0.162722162192
+        },
+        {
+          "absolute_shap": 0.136934631932,
+          "feature": "Process temperature [K]",
+          "rank": 2,
+          "shap_value": -0.136934631932
+        },
+        {
+          "absolute_shap": 0.122337856897,
+          "feature": "Torque [Nm]",
+          "rank": 3,
+          "shap_value": -0.122337856897
+        },
+        {
+          "absolute_shap": 0.071908585163,
+          "feature": "Rotational speed [rpm]",
+          "rank": 4,
+          "shap_value": 0.071908585163
+        },
+        {
+          "absolute_shap": 0.006671863699,
+          "feature": "Air temperature [K]",
+          "rank": 5,
+          "shap_value": -0.006671863699
+        },
+        {
+          "absolute_shap": 0.005245720206,
+          "feature": "Type_M",
+          "rank": 6,
+          "shap_value": -0.005245720206
+        },
+        {
+          "absolute_shap": 0.001212227344,
+          "feature": "Type_L",
+          "rank": 7,
+          "shap_value": 0.001212227344
+        },
+        {
+          "absolute_shap": 0.00079142242,
+          "feature": "Type_H",
+          "rank": 8,
+          "shap_value": 0.00079142242
+        }
+      ]
+    },
+    {
+      "additivity_check_error": 0.0,
+      "case_name": "high_risk",
+      "failure_prediction": 1,
+      "failure_probability": 0.97,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "frozen_threshold": 0.14,
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.219494541295,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": 0.219494541295
+        },
+        {
+          "absolute_shap": 0.162450508419,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": 0.162450508419
+        },
+        {
+          "absolute_shap": 0.085185075262,
+          "feature": "Air temperature [K]",
+          "rank": 3,
+          "shap_value": 0.085185075262
+        },
+        {
+          "absolute_shap": 0.073162092397,
+          "feature": "Tool wear [min]",
+          "rank": 4,
+          "shap_value": -0.073162092397
+        },
+        {
+          "absolute_shap": 0.042508695126,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": 0.042508695126
+        },
+        {
+          "absolute_shap": 0.033523272296,
+          "feature": "Type",
+          "rank": 6,
+          "shap_value": 0.033523272296
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "source_udi": 4418,
+      "transformed_feature_contributions": [
+        {
+          "absolute_shap": 0.219494541295,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": 0.219494541295
+        },
+        {
+          "absolute_shap": 0.162450508419,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": 0.162450508419
+        },
+        {
+          "absolute_shap": 0.085185075262,
+          "feature": "Air temperature [K]",
+          "rank": 3,
+          "shap_value": 0.085185075262
+        },
+        {
+          "absolute_shap": 0.073162092397,
+          "feature": "Tool wear [min]",
+          "rank": 4,
+          "shap_value": -0.073162092397
+        },
+        {
+          "absolute_shap": 0.042508695126,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": 0.042508695126
+        },
+        {
+          "absolute_shap": 0.024291460515,
+          "feature": "Type_L",
+          "rank": 6,
+          "shap_value": 0.024291460515
+        },
+        {
+          "absolute_shap": 0.005168234116,
+          "feature": "Type_M",
+          "rank": 7,
+          "shap_value": 0.005168234116
+        },
+        {
+          "absolute_shap": 0.004063577666,
+          "feature": "Type_H",
+          "rank": 8,
+          "shap_value": 0.004063577666
+        }
+      ]
+    }
+  ]
+}

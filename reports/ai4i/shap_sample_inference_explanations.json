@@ -1,0 +1,151 @@
+{
+  "sample_explanations": [
+    {
+      "additivity_check_error": 0.0,
+      "decision_threshold": 0.14,
+      "failure_prediction": 0,
+      "failure_probability": 0.0,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.189228579447,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": -0.189228579447
+        },
+        {
+          "absolute_shap": 0.121236018566,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": -0.121236018566
+        },
+        {
+          "absolute_shap": 0.089364667145,
+          "feature": "Tool wear [min]",
+          "rank": 3,
+          "shap_value": -0.089364667145
+        },
+        {
+          "absolute_shap": 0.066328719474,
+          "feature": "Air temperature [K]",
+          "rank": 4,
+          "shap_value": -0.066328719474
+        },
+        {
+          "absolute_shap": 0.040813660638,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": -0.040813660638
+        },
+        {
+          "absolute_shap": 0.00697164527,
+          "feature": "Type",
+          "rank": 6,
+          "shap_value": 0.00697164527
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "sample_index": 0
+    },
+    {
+      "additivity_check_error": 0.0,
+      "decision_threshold": 0.14,
+      "failure_prediction": 0,
+      "failure_probability": 0.01,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.27364297435,
+          "feature": "Air temperature [K]",
+          "rank": 1,
+          "shap_value": -0.27364297435
+        },
+        {
+          "absolute_shap": 0.110816620896,
+          "feature": "Tool wear [min]",
+          "rank": 2,
+          "shap_value": -0.110816620896
+        },
+        {
+          "absolute_shap": 0.105851864991,
+          "feature": "Torque [Nm]",
+          "rank": 3,
+          "shap_value": -0.105851864991
+        },
+        {
+          "absolute_shap": 0.05956761637,
+          "feature": "Type",
+          "rank": 4,
+          "shap_value": -0.05956761637
+        },
+        {
+          "absolute_shap": 0.057251253992,
+          "feature": "Rotational speed [rpm]",
+          "rank": 5,
+          "shap_value": 0.057251253992
+        },
+        {
+          "absolute_shap": 0.002627822614,
+          "feature": "Process temperature [K]",
+          "rank": 6,
+          "shap_value": 0.002627822614
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "sample_index": 1
+    },
+    {
+      "additivity_check_error": 0.0,
+      "decision_threshold": 0.14,
+      "failure_prediction": 0,
+      "failure_probability": 0.0,
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "grouped_feature_contributions": [
+        {
+          "absolute_shap": 0.154414815163,
+          "feature": "Torque [Nm]",
+          "rank": 1,
+          "shap_value": -0.154414815163
+        },
+        {
+          "absolute_shap": 0.127600503848,
+          "feature": "Rotational speed [rpm]",
+          "rank": 2,
+          "shap_value": -0.127600503848
+        },
+        {
+          "absolute_shap": 0.078081882123,
+          "feature": "Tool wear [min]",
+          "rank": 3,
+          "shap_value": -0.078081882123
+        },
+        {
+          "absolute_shap": 0.074910269072,
+          "feature": "Air temperature [K]",
+          "rank": 4,
+          "shap_value": -0.074910269072
+        },
+        {
+          "absolute_shap": 0.033520934386,
+          "feature": "Process temperature [K]",
+          "rank": 5,
+          "shap_value": -0.033520934386
+        },
+        {
+          "absolute_shap": 0.031471595409,
+          "feature": "Type",
+          "rank": 6,
+          "shap_value": -0.031471595409
+        }
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "positive_class_base_value": 0.5,
+      "sample_index": 2
+    }
+  ]
+}
