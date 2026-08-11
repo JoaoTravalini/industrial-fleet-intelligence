@@ -1,0 +1,63 @@
+{
+  "categorical_features": [
+    "Type"
+  ],
+  "decision_threshold": 0.14,
+  "excluded_identifier_fields": [
+    "Product ID"
+  ],
+  "excluded_leakage_sensitive_fields": [
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "final_evaluation_data_policy": "test only",
+  "hyperparameters": {
+    "class_weight": "balanced_subsample",
+    "max_depth": null,
+    "max_features": "sqrt",
+    "min_samples_leaf": 1,
+    "n_estimators": 300,
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "model_family": "RandomForestClassifier",
+  "numerical_features": [
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "predictive_features": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "preprocessing_policy": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_policy": "Fit inside the pipeline on train + validation only; never fit on test.",
+    "numerical": "Five numerical features -> passthrough"
+  },
+  "random_seed": 42,
+  "retention_reason": "Fixed Random Forest was retained because tuned nested-OOF Average Precision improved by 0.003413 versus the fixed RF OOF reference, below the predefined promotion minimum of 0.005.",
+  "selection_chain_summary": {
+    "model_comparison_selected_model": "random_forest",
+    "model_comparison_threshold": 0.14,
+    "tuning_selected_candidate": "fixed_random_forest",
+    "tuning_selected_threshold": 0.14,
+    "validation_may_change_selection": false
+  },
+  "source_development_artifacts": [
+    "model_comparison_metrics.json",
+    "random_forest_tuning_metrics.json"
+  ],
+  "target": "Machine failure",
+  "traceability_field": "source_udi",
+  "training_data_policy": "train + validation"
+}

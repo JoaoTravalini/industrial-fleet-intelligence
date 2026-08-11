@@ -1,0 +1,90 @@
+{
+  "final_decision": {
+    "configuration_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+    "decision_threshold": 0.14,
+    "model_family": "RandomForestClassifier",
+    "selected_candidate": "fixed_random_forest",
+    "test_performance_included": false
+  },
+  "purpose": "Evidence that the final model and operating threshold were chosen before final holdout test evaluation.",
+  "selection_chain": [
+    {
+      "average_precision": 0.38438,
+      "roc_auc": 0.862177,
+      "source_artifact": "baseline_metrics.json",
+      "stage": "Logistic Regression baseline",
+      "summary": "Standard Logistic Regression established the first validation baseline."
+    },
+    {
+      "selected_model": "standard_logistic",
+      "selected_threshold": 0.14,
+      "selection_uses_validation": false,
+      "source_artifact": "imbalance_strategy_metrics.json",
+      "stage": "Logistic imbalance and threshold experiment",
+      "threshold_source": "train_oof_max_f2"
+    },
+    {
+      "candidates": [
+        "standard_logistic",
+        "random_forest",
+        "xgboost"
+      ],
+      "primary_metric": "train_oof_average_precision",
+      "source_artifact": "model_comparison_metrics.json",
+      "stage": "Non-linear comparison"
+    },
+    {
+      "ap_tie_tolerance": 0.01,
+      "random_forest_average_precision": 0.749231,
+      "source_artifact": "model_comparison_metrics.json",
+      "stage": "Random Forest vs XGBoost AP comparison",
+      "xgboost_average_precision": 0.752493
+    },
+    {
+      "reason": "Random Forest is within 0.01 train OOF AP of the best candidate and is simpler under the predefined order.",
+      "selected_model": "random_forest",
+      "selected_threshold": 0.14,
+      "selection_uses_validation": false,
+      "source_artifact": "model_comparison_metrics.json",
+      "stage": "Simplicity tie-break decision"
+    },
+    {
+      "average_precision_delta": 0.003413,
+      "fixed_random_forest_average_precision": 0.749231,
+      "promotion_delta_required": 0.005,
+      "source_artifact": "random_forest_tuning_metrics.json",
+      "stage": "Targeted Random Forest tuning",
+      "tuned_nested_average_precision": 0.752644
+    },
+    {
+      "reason": "Tuned nested-OOF Average Precision does not exceed the previous fixed Random Forest OOF AP by at least 0.005, so added complexity is not promoted.",
+      "selected_candidate": "fixed_random_forest",
+      "selected_threshold": 0.14,
+      "selection_uses_validation": false,
+      "source_artifact": "random_forest_tuning_metrics.json",
+      "stage": "Tuning promotion decision"
+    },
+    {
+      "hyperparameters": {
+        "class_weight": "balanced_subsample",
+        "max_depth": null,
+        "max_features": "sqrt",
+        "min_samples_leaf": 1,
+        "n_estimators": 300,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      "model_family": "RandomForestClassifier",
+      "stage": "Final fixed Random Forest configuration"
+    },
+    {
+      "decision_threshold": 0.14,
+      "stage": "Frozen threshold",
+      "threshold_source": "train-only OOF development predictions"
+    },
+    {
+      "final_model_configuration_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "stage": "Final configuration hash"
+    }
+  ]
+}

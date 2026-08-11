@@ -1,0 +1,189 @@
+{
+  "development_positive_count": 288,
+  "development_training_row_count": 8500,
+  "feature_policy": {
+    "categorical_features": [
+      "Type"
+    ],
+    "excluded_identifier_fields": [
+      "Product ID"
+    ],
+    "excluded_leakage_sensitive_fields": [
+      "TWF",
+      "HDF",
+      "PWF",
+      "OSF",
+      "RNF"
+    ],
+    "numerical_features": [
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "predictive_features": [
+      "Type",
+      "Air temperature [K]",
+      "Process temperature [K]",
+      "Rotational speed [rpm]",
+      "Torque [Nm]",
+      "Tool wear [min]"
+    ],
+    "target": "Machine failure",
+    "traceability_field": "source_udi"
+  },
+  "final_model_configuration_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+  "frozen_threshold": 0.14,
+  "hyperparameters": {
+    "class_weight": "balanced_subsample",
+    "max_depth": null,
+    "max_features": "sqrt",
+    "min_samples_leaf": 1,
+    "n_estimators": 300,
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "model_family": "RandomForestClassifier",
+  "no_model_decision_changed_using_test_data": true,
+  "preprocessing_policy": {
+    "categorical": "Type -> OneHotEncoder(handle_unknown=\"ignore\")",
+    "fit_policy": "Fit inside the pipeline on train + validation only; never fit on test.",
+    "numerical": "Five numerical features -> passthrough"
+  },
+  "previous_validation_reference_metrics": {
+    "selection_uses_validation": false,
+    "threshold_0_14": {
+      "accuracy": 0.966,
+      "balanced_accuracy": 0.868895,
+      "confusion_matrix": [
+        [
+          1410,
+          39
+        ],
+        [
+          12,
+          39
+        ]
+      ],
+      "f1": 0.604651,
+      "f2": 0.691489,
+      "false_negative": 12,
+      "false_positive": 39,
+      "precision": 0.5,
+      "predicted_positive_count": 78,
+      "recall": 0.764706,
+      "threshold": 0.14,
+      "true_negative": 1410,
+      "true_positive": 39
+    },
+    "threshold_0_5": {
+      "accuracy": 0.976667,
+      "balanced_accuracy": 0.704157,
+      "confusion_matrix": [
+        [
+          1444,
+          5
+        ],
+        [
+          30,
+          21
+        ]
+      ],
+      "f1": 0.545455,
+      "f2": 0.456522,
+      "false_negative": 30,
+      "false_positive": 5,
+      "precision": 0.807692,
+      "predicted_positive_count": 26,
+      "recall": 0.411765,
+      "threshold": 0.5,
+      "true_negative": 1444,
+      "true_positive": 21
+    },
+    "threshold_independent": {
+      "average_precision": 0.680945,
+      "roc_auc": 0.974743
+    }
+  },
+  "test_metrics": {
+    "threshold_0_14": {
+      "accuracy": 0.961333,
+      "balanced_accuracy": 0.904315,
+      "confusion_matrix": [
+        [
+          1399,
+          50
+        ],
+        [
+          8,
+          43
+        ]
+      ],
+      "f1": 0.597222,
+      "f2": 0.723906,
+      "false_negative": 8,
+      "false_positive": 50,
+      "precision": 0.462366,
+      "predicted_positive_count": 93,
+      "recall": 0.843137,
+      "threshold": 0.14,
+      "true_negative": 1399,
+      "true_positive": 43
+    },
+    "threshold_0_5": {
+      "accuracy": 0.980667,
+      "balanced_accuracy": 0.725145,
+      "confusion_matrix": [
+        [
+          1448,
+          1
+        ],
+        [
+          28,
+          23
+        ]
+      ],
+      "f1": 0.613333,
+      "f2": 0.504386,
+      "false_negative": 28,
+      "false_positive": 1,
+      "precision": 0.958333,
+      "predicted_positive_count": 24,
+      "recall": 0.45098,
+      "threshold": 0.5,
+      "true_negative": 1448,
+      "true_positive": 23
+    },
+    "threshold_independent": {
+      "average_precision": 0.770679,
+      "roc_auc": 0.968707
+    }
+  },
+  "test_minus_validation_deltas": {
+    "average_precision": 0.089734,
+    "f1_at_0_14": -0.007429,
+    "f2_at_0_14": 0.032417,
+    "precision_at_0_14": -0.037634,
+    "recall_at_0_14": 0.078431,
+    "roc_auc": -0.006036
+  },
+  "test_positive_count": 51,
+  "test_row_count": 1500,
+  "test_set_usage_policy": {
+    "allowed": [
+      "final predictions",
+      "final metrics",
+      "final descriptive evaluation plots"
+    ],
+    "not_allowed": [
+      "model selection",
+      "hyperparameter tuning",
+      "preprocessing fitting",
+      "threshold selection",
+      "feature engineering",
+      "feature selection"
+    ]
+  },
+  "training_data_policy": "train + validation"
+}

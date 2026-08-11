@@ -279,6 +279,20 @@ Validate generated Random Forest tuning artifacts without retraining:
 
 No dependency installation should be required for this phase. The tuning command may take longer than previous baseline scripts because nested cross-validation trains multiple Random Forest models.
 
+Run the final AI4I holdout evaluation after the frozen final model configuration exists:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/evaluate_ai4i_final_model.py
+```
+
+Validate generated final evaluation artifacts without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_final_evaluation.py
+```
+
+The test split is a final holdout. It must never be used to modify model choices, feature policy, hyperparameters, preprocessing, or decision thresholds.
+
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -297,4 +311,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, and AI4I imbalance/threshold strategy helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, and final holdout evaluation helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
