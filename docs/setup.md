@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, and explainability dependency groups are installed only into the project `.venv`; no API, frontend, streaming, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, and explainability dependency groups are installed only into the project `.venv`; no API, frontend, Kafka, Spark, or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -158,6 +158,36 @@ docker compose down
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL development volume and all database data stored in that volume.
 
 A deterministic fictional development fleet seed is available for `machines` only. PostgreSQL must be running and schema migrations must already be applied before running the seed.
+
+## Synthetic Telemetry Simulator
+
+The simulator uses only the Python standard library and does not require Kafka, Spark, PostgreSQL access, Docker services, or model inference.
+
+Generate the canonical tracked telemetry sample:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/generate_telemetry_sample.py
+```
+
+Validate the simulator contract, canonical sample, and summary:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_telemetry_simulator.py
+```
+
+Run a small local simulation to stdout:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/simulate_telemetry.py --machines 3 --events-per-machine 5
+```
+
+Write a custom local simulation file:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/simulate_telemetry.py --machines 3 --events-per-machine 5 --output data/generated/example_telemetry.jsonl
+```
+
+`data/generated/` is ignored by Git for ad hoc local outputs. The canonical sample remains tracked at `data/sample/telemetry_events.jsonl`.
 
 ## AI4I Dataset
 
@@ -395,4 +425,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.

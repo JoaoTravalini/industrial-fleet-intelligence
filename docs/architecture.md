@@ -65,18 +65,29 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - AI4I global feature attribution reports and plots.
 - AI4I representative local explanations and waterfall plots.
 - AI4I explainability artifact validation.
+- Synthetic telemetry event contract for simulator output.
+- Deterministic local telemetry simulator.
+- Temporal per-machine telemetry state evolution.
+- Canonical tracked telemetry sample and deterministic summary.
+- Telemetry event and batch schema validation.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Telemetry generation is planned for a later phase.
+- Kafka producer integration for telemetry delivery is planned for a later phase.
+- Kafka broker and topic configuration are planned for a later phase.
+- Spark Structured Streaming telemetry jobs are planned for a later phase.
+- Bronze, Silver, and Gold telemetry processing is planned for a later phase.
+- Streaming ML inference over telemetry is planned for a later phase.
+- Drift monitoring is planned for a later phase.
+- Anomaly detection is planned for a later phase.
 - Preprocessing fit and production feature engineering are planned for a later phase.
 - Final model decision and final model selection are planned for later phases.
 - Final locked test evaluation is planned for a later phase.
 - MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
-- `services/simulator`: Planned synthetic industrial telemetry generator.
+- `services/simulator`: Implemented deterministic synthetic industrial telemetry generator; Kafka producer integration is planned.
 - `services/streaming`: Planned local streaming support around Apache Kafka producers and consumers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
 - `pipelines/batch`: Planned PySpark batch processing jobs for historical data preparation.
@@ -117,15 +128,15 @@ Generated files under `data/processed/ai4i/` are reproducible modeling artifacts
 1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
 2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
 3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
-4. Future telemetry simulator: generated streaming data that will eventually flow through Kafka and Spark.
+4. Synthetic telemetry simulator: deterministic generated telemetry observations that will eventually flow through Kafka and Spark.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
 ## Planned Data Flow
 
-1. A local simulator will generate synthetic fleet telemetry.
-2. Telemetry events will flow through a local Apache Kafka broker.
-3. Streaming jobs will process real-time data into curated local storage layers.
+1. The implemented local simulator generates deterministic synthetic fleet telemetry samples.
+2. Telemetry events will flow through a local Apache Kafka broker in a planned future phase.
+3. Streaming jobs will process telemetry into curated local storage layers in a planned future phase.
 4. Batch jobs will prepare historical features for analytics and machine learning.
 5. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
 6. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
@@ -153,4 +164,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements local AI4I SHAP explainability for the packaged Random Forest: positive-class TreeExplainer attribution, deterministic global and local reports, representative waterfall plots, sample-payload explanations, additivity validation, and a read-only validator. It does not implement MLflow Model Registry, registered deployment models, drift monitoring, anomaly detection, explanation exposure through API, database import, telemetry generation, Kafka, Spark, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements the synthetic telemetry event contract and deterministic local telemetry simulator: strict JSONL event schema, reproducible per-machine state evolution, canonical tracked sample data, deterministic sample summary, local batch simulation CLI, and read-only telemetry validation. It does not implement Kafka producer integration, Spark Structured Streaming, Bronze/Silver/Gold telemetry processing, streaming ML inference, drift monitoring, anomaly detection, database writes, API routes, frontend components, GenAI behavior, or Databricks integration.

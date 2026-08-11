@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0",
+  "source": "synthetic_simulator",
+  "synthetic_data_classification": "synthetic generated telemetry",
+  "description": "Deterministic synthetic industrial telemetry event contract for local streaming and data-engineering preparation. These events are not real industrial telemetry, not manufacturer telemetry, not UCI AI4I data, and not physically validated equipment simulation.",
+  "required_fields": [
+    "schema_version",
+    "event_id",
+    "machine_code",
+    "sequence_number",
+    "event_time",
+    "source",
+    "product_quality_type",
+    "air_temperature_k",
+    "process_temperature_k",
+    "rotational_speed_rpm",
+    "torque_nm",
+    "tool_wear_min",
+    "vibration_mm_s",
+    "pressure_bar"
+  ],
+  "fields": {
+    "schema_version": {
+      "type": "string",
+      "constant": "1.0",
+      "description": "Telemetry event schema version."
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Deterministic UUID5 derived from schema version, machine code, sequence number, and event timestamp."
+    },
+    "machine_code": {
+      "type": "string",
+      "constraints": "MCH-0001 through MCH-0100",
+      "description": "Stable fictional machine identifier aligned with the existing operational fleet identifier range."
+    },
+    "sequence_number": {
+      "type": "integer",
+      "constraints": "positive; starts at 1 and increases by 1 per machine within a simulation",
+      "description": "Per-machine event sequence number."
+    },
+    "event_time": {
+      "type": "string",
+      "format": "UTC ISO-8601 timestamp ending with Z",
+      "description": "Deterministic event timestamp in UTC."
+    },
+    "source": {
+      "type": "string",
+      "constant": "synthetic_simulator",
+      "description": "Event source identifier for generated telemetry."
+    },
+    "product_quality_type": {
+      "type": "string",
+      "allowed_values": [
+        "L",
+        "M",
+        "H"
+      ],
+      "description": "Simulator-only synthetic quality category designed for a future explicit adapter to the AI4I Type feature. It is not the operational machine_type."
+    },
+    "air_temperature_k": {
+      "type": "number",
+      "unit": "kelvin",
+      "minimum": 294.0,
+      "maximum": 306.0,
+      "description": "Synthetic air temperature observation."
+    },
+    "process_temperature_k": {
+      "type": "number",
+      "unit": "kelvin",
+      "minimum": 304.0,
+      "maximum": 315.0,
+      "description": "Synthetic process temperature observation. Simulator invariant keeps it above air temperature."
+    },
+    "rotational_speed_rpm": {
+      "type": "integer",
+      "unit": "rpm",
+      "minimum": 1000,
+      "maximum": 3000,
+      "description": "Synthetic rotational speed observation."
+    },
+    "torque_nm": {
+      "type": "number",
+      "unit": "newton meter",
+      "minimum": 0.0,
+      "maximum": 80.0,
+      "description": "Synthetic torque observation."
+    },
+    "tool_wear_min": {
+      "type": "integer",
+      "unit": "minute",
+      "minimum": 0,
+      "maximum": 300,
+      "description": "Synthetic accumulated tool wear. It never decreases within a simulation."
+    },
+    "vibration_mm_s": {
+      "type": "number",
+      "unit": "millimeter per second",
+      "minimum": 0.0,
+      "maximum": 15.0,
+      "description": "Additional synthetic vibration observation for future streaming analytics and anomaly detection."
+    },
+    "pressure_bar": {
+      "type": "number",
+      "unit": "bar",
+      "minimum": 1.0,
+      "maximum": 12.0,
+      "description": "Additional synthetic pressure observation for future streaming analytics and anomaly detection."
+    }
+  },
+  "sensor_bounds_are_guardrails_not_physical_specifications": true,
+  "excluded_fields": [
+    "Machine failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF",
+    "failure_probability",
+    "failure_prediction",
+    "shap_values",
+    "anomaly_label"
+  ],
+  "future_ai4i_adapter_mapping": {
+    "product_quality_type": "Type",
+    "air_temperature_k": "Air temperature [K]",
+    "process_temperature_k": "Process temperature [K]",
+    "rotational_speed_rpm": "Rotational speed [rpm]",
+    "torque_nm": "Torque [Nm]",
+    "tool_wear_min": "Tool wear [min]"
+  },
+  "notes": [
+    "product_quality_type is not operational machine_type.",
+    "The simulator does not query PostgreSQL in this phase.",
+    "Kafka, Spark, model inference, anomaly labels, and database writes are planned future work."
+  ]
+}

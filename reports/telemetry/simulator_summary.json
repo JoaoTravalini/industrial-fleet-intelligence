@@ -1,0 +1,53 @@
+{
+  "event_count": 100,
+  "events_per_machine": 10,
+  "first_event_time": "2026-01-01T00:00:00Z",
+  "interval_seconds": 5.0,
+  "last_event_time": "2026-01-01T00:00:45Z",
+  "machine_code_range": {
+    "first": "MCH-0001",
+    "last": "MCH-0010"
+  },
+  "machine_count": 10,
+  "product_quality_type_distribution": {
+    "H": 50,
+    "L": 30,
+    "M": 20
+  },
+  "sample_sha256": "09a90f7a4cc9b9f05179c0dc48fd67297617e63605abe69e06ed8030bd2e60fe",
+  "schema_version": "1.0",
+  "seed": 42,
+  "sensor_min_max": {
+    "air_temperature_k": {
+      "max": 302.588,
+      "min": 295.904
+    },
+    "pressure_bar": {
+      "max": 8.651,
+      "min": 4.017
+    },
+    "process_temperature_k": {
+      "max": 309.866,
+      "min": 304.0
+    },
+    "rotational_speed_rpm": {
+      "max": 2077,
+      "min": 1326
+    },
+    "tool_wear_min": {
+      "max": 92,
+      "min": 9
+    },
+    "torque_nm": {
+      "max": 53.091,
+      "min": 17.881
+    },
+    "vibration_mm_s": {
+      "max": 4.479,
+      "min": 0.914
+    }
+  },
+  "source": "synthetic_simulator",
+  "start_time": "2026-01-01T00:00:00Z",
+  "synthetic_data_classification": "synthetic generated telemetry"
+}
