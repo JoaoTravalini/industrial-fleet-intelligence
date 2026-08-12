@@ -149,4 +149,4 @@ docker compose down -v
 
 ## Current Boundaries
 
-Kafka currently transports complete synthetic telemetry events into the implemented downstream flow: Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet. Silver, Gold, ML inference on Kafka messages, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, and Databricks integration are not implemented.
+Kafka currently transports complete synthetic telemetry events into the implemented downstream flow: Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet -> Silver telemetry -> Gold descriptive analytics. ML inference on Kafka messages, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, and Databricks integration are not implemented.

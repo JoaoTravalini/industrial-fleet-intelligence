@@ -27,7 +27,7 @@ The connector is passed through `spark-submit --packages`, allowing Spark to res
 The implemented development flow is:
 
 ```text
-Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet -> Silver validation and deduplication
+Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet -> Silver validation and deduplication -> Gold descriptive analytics
 ```
 
 Spark uses `local[2]` execution inside the container. This demonstrates real Structured Streaming semantics without introducing unnecessary distributed master/worker infrastructure in this phase.
@@ -133,8 +133,8 @@ Run the end-to-end validator:
 
 ## Limitations
 
-This phase does not implement Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, GenAI behavior, Databricks integration, HDFS, or cloud storage.
+This phase does not implement ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, GenAI behavior, Databricks integration, HDFS, or cloud storage.
 
 ## Downstream Silver Layer
 
-The implemented Silver layer parses `raw_value`, validates the telemetry contract and business rules, quarantines invalid records, deduplicates valid `event_id` values explicitly, and prepares typed canonical telemetry records for downstream analytics and future ML workflows. Gold analytics remain planned.
+The implemented Silver layer parses `raw_value`, validates the telemetry contract and business rules, quarantines invalid records, deduplicates valid `event_id` values explicitly, and prepares typed canonical telemetry records for downstream analytics and future ML workflows. The implemented Gold layer derives descriptive machine, window, and fleet analytics from canonical Silver telemetry.

@@ -6,10 +6,10 @@ The Silver telemetry phase converts raw Bronze Kafka records into validated type
 
 ## Bronze to Silver Architecture
 
-The implemented flow is:
+The implemented downstream flow is:
 
 ```text
-Bronze raw Parquet -> Spark parsing and validation -> Silver outputs
+Bronze raw Parquet -> Spark parsing and validation -> Silver outputs -> Gold descriptive analytics
 ```
 
 Bronze remains the authoritative raw record layer. Silver reads `data/bronze/telemetry/` and writes generated Parquet datasets under `data/silver/`.
@@ -39,7 +39,7 @@ Silver parses `raw_value` with an explicit Spark schema:
 - `vibration_mm_s`: double
 - `pressure_bar`: double
 
-The canonical Silver dataset keeps `product_quality_type`. It does not map telemetry into AI4I model feature names yet.
+The canonical Silver dataset keeps `product_quality_type` as an event-level synthetic telemetry attribute. The same `machine_code` may validly appear with multiple `product_quality_type` values across different events. Silver does not map telemetry into AI4I model feature names yet.
 
 ## Contract Validation
 
@@ -160,6 +160,6 @@ Repeated Silver runs over the same unchanged Bronze snapshot should produce the 
 
 This is a local portfolio/development architecture. It does not claim production orchestration, table transactions, Delta Lake, Iceberg, HDFS, cloud object storage, or incremental table maintenance. It also does not perform model inference, drift monitoring, anomaly detection, PostgreSQL telemetry writes, API serving, frontend rendering, GenAI behavior, or Databricks integration.
 
-## Future Gold Layer
+## Downstream Gold Layer
 
-The planned Gold layer may derive fleet analytics, monitoring aggregates, and model-ready views from canonical Silver telemetry. Gold is not implemented in this phase.
+The implemented Gold layer derives descriptive machine summaries, one-minute machine windows, and a fleet-level summary from canonical Silver telemetry. ML inference and anomaly detection remain planned for later dedicated phases.

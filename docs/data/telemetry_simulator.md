@@ -58,7 +58,7 @@ A future adapter may map simulator fields into the existing AI4I model input con
 This phase does not call the AI4I predictor and does not perform streaming inference.
 
 ## AI4I Type vs Operational Machine Type
-`product_quality_type` is a simulator-only synthetic field with values `L`, `M`, and `H`. It is not the operational PostgreSQL `machine_type`, which contains generic equipment categories such as `excavator`, `wheel_loader`, and `crawler_crane`. Do not map operational `machine_type` to AI4I `Type`.
+`product_quality_type` is a simulator-only synthetic event-level field with values `L`, `M`, and `H`. The same `machine_code` may produce events with different `product_quality_type` values over time. It is not the operational PostgreSQL `machine_type`, which contains generic equipment categories such as `excavator`, `wheel_loader`, and `crawler_crane`. Do not map operational `machine_type` to AI4I `Type`.
 
 ## Additional Sensors
 `vibration_mm_s` and `pressure_bar` are intentionally outside the frozen AI4I classifier contract. They are included for future streaming analytics, fleet monitoring, and anomaly detection. They must not be forced into the existing packaged AI4I model.

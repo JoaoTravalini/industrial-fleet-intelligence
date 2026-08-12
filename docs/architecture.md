@@ -99,13 +99,24 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Spark Silver inspection through `scripts/inspect_spark_silver.py`.
 - Spark Silver integration validation through `scripts/check_spark_silver.py`.
 - Deterministic Spark Silver static policy summary.
+- Spark Gold descriptive analytics over canonical Silver telemetry.
+- Per-machine telemetry summaries at `data/gold/machine_summary/`, including deterministic latest product-quality observation and product-quality event-count distributions.
+- Deterministic latest-machine observations using event time plus Kafka lineage ordering.
+- One-minute machine telemetry aggregates at `data/gold/machine_windows/`, including product-quality event-count distributions without splitting the machine/window grain by product quality.
+- Fleet-level descriptive summary at `data/gold/fleet_summary/`.
+- Bronze -> Silver -> Gold local Medallion architecture.
+- Spark Gold inspection through `scripts/inspect_spark_gold.py`.
+- Spark Gold integration validation through `scripts/check_spark_gold.py`.
+- Deterministic Spark Gold static policy summary.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Gold telemetry processing is planned for a later phase.
+- AI4I-compatible telemetry feature adapter is planned for a later phase.
+- Inference over operational telemetry is planned for a later phase.
+- Prediction persistence is planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Drift monitoring is planned for a later phase.
 - Anomaly detection is planned for a later phase.
@@ -116,8 +127,8 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
-- `pipelines/batch`: Planned PySpark batch processing jobs for historical data preparation.
-- `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing; Gold processing is planned.
+- `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics; additional historical feature jobs are planned.
+- `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
 - `ml/inference`: Implemented local AI4I inference utilities; service integration is planned.
 - `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
@@ -135,7 +146,7 @@ The local PostgreSQL service is implemented in `docker-compose.yml`. It binds to
 
 The initial operational schema is implemented through versioned SQL migrations in `db/migrations`. It defines structured relational tables for machines, maintenance records, model predictions, anomaly detections, operational alerts, and the latest machine health state.
 
-PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; telemetry events now flow through local Kafka into Spark-managed Bronze Parquet, while Silver and Gold data lake layers remain planned.
+PostgreSQL must not become the primary store for high-volume raw telemetry history. The schema intentionally avoids raw telemetry tables; telemetry events now flow through local Kafka into Spark-managed Bronze Parquet, Silver telemetry, and Gold descriptive analytics.
 
 ## Implemented Development Seed Data
 
@@ -147,7 +158,7 @@ AI4I is an external public synthetic dataset used for data-science and predictiv
 
 The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, drift monitoring, API integration, dashboard integration, or explanation exposure through API has been implemented.
 
-Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze` and `data/silver` telemetry lakehouse layers and the planned `data/gold` layer.
+Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
 ## Data Concept Boundaries
 
@@ -164,8 +175,8 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 2. Telemetry events can now flow through the implemented local Apache Kafka broker.
 3. The implemented Spark available-now Structured Streaming job ingests Kafka telemetry into local Bronze Parquet.
 4. The implemented Silver job parses, validates, quarantines, deduplicates, and curates telemetry from Bronze.
-5. Future Gold jobs will derive fleet analytics and model-ready views.
-6. Batch jobs will prepare historical features for analytics and machine learning.
+5. The implemented Gold job derives descriptive machine, time-window, and fleet analytics.
+6. Future batch jobs may prepare historical features for machine learning.
 7. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
 8. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
 9. The FastAPI backend will expose local platform capabilities to the web dashboard.
@@ -181,7 +192,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - React, TypeScript, and Vite
 - PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
 - Apache Kafka local infrastructure is implemented.
-- Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, and deterministic Silver processing are implemented.
+- Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, and Gold descriptive analytics are implemented.
 - scikit-learn and XGBoost
 - SHAP
 - MLflow
@@ -192,4 +203,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements local Apache Spark Silver telemetry processing over the current Bronze Parquet snapshot: explicit telemetry parsing schema, Spark-native contract validation, stable rejection reasons, invalid-record quarantine, valid business-event deduplication by `event_id`, canonical Silver telemetry, valid duplicate audit data, Kafka lineage preservation, read-only Silver inspection, end-to-end validation, and focused unit/source tests. It does not implement Gold analytics, streaming ML inference, drift monitoring, anomaly detection, PostgreSQL telemetry writes, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements local Apache Spark Gold descriptive analytics over canonical Silver telemetry: per-machine summaries, deterministic latest-machine observations, one-minute machine telemetry aggregates, product-quality event-count distributions, a fleet-level descriptive summary, read-only Gold inspection, end-to-end validation, and focused unit/source tests. `product_quality_type` is treated as an event-level synthetic telemetry attribute, not a stable machine attribute. It does not implement an AI4I-compatible telemetry feature adapter, inference over operational telemetry, prediction persistence, drift monitoring, anomaly detection, PostgreSQL operational ML state, API routes, frontend components, GenAI behavior, or Databricks integration.

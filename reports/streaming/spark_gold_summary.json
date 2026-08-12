@@ -1,0 +1,48 @@
+{
+  "analytics_type": "descriptive_analytics_only",
+  "execution_model": "deterministic local Spark snapshot rebuild on local[2]",
+  "fleet_summary_grain": [
+    "fleet_scope"
+  ],
+  "fleet_summary_output_path": "data/gold/fleet_summary",
+  "latest_observation_order": [
+    "event_time desc",
+    "source_kafka_timestamp desc",
+    "source_kafka_topic desc",
+    "source_kafka_partition desc",
+    "source_kafka_offset desc",
+    "event_id desc"
+  ],
+  "machine_summary_grain": [
+    "machine_code"
+  ],
+  "machine_summary_output_path": "data/gold/machine_summary",
+  "machine_windows_grain": [
+    "machine_code",
+    "window_start",
+    "window_end"
+  ],
+  "machine_windows_output_path": "data/gold/machine_windows",
+  "output_format": "parquet",
+  "product_quality_type_semantics": "event-level synthetic model-compatible attribute; not a stable machine attribute",
+  "machine_summary_product_quality_fields": [
+    "latest_product_quality_type",
+    "product_quality_type_h_event_count",
+    "product_quality_type_l_event_count",
+    "product_quality_type_m_event_count"
+  ],
+  "machine_windows_product_quality_fields": [
+    "product_quality_type_h_event_count",
+    "product_quality_type_l_event_count",
+    "product_quality_type_m_event_count"
+  ],
+  "fleet_summary_product_quality_fields": [
+    "product_quality_type_h_count",
+    "product_quality_type_l_count",
+    "product_quality_type_m_count"
+  ],
+  "runtime_counts": "intentionally excluded from tracked summary",
+  "silver_input_path": "data/silver/telemetry",
+  "spark_version": "4.0.4",
+  "window_duration": "1 minute"
+}

@@ -235,7 +235,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. This phase does not implement Gold, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +281,7 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+This phase does not implement ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Silver Processing
 
@@ -317,7 +317,45 @@ Validate Silver processing:
 .\.venv\Scripts\python.exe scripts/check_spark_silver.py
 ```
 
-Silver does not read Kafka, write PostgreSQL, create Gold data, or perform model inference.
+Silver does not read Kafka, write PostgreSQL, or perform model inference.
+
+## Spark Gold Analytics
+
+Gold analytics runs inside the same local Spark Docker container and reads the persisted canonical Silver telemetry snapshot. It is a deterministic snapshot rebuild, not a Structured Streaming query. It writes three generated local datasets:
+
+- `data/gold/machine_summary`: one row per canonical Silver machine with descriptive telemetry summaries.
+- `data/gold/machine_windows`: one-minute event-time telemetry aggregates by machine.
+- `data/gold/fleet_summary`: one row describing the current canonical Silver fleet snapshot.
+
+These directories are local runtime data and are Git-ignored. The tracked `data/gold/.gitkeep` placeholder remains in place.
+
+Start Spark:
+
+```powershell
+docker compose up -d spark
+```
+
+Run the Gold snapshot rebuild:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_spark_gold_docker.py
+```
+
+Inspect Gold:
+
+```powershell
+docker compose exec -T spark /opt/spark/bin/spark-submit /workspace/scripts/inspect_spark_gold.py
+```
+
+Validate Gold analytics:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_spark_gold.py
+```
+
+Gold does not read Kafka, write PostgreSQL, perform model inference, assign health or risk scores, or create anomaly labels.
+
+`product_quality_type` is an event-level synthetic telemetry attribute. A machine may have multiple product-quality values across its canonical Silver events. Gold exposes `latest_product_quality_type` from the deterministic latest event and H/L/M event-count distributions rather than treating product quality as a stable machine classification.
 
 ## Synthetic Telemetry Simulator
 

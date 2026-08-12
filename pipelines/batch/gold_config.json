@@ -1,0 +1,13 @@
+{
+  "application_name": "industrial-fleet-gold-analytics",
+  "fleet_summary_output_path": "data/gold/fleet_summary",
+  "machine_summary_output_path": "data/gold/machine_summary",
+  "machine_windows_output_path": "data/gold/machine_windows",
+  "master": "local[2]",
+  "output_format": "parquet",
+  "shuffle_partitions": 3,
+  "silver_input_path": "data/silver/telemetry",
+  "spark_version": "4.0.4",
+  "timezone": "UTC",
+  "window_duration": "1 minute"
+}
