@@ -62,6 +62,7 @@ services:
       - ./services:/workspace/services:ro
       - ./scripts:/workspace/scripts:ro
       - ./data/bronze:/workspace/data/bronze
+      - ./data/silver:/workspace/data/silver
       - ./data/checkpoints:/workspace/data/checkpoints
     healthcheck:
       test: ["CMD-SHELL", "/opt/spark/bin/spark-submit --version >/dev/null 2>&1"]

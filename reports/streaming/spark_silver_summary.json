@@ -1,0 +1,23 @@
+{
+  "bronze_input_path": "data/bronze/telemetry",
+  "business_event_key": "event_id",
+  "canonical_ordering_strategy": [
+    "source_kafka_timestamp",
+    "source_kafka_topic",
+    "source_kafka_partition",
+    "source_kafka_offset",
+    "payload_sha256"
+  ],
+  "canonical_silver_path": "data/silver/telemetry",
+  "deduplication_strategy": "Valid telemetry records are partitioned by event_id; the first deterministic record is retained as canonical and later valid records are audited.",
+  "duplicate_audit_path": "data/silver/duplicates",
+  "duplicate_audit_policy": "Valid non-canonical records with repeated event_id values are preserved in the duplicate audit dataset.",
+  "execution_model": "deterministic local Spark snapshot rebuild on local[2]",
+  "output_format": "parquet",
+  "quarantine_path": "data/silver/quarantine",
+  "quarantine_policy": "Invalid telemetry records retain raw payload and Kafka lineage with stable machine-readable rejection reasons.",
+  "runtime_counts": "intentionally excluded from tracked summary",
+  "spark_version": "4.0.4",
+  "telemetry_schema_version": "1.0",
+  "validation_strategy": "Spark parses raw Bronze JSON with an explicit schema, checks exact contract fields, validates typed sensor and identity rules, and separates invalid rows."
+}

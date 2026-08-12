@@ -1,0 +1,15 @@
+{
+  "application_name": "industrial-fleet-silver-telemetry",
+  "bronze_input_path": "data/bronze/telemetry",
+  "business_event_key": "event_id",
+  "duplicate_output_path": "data/silver/duplicates",
+  "duplicate_policy": "retain_one_canonical_record_and_audit_additional_valid_records",
+  "master": "local[2]",
+  "output_format": "parquet",
+  "quarantine_output_path": "data/silver/quarantine",
+  "silver_output_path": "data/silver/telemetry",
+  "spark_sql_shuffle_partitions": 3,
+  "spark_timezone": "UTC",
+  "spark_version": "4.0.4",
+  "telemetry_schema_version": "1.0"
+}

@@ -235,7 +235,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. This phase does not implement Silver, Gold, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. This phase does not implement Gold, streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +281,43 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement Silver, Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+This phase does not implement Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+
+## Spark Silver Processing
+
+Silver processing runs inside the same local Spark Docker container and reads the persisted Bronze Parquet snapshot. It is a deterministic snapshot rebuild, not a second Structured Streaming query. It writes three generated local datasets:
+
+- `data/silver/telemetry`: canonical typed telemetry, one valid record per `event_id`.
+- `data/silver/duplicates`: valid non-canonical duplicate business events retained for audit.
+- `data/silver/quarantine`: invalid telemetry records with raw payload, Kafka lineage, and rejection reasons.
+
+These directories are local runtime data and are Git-ignored. The tracked `data/silver/.gitkeep` placeholder remains in place.
+
+Start Spark:
+
+```powershell
+docker compose up -d spark
+```
+
+Run the Silver snapshot rebuild:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_spark_silver_docker.py
+```
+
+Inspect Silver:
+
+```powershell
+docker compose exec -T spark /opt/spark/bin/spark-submit /workspace/scripts/inspect_spark_silver.py
+```
+
+Validate Silver processing:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_spark_silver.py
+```
+
+Silver does not read Kafka, write PostgreSQL, create Gold data, or perform model inference.
 
 ## Synthetic Telemetry Simulator
 

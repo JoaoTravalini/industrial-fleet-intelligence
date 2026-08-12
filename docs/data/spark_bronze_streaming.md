@@ -27,7 +27,7 @@ The connector is passed through `spark-submit --packages`, allowing Spark to res
 The implemented development flow is:
 
 ```text
-Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet
+Telemetry Simulator -> Kafka -> Spark Structured Streaming -> Bronze Parquet -> Silver validation and deduplication
 ```
 
 Spark uses `local[2]` execution inside the container. This demonstrates real Structured Streaming semantics without introducing unnecessary distributed master/worker infrastructure in this phase.
@@ -53,7 +53,7 @@ The `payload_sha256` column is a SHA-256 integrity value derived from `raw_value
 
 ## Raw Payload Preservation
 
-Kafka telemetry values are UTF-8 JSON. Spark casts the Kafka byte array to a string and stores it as `raw_value`. Bronze does not flatten telemetry sensor fields, validate business constraints, normalize units, quarantine malformed payloads, or rewrite the event. Parsing and validation belong to the future Silver layer.
+Kafka telemetry values are UTF-8 JSON. Spark casts the Kafka byte array to a string and stores it as `raw_value`. Bronze does not flatten telemetry sensor fields, validate business constraints, normalize units, quarantine malformed payloads, or rewrite the event. Parsing, validation, valid-record deduplication, duplicate auditing, and quarantine handling are implemented downstream in the Silver telemetry layer.
 
 ## Kafka Metadata
 
@@ -99,7 +99,7 @@ Bronze uniqueness is based on the Kafka coordinate:
 topic + partition + offset
 ```
 
-This is different from business event identity such as `event_id`. Duplicate Kafka coordinates indicate an invalid Bronze dataset. Duplicate `event_id` values at different Kafka offsets are valid Bronze records and will be handled explicitly in a future Silver layer.
+This is different from business event identity such as `event_id`. Duplicate Kafka coordinates indicate an invalid Bronze dataset. Duplicate `event_id` values at different Kafka offsets are valid Bronze records and are handled explicitly in the implemented Silver layer.
 
 ## Reproducibility
 
@@ -133,8 +133,8 @@ Run the end-to-end validator:
 
 ## Limitations
 
-This phase does not implement Silver, Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, GenAI behavior, Databricks integration, HDFS, or cloud storage.
+This phase does not implement Gold, ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, GenAI behavior, Databricks integration, HDFS, or cloud storage.
 
-## Future Silver Layer
+## Downstream Silver Layer
 
-The future Silver layer will parse `raw_value`, validate the telemetry contract and business rules, define malformed-payload handling, deduplicate `event_id` values explicitly, and prepare typed curated telemetry records for downstream analytics and ML workflows.
+The implemented Silver layer parses `raw_value`, validates the telemetry contract and business rules, quarantines invalid records, deduplicates valid `event_id` values explicitly, and prepares typed canonical telemetry records for downstream analytics and future ML workflows. Gold analytics remain planned.

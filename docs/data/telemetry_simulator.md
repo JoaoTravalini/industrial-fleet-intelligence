@@ -1,7 +1,7 @@
 # Synthetic Industrial Telemetry Simulator
 
 ## Purpose
-The simulator creates deterministic synthetic industrial telemetry events for local data-engineering and streaming preparation. It now provides complete validated JSON events for the local Kafka telemetry producer, while Spark processing, Bronze/Silver/Gold data layers, model-inference integration, anomaly detection, and dashboard work remain planned.
+The simulator creates deterministic synthetic industrial telemetry events for local data-engineering and streaming preparation. It now provides complete validated JSON events for the local Kafka telemetry producer and downstream Spark Bronze/Silver processing, while Gold data layers, model-inference integration, anomaly detection, and dashboard work remain planned.
 
 ## Synthetic Data Disclaimer
 The generated telemetry is synthetic generated telemetry. It is not real industrial telemetry, not manufacturer telemetry, not UCI AI4I data, and not a replay of the AI4I CSV. The simulator is realistic enough for software architecture demonstrations, but it is not a physically validated equipment model.
@@ -94,4 +94,4 @@ The canonical sample contains 100 events: 10 machines and 10 timestamps per mach
 This simulator is a local portfolio data source. It does not represent a specific manufacturer, fleet, site, machine model, physics system, maintenance policy, failure process, or production telemetry feed.
 
 ## Implemented Kafka Integration
-The deterministic simulator is now wrapped by `scripts/produce_telemetry_kafka.py` for local Kafka delivery. Kafka payloads preserve the exact telemetry schema version `1.0`; message keys are UTF-8 encoded `machine_code` values. Spark, Bronze/Silver/Gold processing, model inference on streaming data, anomaly detection, and PostgreSQL telemetry writes are not implemented here.
+The deterministic simulator is now wrapped by `scripts/produce_telemetry_kafka.py` for local Kafka delivery. Kafka payloads preserve the exact telemetry schema version `1.0`; message keys are UTF-8 encoded `machine_code` values. Spark Bronze and Silver processing are implemented downstream. Gold processing, model inference on streaming data, anomaly detection, and PostgreSQL telemetry writes are not implemented here.
