@@ -1,0 +1,34 @@
+{
+  "adapter_version": "1.0",
+  "source_layer": "canonical Silver telemetry",
+  "source_path": "data/silver/telemetry",
+  "adapter_output_path": "data/model_input/ai4i/telemetry",
+  "prediction_output_path": "data/predictions/ai4i/telemetry_predictions.jsonl",
+  "model_input_features": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "feature_mapping": {
+    "product_quality_type": "Type",
+    "air_temperature_k": "Air temperature [K]",
+    "process_temperature_k": "Process temperature [K]",
+    "rotational_speed_rpm": "Rotational speed [rpm]",
+    "torque_nm": "Torque [Nm]",
+    "tool_wear_min": "Tool wear [min]"
+  },
+  "excluded_current_model_fields": [
+    "vibration_mm_s",
+    "pressure_bar"
+  ],
+  "model_name": "ai4i-failure-risk-random-forest",
+  "model_version": "1.0.0",
+  "frozen_threshold": 0.14,
+  "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+  "inference_mode": "deterministic local batch inference from adapted Silver events",
+  "runtime_counts": "intentionally excluded from tracked summary",
+  "ground_truth_policy": "No labels or performance evaluation are involved."
+}

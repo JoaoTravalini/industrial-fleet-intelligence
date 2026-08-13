@@ -64,6 +64,7 @@ services:
       - ./data/bronze:/workspace/data/bronze
       - ./data/silver:/workspace/data/silver
       - ./data/gold:/workspace/data/gold
+      - ./data/model_input:/workspace/data/model_input
       - ./data/checkpoints:/workspace/data/checkpoints
     healthcheck:
       test: ["CMD-SHELL", "/opt/spark/bin/spark-submit --version >/dev/null 2>&1"]

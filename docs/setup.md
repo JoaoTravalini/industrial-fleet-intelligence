@@ -553,6 +553,42 @@ Run custom inference with one JSON object or an array of objects:
 
 The packaging command uses train + validation only. The final test split is not used for model packaging or inference.
 
+## AI4I Telemetry Inference Bridge
+
+The telemetry inference bridge uses canonical Silver telemetry, the Spark Docker runtime, and the existing trusted packaged AI4I model artifact. It does not install new project dependencies, retrain the model, read AI4I `test.csv`, write PostgreSQL, calculate SHAP values, or create anomaly labels.
+
+Run the Spark AI4I feature adapter:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_spark_ai4i_adapter_docker.py
+```
+
+Run telemetry inference from the adapted Silver events:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/predict_silver_telemetry.py
+```
+
+Validate the complete Silver-to-model bridge:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_telemetry_inference.py
+```
+
+Generated adapter records are written under:
+
+```text
+data/model_input/ai4i/telemetry
+```
+
+Generated prediction records are written to:
+
+```text
+data/predictions/ai4i/telemetry_predictions.jsonl
+```
+
+Both runtime locations are Git-ignored.
+
 Install declared development, data, modeling, and local MLOps dependencies after MLflow is added:
 
 ```powershell
@@ -623,4 +659,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.

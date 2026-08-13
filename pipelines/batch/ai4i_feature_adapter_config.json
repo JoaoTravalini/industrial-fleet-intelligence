@@ -1,0 +1,31 @@
+{
+  "adapter_version": "1.0",
+  "application_name": "industrial-fleet-ai4i-feature-adapter",
+  "spark_version": "4.0.4",
+  "master": "local[2]",
+  "source": "data/silver/telemetry",
+  "output": "data/model_input/ai4i/telemetry",
+  "output_format": "json",
+  "timezone": "UTC",
+  "shuffle_partitions": 3,
+  "model_input_features": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "mapping": {
+    "product_quality_type": "Type",
+    "air_temperature_k": "Air temperature [K]",
+    "process_temperature_k": "Process temperature [K]",
+    "rotational_speed_rpm": "Rotational speed [rpm]",
+    "torque_nm": "Torque [Nm]",
+    "tool_wear_min": "Tool wear [min]"
+  },
+  "excluded_current_model_fields": [
+    "vibration_mm_s",
+    "pressure_bar"
+  ]
+}

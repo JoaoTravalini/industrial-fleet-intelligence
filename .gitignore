@@ -62,6 +62,8 @@ data/checkpoints/*
 data/bronze/*
 data/silver/*
 data/gold/*
+data/model_input/
+data/predictions/
 ml/artifacts/*
 !ml/artifacts/README.md
 ml/artifacts/ai4i/artifact_metadata.json

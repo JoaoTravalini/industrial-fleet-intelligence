@@ -116,13 +116,17 @@ fleet H + L + M event counts = Silver canonical rows
 
 `machine_code` is the stable fictional equipment identity.
 
-`product_quality_type` is an event-level synthetic model-compatible attribute designed for a future explicit mapping to the AI4I `Type` field. It is not an intrinsic stable attribute of a machine, and the same `machine_code` may validly appear with multiple product-quality values across different events.
+`product_quality_type` is an event-level synthetic model-compatible attribute that the separate AI4I telemetry feature adapter maps to the AI4I `Type` field per event. It is not an intrinsic stable attribute of a machine, and the same `machine_code` may validly appear with multiple product-quality values across different events.
 
 `latest_product_quality_type` is the `product_quality_type` observed on the deterministic latest canonical telemetry event for a machine. It is selected from the same row that supplies the latest telemetry sensor values.
 
 `product_quality_type_*_event_count` columns are event-distribution counts, not machine classifications. Gold must never document a machine such as `MCH-0001` as being an `H`, `L`, or `M` machine.
 
 Operational `machine_type` and telemetry `product_quality_type` remain different concepts. Operational `machine_type` describes fictional equipment categories in PostgreSQL seed data; `product_quality_type` is a synthetic telemetry event attribute.
+
+## AI4I Classifier Boundary
+
+Gold remains descriptive analytics and is not used as input to the frozen AI4I classifier. The classifier consumes event-level model inputs adapted directly from canonical Silver telemetry, not machine summaries, one-minute aggregates, fleet summaries, latest observations, or operational `machine_type`.
 
 ## Reproducibility
 
@@ -136,7 +140,7 @@ Gold intentionally does not contain model predictions, anomaly scores, health sc
 
 ## Future ML Integration
 
-A later dedicated phase may map `product_quality_type` and telemetry measurements into a model-compatible feature adapter. This Gold phase does not perform inference and does not compare telemetry to the AI4I training distribution.
+Future phases may join prediction outputs with curated operational projections for API and dashboard consumption. This Gold phase does not perform inference and does not compare telemetry to the AI4I training distribution.
 
 ## Future API Consumption
 

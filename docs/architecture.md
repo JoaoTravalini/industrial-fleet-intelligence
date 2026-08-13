@@ -108,31 +108,33 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Spark Gold inspection through `scripts/inspect_spark_gold.py`.
 - Spark Gold integration validation through `scripts/check_spark_gold.py`.
 - Deterministic Spark Gold static policy summary.
+- Spark AI4I feature adapter over canonical Silver telemetry.
+- Explicit event-level `product_quality_type` -> AI4I `Type` mapping.
+- Silver telemetry batch model inference through the trusted packaged AI4I predictor.
+- Deterministic model-input audit hashing with `model_input_sha256`.
+- Runtime telemetry prediction output at `data/predictions/ai4i/telemetry_predictions.jsonl`.
+- Data Engineering -> ML integration from canonical Silver events to local model predictions.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- AI4I-compatible telemetry feature adapter is planned for a later phase.
-- Inference over operational telemetry is planned for a later phase.
 - Prediction persistence is planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Drift monitoring is planned for a later phase.
 - Anomaly detection is planned for a later phase.
-- Preprocessing fit and production feature engineering are planned for a later phase.
-- Final model decision and final model selection are planned for later phases.
-- Final locked test evaluation is planned for a later phase.
+- Additional production feature engineering workflows are planned for a later phase.
 - MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
-- `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics; additional historical feature jobs are planned.
+- `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics and the Spark AI4I feature adapter; additional historical feature jobs are planned.
 - `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
-- `ml/inference`: Implemented local AI4I inference utilities; service integration is planned.
+- `ml/inference`: Implemented local AI4I inference utilities and Silver telemetry inference bridge; service integration is planned.
 - `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
-- `data`: Local storage for external raw data, generated modeling data, and planned lakehouse layers.
+- `data`: Local storage for external raw data, generated modeling data, implemented lakehouse layers, ignored model-input handoff data, and ignored runtime prediction data.
 - `docs`: Project documentation.
 - `tests`: Python test suite.
 - `scripts`: Local developer automation and validation scripts.
@@ -160,12 +162,15 @@ The modeling dataset uses `source_udi` only for traceability. `Product ID` is ex
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
+The implemented telemetry inference bridge uses the frozen packaged AI4I predictor against adapted canonical Silver telemetry events. It does not read Gold aggregates, AI4I `test.csv`, PostgreSQL operational machine types, SHAP outputs, or anomaly fields.
+
 ## Data Concept Boundaries
 
 1. `MCH-XXXX` PostgreSQL fleet: fictional operational assets used by the application.
 2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
 3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
 4. Synthetic telemetry simulator: deterministic generated telemetry observations that can flow through local Kafka into Spark-managed Bronze Parquet.
+5. `data/model_input` and `data/predictions`: ignored runtime handoff and prediction outputs derived from canonical Silver telemetry.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
@@ -176,12 +181,14 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 3. The implemented Spark available-now Structured Streaming job ingests Kafka telemetry into local Bronze Parquet.
 4. The implemented Silver job parses, validates, quarantines, deduplicates, and curates telemetry from Bronze.
 5. The implemented Gold job derives descriptive machine, time-window, and fleet analytics.
-6. Future batch jobs may prepare historical features for machine learning.
-7. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
-8. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-9. The FastAPI backend will expose local platform capabilities to the web dashboard.
-10. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
-11. The copilot service will use a local Ollama model for natural-language assistance.
+6. The implemented Spark AI4I feature adapter maps canonical Silver events into the frozen six-feature model contract.
+7. The implemented host inference bridge writes deterministic telemetry failure-risk predictions locally.
+8. Future phases may persist selected prediction outputs to PostgreSQL operational tables.
+9. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
+10. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
+11. The FastAPI backend will expose local platform capabilities to the web dashboard.
+12. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
+13. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
 
@@ -192,7 +199,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - React, TypeScript, and Vite
 - PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
 - Apache Kafka local infrastructure is implemented.
-- Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, and Gold descriptive analytics are implemented.
+- Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, Gold descriptive analytics, and the AI4I feature adapter are implemented.
 - scikit-learn and XGBoost
 - SHAP
 - MLflow
@@ -203,4 +210,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements local Apache Spark Gold descriptive analytics over canonical Silver telemetry: per-machine summaries, deterministic latest-machine observations, one-minute machine telemetry aggregates, product-quality event-count distributions, a fleet-level descriptive summary, read-only Gold inspection, end-to-end validation, and focused unit/source tests. `product_quality_type` is treated as an event-level synthetic telemetry attribute, not a stable machine attribute. It does not implement an AI4I-compatible telemetry feature adapter, inference over operational telemetry, prediction persistence, drift monitoring, anomaly detection, PostgreSQL operational ML state, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements the local canonical Silver telemetry -> AI4I feature adapter -> trusted packaged predictor -> deterministic telemetry prediction bridge. `product_quality_type` is treated as an event-level synthetic telemetry attribute and maps to AI4I `Type` only for each individual event. Gold descriptive aggregates, operational PostgreSQL `machine_type`, `vibration_mm_s`, and `pressure_bar` are not model inputs. This phase does not implement PostgreSQL prediction persistence, machine-health projections, alerts, streaming ML inference, drift monitoring, anomaly detection, API routes, frontend components, GenAI behavior, or Databricks integration.
