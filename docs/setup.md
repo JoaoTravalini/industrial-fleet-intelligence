@@ -235,7 +235,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, anomaly detection, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +281,7 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement ML inference, anomaly detection, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+This phase does not implement streaming ML inference, streaming anomaly scoring, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Silver Processing
 
@@ -635,6 +635,50 @@ Validate persistence and idempotency:
 .\.venv\Scripts\python.exe scripts/check_ai4i_prediction_persistence.py
 ```
 
+## Operational Telemetry Anomaly Detection
+
+The operational telemetry anomaly detector is independent from the AI4I failure-risk classifier. It uses only `vibration_mm_s` and `pressure_bar` from canonical Silver telemetry, packages a frozen synthetic reference baseline with `IsolationForest`, writes runtime anomaly JSONL, and persists auditable detector outputs in `anomalies`. It does not create alerts, update `machine_health`, calculate drift, implement API routes, or modify AI4I.
+
+Package the anomaly model artifact:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/package_telemetry_anomaly_model.py
+```
+
+Score canonical Silver telemetry:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/score_telemetry_anomalies.py
+```
+
+Persist anomaly state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/persist_telemetry_anomalies.py
+```
+
+Inspect persisted anomaly state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/inspect_telemetry_anomaly_state.py
+```
+
+Validate anomaly detection and persistence:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_telemetry_anomaly_detection.py
+```
+
+Generated anomaly feature handoff data, runtime JSONL, and binary artifacts are Git-ignored:
+
+```text
+data/model_input/anomaly/telemetry
+data/anomalies/telemetry_anomalies.jsonl
+ml/artifacts/anomaly/
+```
+
+The anomaly score is not a probability. The current data has no anomaly labels, so no supervised anomaly metrics are calculated.
+
 Install declared development, data, modeling, and local MLOps dependencies after MLflow is added:
 
 ```powershell
@@ -705,4 +749,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, or the real 10,000-row AI4I dataset.

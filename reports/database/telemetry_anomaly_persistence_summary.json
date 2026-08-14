@@ -1,0 +1,23 @@
+{
+  "source_anomaly_path": "data/anomalies/telemetry_anomalies.jsonl",
+  "target_anomaly_table": "anomalies",
+  "stable_anomaly_identity": [
+    "event_id",
+    "model_name",
+    "model_version",
+    "model_config_hash"
+  ],
+  "model_identity_dimensions": [
+    "model_name",
+    "model_version",
+    "model_config_hash"
+  ],
+  "idempotency_policy": "Identical anomaly identity is reused without duplicate rows.",
+  "conflict_policy": "Existing identical stable identity with different immutable values fails.",
+  "persistence_scope": "All scored telemetry anomaly outputs are persisted for audit.",
+  "machine_lookup_policy": "machine_code must resolve to an existing machines row.",
+  "runtime_counts": "intentionally excluded from tracked summary",
+  "alerts_policy": "No alerts are created by this persistence phase.",
+  "machine_health_policy": "machine_health is not updated by anomaly persistence.",
+  "ai4i_policy": "AI4I model_predictions are not read or modified by anomaly persistence."
+}

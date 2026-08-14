@@ -10,13 +10,13 @@ PostgreSQL is not the primary storage layer for the full raw telemetry stream. H
 - `machines`: Stores the simulated fleet assets with stable human-readable identifiers and operational status.
 - `maintenance_records`: Stores historical or planned maintenance activity for each machine.
 - `model_predictions`: Stores auditable model prediction outputs. AI4I telemetry predictions include event identity, model identity, frozen threshold, probability, decision, model-input hash, and Kafka/source lineage.
-- `anomalies`: Stores anomaly detections from future analytical or ML pipelines.
+- `anomalies`: Stores auditable telemetry anomaly detector outputs, including model identity, baseline hashes, anomaly score, flag, feature values, and source lineage.
 - `alerts`: Stores actionable operational alerts that may reference predictions, anomalies, or future rule systems.
 - `machine_health`: Stores one current row per machine. The AI4I persistence phase uses it as a latest-prediction projection and does not invent health labels or raw telemetry history.
 
 ## AI4I Prediction Persistence
 
-Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. It is additive and does not drop, recreate, truncate, or delete existing tables.
+Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. Migration `003_telemetry_anomaly_persistence.sql` additively extends `anomalies` for independent telemetry anomaly detector outputs. These migrations do not drop, recreate, truncate, or delete existing tables.
 
 The stable AI4I prediction identity is:
 
@@ -35,6 +35,8 @@ The persistence commands are:
 ```
 
 These commands consume only `data/predictions/ai4i/telemetry_predictions.jsonl`. They do not run model inference, create alerts, or create anomaly records.
+
+Telemetry anomaly persistence consumes only `data/anomalies/telemetry_anomalies.jsonl`. It does not score telemetry, refit the anomaly model, create alerts, modify AI4I predictions, or update `machine_health`.
 
 ## Migration Convention
 

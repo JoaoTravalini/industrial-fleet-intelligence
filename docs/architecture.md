@@ -120,6 +120,14 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Latest per-machine ML prediction projection in PostgreSQL `machine_health`.
 - Deterministic latest prediction selection using event time plus Kafka/source lineage ordering.
 - Data Engineering -> ML -> operational PostgreSQL integration for persisted AI4I telemetry predictions.
+- Independent operational telemetry anomaly detector for canonical Silver telemetry.
+- Vibration/pressure anomaly feature contract using exactly `vibration_mm_s` and `pressure_bar`.
+- Frozen synthetic anomaly reference baseline for model version `1.0.0`.
+- Isolation Forest anomaly scoring with higher-is-more-anomalous score semantics.
+- Runtime anomaly output at `data/anomalies/telemetry_anomalies.jsonl`.
+- Anomaly detector provenance in PostgreSQL `anomalies`, including model identity, baseline hashes, feature values, flag, score, and Kafka/source lineage.
+- Idempotent anomaly ingestion using `event_id`, `model_name`, `model_version`, and `model_config_hash`.
+- AI4I/anomaly semantic separation with no combined health score, no alert creation, and no AI4I feature modification.
 
 ## Planned Component Areas
 
@@ -129,17 +137,18 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Prediction-driven alerts are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Drift monitoring is planned for a later phase.
-- Anomaly detection is planned for a later phase.
+- Streaming anomaly detection is planned for a later phase.
 - Additional production feature engineering workflows are planned for a later phase.
 - MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
-- `services/database`: Implemented reusable AI4I prediction persistence helpers for PostgreSQL validation, idempotency, and latest projection logic.
+- `services/database`: Implemented reusable AI4I prediction persistence helpers and telemetry anomaly persistence helpers for PostgreSQL validation and idempotency.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
-- `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics and the Spark AI4I feature adapter; additional historical feature jobs are planned.
+- `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics, the Spark AI4I feature adapter, and Silver-to-anomaly feature extraction; additional historical feature jobs are planned.
 - `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
 - `ml/inference`: Implemented local AI4I inference utilities and Silver telemetry inference bridge; service integration is planned.
+- `ml/anomaly`: Implemented local operational telemetry anomaly detector utilities.
 - `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
 - `data`: Local storage for external raw data, generated modeling data, implemented lakehouse layers, ignored model-input handoff data, and ignored runtime prediction data.
 - `docs`: Project documentation.
@@ -177,7 +186,7 @@ The implemented telemetry inference bridge uses the frozen packaged AI4I predict
 2. AI4I dataset: external public synthetic dataset used for Data Science and ML development.
 3. `data/processed/ai4i`: reproducible local modeling datasets derived from AI4I.
 4. Synthetic telemetry simulator: deterministic generated telemetry observations that can flow through local Kafka into Spark-managed Bronze Parquet.
-5. `data/model_input` and `data/predictions`: ignored runtime handoff and prediction outputs derived from canonical Silver telemetry.
+5. `data/model_input`, `data/predictions`, and `data/anomalies`: ignored runtime handoff, prediction, and anomaly outputs derived from canonical Silver telemetry.
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
@@ -191,11 +200,14 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 6. The implemented Spark AI4I feature adapter maps canonical Silver events into the frozen six-feature model contract.
 7. The implemented host inference bridge writes deterministic telemetry failure-risk predictions locally.
 8. The implemented PostgreSQL persistence step stores AI4I prediction history and updates the latest per-machine ML prediction projection.
-9. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
-10. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-11. The FastAPI backend will expose local platform capabilities to the web dashboard.
-12. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
-13. The copilot service will use a local Ollama model for natural-language assistance.
+9. The implemented telemetry anomaly feature extraction reads canonical Silver telemetry for `vibration_mm_s` and `pressure_bar`.
+10. The implemented local anomaly detector writes deterministic runtime anomaly outputs.
+11. The implemented PostgreSQL anomaly persistence step stores auditable detector outputs without creating alerts.
+12. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
+13. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
+14. The FastAPI backend will expose local platform capabilities to the web dashboard.
+15. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
+16. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
 
@@ -217,4 +229,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements PostgreSQL persistence for the existing AI4I telemetry prediction JSONL output and maintains a deterministic latest ML prediction projection per machine in `machine_health`. The persistence layer consumes existing predictions only and does not run model inference or retraining. This phase does not implement prediction-driven alerts, anomaly detection, drift monitoring, streaming ML inference, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements independent operational telemetry anomaly detection for canonical Silver `vibration_mm_s` and `pressure_bar`, packages a frozen synthetic reference baseline, writes runtime anomaly JSONL, and persists auditable detector outputs in `anomalies`. This phase does not implement prediction-driven alerts, drift monitoring, streaming anomaly detection, streaming ML inference, API routes, frontend components, GenAI behavior, or Databricks integration.

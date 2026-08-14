@@ -13,6 +13,7 @@ EXEC_TIMEOUT_SECONDS = 60
 EXPECTED_MIGRATIONS = {
     "001_initial_operational_schema.sql",
     "002_ai4i_prediction_persistence.sql",
+    "003_telemetry_anomaly_persistence.sql",
 }
 EXPECTED_TABLES = {
     "schema_migrations",
@@ -50,6 +51,12 @@ EXPECTED_CONSTRAINTS = {
     "ck_model_predictions_source_kafka_key_not_blank",
     "ck_model_predictions_payload_sha256_format",
     "ck_anomalies_score",
+    "ck_anomalies_telemetry_required_fields",
+    "ck_anomalies_telemetry_model_config_hash_format",
+    "ck_anomalies_telemetry_baseline_event_hash_format",
+    "ck_anomalies_telemetry_baseline_feature_hash_format",
+    "ck_anomalies_telemetry_payload_hash_format",
+    "ck_anomalies_telemetry_feature_values",
     "ck_alerts_severity",
     "ck_alerts_status",
     "ck_alerts_status_timestamp_consistency",
@@ -78,6 +85,8 @@ EXPECTED_INDEXES = {
     "idx_model_predictions_machine_timestamp",
     "idx_model_predictions_ai4i_latest",
     "idx_anomalies_machine_timestamp",
+    "uq_anomalies_telemetry_business_identity",
+    "idx_anomalies_telemetry_model_scope",
     "idx_alerts_machine_status_severity",
     "idx_machine_health_latest_prediction",
 }

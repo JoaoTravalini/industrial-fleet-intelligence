@@ -1,0 +1,29 @@
+{
+  "algorithm": "IsolationForest",
+  "artifact_path": "ml/artifacts/anomaly/telemetry_isolation_forest.joblib",
+  "baseline_policy": "Frozen synthetic operational reference baseline built from canonical Silver telemetry; not known healthy data and not production calibration.",
+  "decision_semantics": "anomaly_flag is directly consistent with IsolationForest.predict where -1 is flagged.",
+  "features": [
+    "vibration_mm_s",
+    "pressure_bar"
+  ],
+  "model_name": "telemetry-isolation-forest",
+  "model_version": "1.0.0",
+  "no_anomaly_labels": true,
+  "no_supervised_evaluation_metrics": true,
+  "persistence_table": "anomalies",
+  "relationship_to_ai4i": "AI4I failure prediction and telemetry anomaly detection are independent outputs.",
+  "runtime_output_path": "data/anomalies/telemetry_anomalies.jsonl",
+  "score_semantics": "anomaly_score is a bounded monotonic transform of IsolationForest decision_function; higher means more anomalous and it is not a calibrated probability.",
+  "source_layer": "silver",
+  "source_path": "data/silver/telemetry",
+  "stable_identity_policy": [
+    "event_id",
+    "model_name",
+    "model_version",
+    "model_config_hash"
+  ],
+  "future_alert_policy": "planned",
+  "future_drift_monitoring": "planned",
+  "future_streaming_detection": "planned"
+}

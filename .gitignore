@@ -64,8 +64,10 @@ data/silver/*
 data/gold/*
 data/model_input/
 data/predictions/
+data/anomalies/
 ml/artifacts/*
 !ml/artifacts/README.md
+ml/artifacts/anomaly/
 ml/artifacts/ai4i/artifact_metadata.json
 ml/artifacts/ai4i/*.joblib
 !data/raw/.gitkeep

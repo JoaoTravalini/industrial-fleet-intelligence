@@ -39,7 +39,6 @@ EXPECTED_MODEL_FAMILIES = {
 }
 EXPECTED_EMPTY_TABLE_COUNTS = {
     "maintenance_records": 0,
-    "anomalies": 0,
     "alerts": 0,
 }
 
@@ -369,7 +368,6 @@ def check_other_tables_empty() -> CheckResult:
     result = run_psql_query(
         """
         SELECT 'maintenance_records' AS table_name, count(*) FROM maintenance_records
-        UNION ALL SELECT 'anomalies', count(*) FROM anomalies
         UNION ALL SELECT 'alerts', count(*) FROM alerts
         ORDER BY table_name;
         """
