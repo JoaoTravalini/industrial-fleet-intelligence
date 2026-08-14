@@ -9,10 +9,14 @@ import type {
   MachineDetailResponse,
   MachineListResponse,
   MachineSummary,
+  PredictionExplanationResponse,
   PredictionListResponse,
   PredictionResponse,
   SourceLineage,
 } from '../api/types'
+
+export const eventOne = '00000000-0000-4000-8000-000000000001'
+export const eventTwo = '00000000-0000-4000-8000-000000000002'
 
 const lineage: SourceLineage = {
   source_kafka_topic: 'industrial.telemetry.v1',
@@ -55,7 +59,7 @@ export function machineSummaryFixture(machineCode = 'MCH-0001'): MachineSummary 
       event_time: '2026-08-14T12:05:00Z',
       failure_probability: 0.033333,
       failure_prediction: false,
-      frozen_threshold: 0.42,
+      frozen_threshold: 0.14,
       model_name: 'ai4i_random_forest',
       model_version: '1.0.0',
       final_config_hash: 'test-only-config-hash',
@@ -71,12 +75,12 @@ export const machineDetailFixture: MachineDetailResponse = {
 
 export const predictionFixture: PredictionResponse = {
   model_prediction_id: 501,
-  event_id: 'evt-test-001',
+  event_id: eventOne,
   event_time: '2026-08-14T12:05:00Z',
-  failure_probability: 0.033333,
+  failure_probability: 0.1,
   failure_prediction: false,
   decision_semantics: 'model_decision_not_observed_failure',
-  frozen_threshold: 0.42,
+  frozen_threshold: 0.14,
   model_name: 'ai4i_random_forest',
   model_version: '1.0.0',
   final_config_hash: 'test-only-config-hash',
@@ -87,7 +91,7 @@ export const predictionFixture: PredictionResponse = {
 
 export const anomalyFixture: AnomalyResponse = {
   anomaly_id: 901,
-  event_id: 'evt-test-001',
+  event_id: eventOne,
   event_time: '2026-08-14T12:05:00Z',
   vibration_mm_s: 4.2,
   pressure_bar: 118.5,
@@ -136,21 +140,82 @@ export function machineListFixture(offset = 0): MachineListResponse {
 
 export const predictionListFixture: PredictionListResponse = {
   machine_code: 'MCH-0001',
-  items: [predictionFixture],
+  items: [
+    predictionFixture,
+    {
+      ...predictionFixture,
+      model_prediction_id: 502,
+      event_id: eventTwo,
+      event_time: '2026-08-14T12:10:00Z',
+      failure_probability: 0.2,
+      failure_prediction: true,
+    },
+  ],
   limit: 5,
   offset: 0,
-  count: 1,
-  total: 1,
+  count: 2,
+  total: 2,
 }
 
 export const anomalyListFixture: AnomalyListResponse = {
   machine_code: 'MCH-0001',
   flagged_only: false,
-  items: [anomalyFixture],
+  items: [
+    anomalyFixture,
+    {
+      ...anomalyFixture,
+      anomaly_id: 902,
+      event_id: eventTwo,
+      event_time: '2026-08-14T12:10:00Z',
+      vibration_mm_s: 3.4,
+      pressure_bar: 121.2,
+      anomaly_score: 0.124,
+      anomaly_flag: false,
+    },
+  ],
   limit: 5,
   offset: 0,
-  count: 1,
-  total: 1,
+  count: 2,
+  total: 2,
+}
+
+export function explanationFixture(eventId = eventOne): PredictionExplanationResponse {
+  const isSecond = eventId === eventTwo
+  return {
+    prediction_explanation_id: isSecond ? 702 : 701,
+    model_prediction_id: isSecond ? 502 : 501,
+    event_id: eventId,
+    machine_code: 'MCH-0001',
+    event_time: isSecond ? '2026-08-14T12:10:00Z' : '2026-08-14T12:05:00Z',
+    failure_probability: isSecond ? 0.2 : 0.1,
+    failure_prediction: isSecond,
+    decision_semantics: 'model_decision_not_observed_failure',
+    frozen_threshold: 0.14,
+    model_name: 'ai4i_random_forest',
+    model_version: '1.0.0',
+    final_config_hash: 'test-only-config-hash',
+    model_input_sha256: 'test-only-input-hash',
+    explainer_name: 'shap.TreeExplainer',
+    explainer_version: '0.52.0',
+    explanation_config_hash: 'test-only-explanation-hash',
+    output_semantics: 'positive_class_failure_risk_model_output',
+    attribution_semantics: 'shap_model_attribution_not_causality',
+    positive_contribution_semantics: 'positive_shap_pushes_model_output_toward_higher_failure_risk',
+    negative_contribution_semantics: 'negative_shap_pushes_model_output_toward_lower_failure_risk',
+    base_value: 0.12,
+    model_output_value: isSecond ? 0.2 : 0.1,
+    contribution_sum: isSecond ? 0.08 : -0.02,
+    additivity_error: 0,
+    feature_contributions: [
+      { feature_name: 'Type', feature_value: 'L', shap_value: 0.003 },
+      { feature_name: 'Air temperature [K]', feature_value: 300.1, shap_value: -0.004 },
+      { feature_name: 'Process temperature [K]', feature_value: 309.2, shap_value: -0.002 },
+      { feature_name: 'Rotational speed [rpm]', feature_value: 1450, shap_value: 0.006 },
+      { feature_name: 'Torque [Nm]', feature_value: 42, shap_value: isSecond ? 0.018 : -0.018 },
+      { feature_name: 'Tool wear [min]', feature_value: 20, shap_value: isSecond ? 0.059 : -0.005 },
+    ],
+    lineage,
+  }
 }
 
 export const alertListFixture: AlertListResponse = {

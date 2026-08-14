@@ -1,6 +1,14 @@
 import { useLatestDrift } from '../api/queries'
 import type { DriftFeatureMetric } from '../api/types'
-import { EmptyState, ErrorState, LoadingState, PageHeader, Section, StatusBadge } from '../components'
+import {
+  DriftPsiChart,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  PageHeader,
+  Section,
+  StatusBadge,
+} from '../components'
 import { formatInteger, formatPsi, formatTimestamp, humanizeToken } from '../utils/format'
 
 const AI4I_SCOPE = 'ai4i_model_input'
@@ -99,35 +107,38 @@ function DriftScope({ title, status, currentCount, features }: DriftScopeProps) 
           message="This scope has no feature-level drift metrics in the latest snapshot."
         />
       ) : (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Feature</th>
-                <th scope="col">Type</th>
-                <th scope="col">PSI</th>
-                <th scope="col">Status</th>
-                <th scope="col">Reference</th>
-                <th scope="col">Current</th>
-                <th scope="col">Diagnostics</th>
-              </tr>
-            </thead>
-            <tbody>
-              {features.map((feature) => (
-                <tr key={feature.feature_name}>
-                  <td data-label="Feature">{feature.feature_name}</td>
-                  <td data-label="Type">{humanizeToken(feature.feature_type)}</td>
-                  <td data-label="PSI">{formatPsi(feature.psi)}</td>
-                  <td data-label="Status">
-                    <StatusBadge kind="drift" value={feature.status} />
-                  </td>
-                  <td data-label="Reference">{formatInteger(feature.reference_count)}</td>
-                  <td data-label="Current">{formatInteger(feature.current_count)}</td>
-                  <td data-label="Diagnostics">{formatDiagnostics(feature)}</td>
+        <div className="section-stack">
+          <DriftPsiChart title={title} features={features} />
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Feature</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">PSI</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Reference</th>
+                  <th scope="col">Current</th>
+                  <th scope="col">Diagnostics</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {features.map((feature) => (
+                  <tr key={feature.feature_name}>
+                    <td data-label="Feature">{feature.feature_name}</td>
+                    <td data-label="Type">{humanizeToken(feature.feature_type)}</td>
+                    <td data-label="PSI">{formatPsi(feature.psi)}</td>
+                    <td data-label="Status">
+                      <StatusBadge kind="drift" value={feature.status} />
+                    </td>
+                    <td data-label="Reference">{formatInteger(feature.reference_count)}</td>
+                    <td data-label="Current">{formatInteger(feature.current_count)}</td>
+                    <td data-label="Diagnostics">{formatDiagnostics(feature)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </Section>

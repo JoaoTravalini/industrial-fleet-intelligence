@@ -1,0 +1,31 @@
+{
+  "api_endpoint": "/api/v1/machines/{machine_code}/predictions/{event_id}/explanation",
+  "explanation_method": "shap.TreeExplainer",
+  "explanation_version_source": "Installed SHAP library version",
+  "explanations_materialized_offline": true,
+  "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+  "model_identity": {
+    "model_name": "ai4i-failure-risk-random-forest",
+    "model_version": "1.0.0"
+  },
+  "model_retraining_occurs": false,
+  "output_semantics": "positive_class_failure_risk_model_output",
+  "persistence_table": "prediction_explanations",
+  "runtime_explanation_path": "data/explanations/ai4i/telemetry_explanations.jsonl",
+  "semantic_feature_list": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "shap_interpretation": "Model attribution for the positive-class output, not physical causality.",
+  "source_prediction_path": "data/predictions/ai4i/telemetry_predictions.jsonl",
+  "stable_explanation_identity": [
+    "model_prediction_id",
+    "explainer_name",
+    "explainer_version",
+    "explanation_config_hash"
+  ]
+}

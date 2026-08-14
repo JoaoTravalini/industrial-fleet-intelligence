@@ -41,6 +41,7 @@ Operational endpoints use `/api/v1`. The health endpoint remains `/health`.
 - `GET /api/v1/machines`
 - `GET /api/v1/machines/{machine_code}`
 - `GET /api/v1/machines/{machine_code}/predictions`
+- `GET /api/v1/machines/{machine_code}/predictions/{event_id}/explanation`
 - `GET /api/v1/machines/{machine_code}/anomalies`
 - `GET /api/v1/drift/latest`
 - `GET /api/v1/alerts`
@@ -57,6 +58,12 @@ The machine list supports `limit`, `offset`, and truthful filtering by the real 
 ## Predictions
 
 Prediction history returns persisted AI4I prediction rows ordered by event time and Kafka/source lineage. `failure_prediction` is a model decision from the frozen classifier and is not an observed failure.
+
+## Prediction Explanations
+
+`GET /api/v1/machines/{machine_code}/predictions/{event_id}/explanation` returns a persisted operational SHAP explanation for one persisted prediction. The endpoint verifies that the machine exists, verifies that the prediction belongs to that machine, and returns 404 when either the prediction or its materialized explanation is unavailable.
+
+The response includes prediction context, the positive-class model output, additivity error, the six semantic AI4I feature contributions, explainer identity, explanation configuration hash, and source lineage. SHAP values are signed decimal model attributions, not probabilities or causal claims.
 
 ## Anomalies
 
@@ -88,7 +95,7 @@ Local CORS defaults to `http://localhost:5173` for the React/Vite dashboard. The
 
 ## No Runtime Model Execution
 
-Request handlers do not import or execute AI4I prediction, Isolation Forest scoring, SHAP calculation, Spark, Kafka consumers, or PSI/drift computation. They serve materialized PostgreSQL state only.
+Request handlers do not import or execute AI4I prediction, Isolation Forest scoring, SHAP calculation, Spark, Kafka consumers, or PSI/drift computation. The explanation endpoint reads persisted `prediction_explanations` rows only and does not calculate missing explanations on demand.
 
 ## Limitations
 
@@ -96,7 +103,7 @@ This local portfolio API does not implement authentication, authorization, produ
 
 ## Frontend Dashboard
 
-A React, TypeScript, and Vite dashboard consumes these read endpoints through `VITE_API_BASE_URL`. Advanced telemetry charts, SHAP visualizations, and copilot interactions remain planned for later phases.
+A React, TypeScript, and Vite dashboard consumes these read endpoints through `VITE_API_BASE_URL`. AI copilot interactions remain planned for a later phase.
 
 ## Future Authentication
 

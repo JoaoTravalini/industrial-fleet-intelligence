@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -8,6 +8,8 @@ import {
   anomalyListFixture,
   driftFixture,
   emptyAlertListFixture,
+  eventTwo,
+  explanationFixture,
   fleetOverviewFixture,
   healthFixture,
   machineDetailFixture,
@@ -16,12 +18,22 @@ import {
 } from './test/fixtures'
 import { renderWithProviders } from './test/render'
 
-type FetchMode = 'default' | 'overview-error' | 'machine-missing' | 'alerts-empty' | 'overview-loading'
+type FetchMode =
+  | 'default'
+  | 'overview-error'
+  | 'machine-missing'
+  | 'alerts-empty'
+  | 'overview-loading'
+  | 'explanation-missing'
+  | 'explanation-error'
+  | 'explanation-loading'
 
 let fetchMode: FetchMode = 'default'
+let requestedPaths: string[] = []
 
 beforeEach(() => {
   fetchMode = 'default'
+  requestedPaths = []
   vi.stubGlobal('fetch', vi.fn(handleFetch))
 })
 
@@ -92,6 +104,78 @@ describe('dashboard routing and data states', () => {
     expect(screen.getByText('0.840')).toBeInTheDocument()
   })
 
+  it('renders failure probability history with the model threshold label', async () => {
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByText('Failure Probability History')).toBeInTheDocument()
+    expect(screen.getByText('Model decision threshold 14.00%')).toBeInTheDocument()
+  })
+
+  it('renders anomaly monitoring charts without formatting score as a percent', async () => {
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByText('Operational Sensor Monitoring')).toBeInTheDocument()
+    expect(screen.getByText('Vibration History')).toBeInTheDocument()
+    expect(screen.getByText('Pressure History')).toBeInTheDocument()
+    expect(screen.getByText('Anomaly Score History')).toBeInTheDocument()
+    expect(screen.getByText('0.840')).toBeInTheDocument()
+    expect(screen.queryByText('84.00%')).not.toBeInTheDocument()
+  })
+
+  it('renders persisted SHAP explanation details for all six semantic features', async () => {
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByText('SHAP Contribution')).toBeInTheDocument()
+    expect(screen.getByText('SHAP values are signed decimal model attributions; they are not probabilities.')).toBeInTheDocument()
+    expect(screen.getByText('Positive SHAP: toward higher model failure-risk output. Negative SHAP: toward lower model failure-risk output.')).toBeInTheDocument()
+    for (const label of ['Type', 'Air temperature', 'Process temperature', 'Rotational speed', 'Torque', 'Tool wear']) {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0)
+    }
+    expect(screen.getByText('-0.0180')).toBeInTheDocument()
+    expect(screen.queryByText('-1.80%')).not.toBeInTheDocument()
+  })
+
+  it('selects another prediction and requests its persisted explanation', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    await screen.findByText('SHAP Contribution')
+    await user.click(screen.getByRole('button', { name: '502' }))
+
+    await waitFor(() => {
+      expect(requestedPaths.some((path) => path.includes(eventTwo))).toBe(true)
+    })
+    expect((await screen.findAllByText('20.00%')).length).toBeGreaterThan(0)
+  })
+
+  it('shows a stable empty state when an explanation is not materialized', async () => {
+    fetchMode = 'explanation-missing'
+
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByText('Explanation not materialized for this prediction.')).toBeInTheDocument()
+  })
+
+  it('shows explanation loading and error states', async () => {
+    fetchMode = 'explanation-loading'
+    const loadingView = renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByText('Loading materialized explanation')).toBeInTheDocument()
+    loadingView.unmount()
+
+    fetchMode = 'explanation-error'
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByRole('heading', { name: 'Unable to load prediction explanation' })).toBeInTheDocument()
+  })
+
+  it('keeps chart layouts mobile-stackable through structural classes', async () => {
+    renderWithProviders(<App />, { route: '/machines/MCH-0001' })
+
+    expect(await screen.findByTestId('machine-monitoring-chart-grid')).toHaveClass('chart-grid--three')
+    expect(document.querySelector('.chart-frame')).toBeInTheDocument()
+  })
+
   it('renders a clear not-found state for an unknown machine', async () => {
     fetchMode = 'machine-missing'
 
@@ -116,6 +200,8 @@ describe('dashboard routing and data states', () => {
     expect(await screen.findByText('AI4I Model Inputs')).toBeInTheDocument()
     expect(screen.getByText('Operational Anomaly Inputs')).toBeInTheDocument()
     expect(screen.getByText('Distribution shift does not directly measure model accuracy.')).toBeInTheDocument()
+    expect(screen.getByText('AI4I Model Inputs PSI')).toBeInTheDocument()
+    expect(screen.getAllByText('Heuristic monitoring bands: 0.10 watch, 0.25 drift.').length).toBeGreaterThan(0)
   })
 
   it('renders valid empty states', async () => {
@@ -136,6 +222,7 @@ describe('dashboard routing and data states', () => {
 async function handleFetch(input: RequestInfo | URL): Promise<Response> {
   const url = getUrl(input)
   const path = url.pathname
+  requestedPaths.push(path)
 
   if (path === '/health') {
     return jsonResponse(healthFixture)
@@ -168,6 +255,25 @@ async function handleFetch(input: RequestInfo | URL): Promise<Response> {
 
   if (path === '/api/v1/machines/MCH-0001/anomalies') {
     return jsonResponse(anomalyListFixture)
+  }
+
+  const explanationMatch = path.match(
+    /^\/api\/v1\/machines\/MCH-0001\/predictions\/([^/]+)\/explanation$/,
+  )
+  if (explanationMatch) {
+    if (fetchMode === 'explanation-loading') {
+      return new Promise<Response>(() => undefined)
+    }
+
+    if (fetchMode === 'explanation-error') {
+      return jsonResponse({ detail: 'database unavailable' }, 503)
+    }
+
+    if (fetchMode === 'explanation-missing') {
+      return jsonResponse({ detail: 'Prediction explanation not found' }, 404)
+    }
+
+    return jsonResponse(explanationFixture(decodeURIComponent(explanationMatch[1])))
   }
 
   if (path === '/api/v1/machines/MCH-404') {

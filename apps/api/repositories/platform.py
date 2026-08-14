@@ -15,6 +15,10 @@ from apps.api.db import DatabaseUnavailableError, open_connection
 AI4I_PREDICTION_TYPE = "ai4i_failure_risk"
 TELEMETRY_ANOMALY_TYPE = "telemetry_isolation_forest_score"
 DRIFT_SCOPES = ("ai4i_model_input", "operational_anomaly_inputs")
+EXPLANATION_OUTPUT_SEMANTICS = "positive_class_failure_risk_model_output"
+EXPLANATION_ATTRIBUTION_SEMANTICS = "shap_model_attribution_not_causality"
+POSITIVE_CONTRIBUTION_SEMANTICS = "positive_shap_pushes_model_output_toward_higher_failure_risk"
+NEGATIVE_CONTRIBUTION_SEMANTICS = "negative_shap_pushes_model_output_toward_lower_failure_risk"
 
 
 class MachineNotFoundError(LookupError):
@@ -23,6 +27,10 @@ class MachineNotFoundError(LookupError):
 
 class AlertNotFoundError(LookupError):
     """Raised when an alert id does not exist."""
+
+
+class PredictionExplanationNotFoundError(LookupError):
+    """Raised when a prediction explanation is unavailable."""
 
 
 def normalize_value(value: Any) -> Any:
@@ -292,6 +300,89 @@ class PlatformRepository:
             "offset": offset,
             "count": len(items),
             "total": int(total_row["total"] if total_row else 0),
+        }
+
+    def get_prediction_explanation(self, machine_code: str, event_id: str) -> dict[str, Any]:
+        machine_id = self.machine_exists(machine_code)
+        try:
+            event_uuid = str(UUID(event_id))
+        except ValueError as exc:
+            raise PredictionExplanationNotFoundError(event_id) from exc
+        row = self._fetch_one(
+            """
+            SELECT
+                e.prediction_explanation_id,
+                e.model_prediction_id,
+                e.event_id::text AS event_id,
+                e.event_time,
+                e.model_input_sha256,
+                e.explainer_name,
+                e.explainer_version,
+                e.explanation_config_hash,
+                e.output_semantics,
+                e.attribution_semantics,
+                e.base_value,
+                e.model_output_value,
+                e.contribution_sum,
+                e.additivity_error,
+                e.feature_contributions,
+                m.machine_identifier AS machine_code,
+                p.failure_probability,
+                p.failure_prediction,
+                p.frozen_threshold,
+                p.model_name,
+                p.model_version,
+                p.final_config_hash,
+                p.source_kafka_topic,
+                p.source_kafka_partition,
+                p.source_kafka_offset,
+                p.source_kafka_timestamp,
+                p.source_kafka_key,
+                p.payload_sha256
+            FROM prediction_explanations e
+            JOIN model_predictions p
+              ON p.model_prediction_id = e.model_prediction_id
+            JOIN machines m
+              ON m.machine_id = e.machine_id
+            WHERE p.machine_id = %s
+              AND p.prediction_type = %s
+              AND p.event_id = %s::uuid
+            ORDER BY e.created_at DESC, e.prediction_explanation_id DESC
+            LIMIT 1;
+            """,
+            (machine_id, AI4I_PREDICTION_TYPE, event_uuid),
+        )
+        if row is None:
+            raise PredictionExplanationNotFoundError(event_id)
+        return {
+            "prediction_explanation_id": row["prediction_explanation_id"],
+            "model_prediction_id": row["model_prediction_id"],
+            "event_id": row["event_id"],
+            "machine_code": row["machine_code"],
+            "event_time": row["event_time"],
+            "failure_probability": row["failure_probability"],
+            "failure_prediction": row["failure_prediction"],
+            "decision_semantics": "model_decision_not_observed_failure",
+            "frozen_threshold": row["frozen_threshold"],
+            "model_name": row["model_name"],
+            "model_version": row["model_version"],
+            "final_config_hash": row["final_config_hash"],
+            "model_input_sha256": row["model_input_sha256"],
+            "explainer_name": row["explainer_name"],
+            "explainer_version": row["explainer_version"],
+            "explanation_config_hash": row["explanation_config_hash"],
+            "output_semantics": row.get("output_semantics") or EXPLANATION_OUTPUT_SEMANTICS,
+            "attribution_semantics": (
+                row.get("attribution_semantics") or EXPLANATION_ATTRIBUTION_SEMANTICS
+            ),
+            "positive_contribution_semantics": POSITIVE_CONTRIBUTION_SEMANTICS,
+            "negative_contribution_semantics": NEGATIVE_CONTRIBUTION_SEMANTICS,
+            "base_value": row["base_value"],
+            "model_output_value": row["model_output_value"],
+            "contribution_sum": row["contribution_sum"],
+            "additivity_error": row["additivity_error"],
+            "feature_contributions": row["feature_contributions"],
+            "lineage": source_lineage_from_row(row),
         }
 
     def list_machine_anomalies(
@@ -660,6 +751,7 @@ class PlatformRepository:
             """
             SELECT
                 (SELECT count(*) FROM model_predictions) AS model_predictions,
+                (SELECT count(*) FROM prediction_explanations) AS prediction_explanations,
                 (SELECT count(*) FROM anomalies) AS anomalies,
                 (SELECT count(*) FROM drift_snapshots) AS drift_snapshots,
                 (SELECT count(*) FROM drift_feature_metrics) AS drift_feature_metrics;

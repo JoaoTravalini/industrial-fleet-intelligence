@@ -9,6 +9,7 @@ import type {
   HealthResponse,
   MachineDetailResponse,
   MachineListResponse,
+  PredictionExplanationResponse,
   PredictionListResponse,
 } from './types'
 
@@ -41,6 +42,8 @@ export const queryKeys = {
   machineDetail: (machineCode: string) => ['machines', machineCode, 'detail'] as const,
   machinePredictions: (machineCode: string, limit: number, offset: number) =>
     ['machines', machineCode, 'predictions', { limit, offset }] as const,
+  predictionExplanation: (machineCode: string, eventId: string) =>
+    ['machines', machineCode, 'predictions', eventId, 'explanation'] as const,
   machineAnomalies: (
     machineCode: string,
     limit: number,
@@ -106,6 +109,27 @@ export function useMachinePredictions(
         offset,
       }),
     enabled: code.length > 0,
+    staleTime: DEFAULT_STALE_TIME_MS,
+    retry: false,
+  })
+}
+
+export function usePredictionExplanation(
+  machineCode: string | undefined,
+  eventId: string | null | undefined,
+) {
+  const code = machineCode ?? ''
+  const selectedEventId = eventId ?? ''
+
+  return useQuery({
+    queryKey: queryKeys.predictionExplanation(code, selectedEventId),
+    queryFn: () =>
+      fetchJson<PredictionExplanationResponse>(
+        `/api/v1/machines/${encodeURIComponent(code)}/predictions/${encodeURIComponent(
+          selectedEventId,
+        )}/explanation`,
+      ),
+    enabled: code.length > 0 && selectedEventId.length > 0,
     staleTime: DEFAULT_STALE_TIME_MS,
     retry: false,
   })

@@ -124,11 +124,11 @@ Telemetry predictions are model outputs, not observed equipment failures. The sy
 
 ## Limitations
 
-This bridge is deterministic local batch inference over the current canonical Silver snapshot. It is not streaming inference, model monitoring, drift detection, anomaly detection, API serving, dashboard integration, or a production MLOps deployment.
+This bridge is deterministic local batch inference over the current canonical Silver snapshot. It is not streaming inference, anomaly detection, SHAP explanation generation, API request-time model serving, or a production MLOps deployment.
 
-## Future API Integration
+## Downstream API And Dashboard Access
 
-A later FastAPI phase may expose prediction records and optional explanation workflows to the web dashboard. Prediction serving endpoints, SHAP-on-demand integration, frontend views, alerts, and local GenAI copilot behavior are planned separately.
+Downstream phases persist prediction records, materialize optional SHAP explanations, and expose that PostgreSQL state through read-only FastAPI endpoints and the React dashboard. The API and frontend consume materialized records; they do not run prediction serving or SHAP-on-demand workflows.
 ## Model-Input Drift Monitoring
 
 The adapted Silver model-input records are now used by a downstream data drift monitoring phase. That monitor compares the current adapter output against the frozen AI4I train + validation development reference using exactly the six frozen model input features.

@@ -103,6 +103,29 @@ def no_forbidden_claims(payload: Any) -> bool:
     return not any(term in text for term in forbidden)
 
 
+def schema_descriptions(payload: Any) -> list[str]:
+    descriptions: list[str] = []
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            if key == "description" and isinstance(value, str):
+                descriptions.append(value)
+            else:
+                descriptions.extend(schema_descriptions(value))
+    elif isinstance(payload, list):
+        for item in payload:
+            descriptions.extend(schema_descriptions(item))
+    return descriptions
+
+
+def no_forbidden_causal_schema_descriptions(openapi_payload: Any) -> bool:
+    forbidden = ("cause", "causal", "root-cause", "root cause", "protective physical effect")
+    return not any(
+        term in description.lower()
+        for description in schema_descriptions(openapi_payload)
+        for term in forbidden
+    )
+
+
 def validate_api_endpoints() -> CheckResult:
     repository = PlatformRepository(get_settings())
     before_counts = repository.protected_state_counts()
@@ -135,6 +158,12 @@ def validate_api_endpoints() -> CheckResult:
         openapi_payload = checks[-1][1].json()
         if openapi_payload.get("info", {}).get("title") != "Industrial Fleet Intelligence API":
             return CheckResult("API Endpoints", Status.FAIL, "OpenAPI title mismatch.")
+        if not no_forbidden_causal_schema_descriptions(openapi_payload):
+            return CheckResult(
+                "API Endpoints",
+                Status.FAIL,
+                "Forbidden causal language found in OpenAPI descriptions.",
+            )
         cors = client.options(
             "/api/v1/machines",
             headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"},
@@ -147,6 +176,50 @@ def validate_api_endpoints() -> CheckResult:
         machines_payload = checks[2][1].json()
         if not isinstance(machines_payload.get("items"), list):
             return CheckResult("API Endpoints", Status.FAIL, "Machine list items is not a list.")
+        prediction_payload = checks[4][1].json()
+        prediction_items = prediction_payload.get("items", [])
+        if not prediction_items:
+            return CheckResult("API Endpoints", Status.FAIL, "No prediction row available.")
+        event_id = prediction_items[0].get("event_id")
+        if not event_id:
+            return CheckResult("API Endpoints", Status.FAIL, "Prediction event_id is missing.")
+        explanation = client.get(f"/api/v1/machines/MCH-0001/predictions/{event_id}/explanation")
+        failure = assert_status(explanation, 200, "API Endpoints")
+        if failure:
+            return CheckResult(
+                "API Endpoints",
+                Status.FAIL,
+                f"prediction explanation: {failure.message}",
+            )
+        explanation_payload = explanation.json()
+        feature_names = [
+            item.get("feature_name")
+            for item in explanation_payload.get("feature_contributions", [])
+        ]
+        expected_features = [
+            "Type",
+            "Air temperature [K]",
+            "Process temperature [K]",
+            "Rotational speed [rpm]",
+            "Torque [Nm]",
+            "Tool wear [min]",
+        ]
+        if feature_names != expected_features:
+            return CheckResult(
+                "API Endpoints",
+                Status.FAIL,
+                "Explanation endpoint did not return the six semantic features.",
+            )
+        unknown_explanation = client.get(
+            "/api/v1/machines/MCH-0001/predictions/00000000-0000-4000-8000-000000000404/explanation"
+        )
+        failure = assert_status(unknown_explanation, 404, "API Endpoints")
+        if failure:
+            return CheckResult(
+                "API Endpoints",
+                Status.FAIL,
+                f"unknown explanation: {failure.message}",
+            )
     after_counts = repository.protected_state_counts()
     if before_counts != after_counts:
         return CheckResult("API Endpoints", Status.FAIL, "API request changed protected state.")

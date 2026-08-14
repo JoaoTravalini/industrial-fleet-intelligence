@@ -1,0 +1,12 @@
+{
+  "conflict_policy": "Identical stable identities with different immutable values fail.",
+  "runtime_explanation_path": "data/explanations/ai4i/telemetry_explanations.jsonl",
+  "stable_explanation_identity": [
+    "model_prediction_id",
+    "explainer_name",
+    "explainer_version",
+    "explanation_config_hash"
+  ],
+  "target_table": "prediction_explanations",
+  "transactional": true
+}

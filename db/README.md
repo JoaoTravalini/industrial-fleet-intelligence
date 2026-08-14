@@ -10,6 +10,7 @@ PostgreSQL is not the primary storage layer for the full raw telemetry stream. H
 - `machines`: Stores the simulated fleet assets with stable human-readable identifiers and operational status.
 - `maintenance_records`: Stores historical or planned maintenance activity for each machine.
 - `model_predictions`: Stores auditable model prediction outputs. AI4I telemetry predictions include event identity, model identity, frozen threshold, probability, decision, model-input hash, and Kafka/source lineage.
+- `prediction_explanations`: Stores persisted operational SHAP explanations for model predictions, linked to `model_predictions` and storing deterministic six-feature semantic contribution JSON.
 - `anomalies`: Stores auditable telemetry anomaly detector outputs, including model identity, baseline hashes, anomaly score, flag, feature values, and source lineage.
 - `alerts`: Stores actionable operational alerts that may reference persisted model predictions or anomaly audit rows.
 - `machine_health`: Stores one current row per machine. The AI4I persistence phase uses it as a latest-prediction projection and does not invent health labels or raw telemetry history.
@@ -18,7 +19,7 @@ PostgreSQL is not the primary storage layer for the full raw telemetry stream. H
 
 ## AI4I Prediction Persistence
 
-Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. Migration `003_telemetry_anomaly_persistence.sql` additively extends `anomalies` for independent telemetry anomaly detector outputs. Migration `004_data_drift_monitoring.sql` creates drift monitoring history tables. These migrations do not drop, recreate, truncate, or delete existing tables.
+Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. Migration `003_telemetry_anomaly_persistence.sql` additively extends `anomalies` for independent telemetry anomaly detector outputs. Migration `004_data_drift_monitoring.sql` creates drift monitoring history tables. Migration `006_prediction_explanations.sql` creates persisted prediction explanation history. These migrations do not drop, recreate, truncate, or delete existing tables.
 
 The stable AI4I prediction identity is:
 
@@ -37,6 +38,30 @@ The persistence commands are:
 ```
 
 These commands consume only `data/predictions/ai4i/telemetry_predictions.jsonl`. They do not run model inference, create alerts, or create anomaly records.
+
+## AI4I Prediction Explanation Persistence
+
+Operational prediction explanation generation consumes the existing runtime prediction JSONL and canonical AI4I telemetry adapter records. It validates event identity and `model_input_sha256` alignment before writing deterministic runtime explanation JSONL:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/explain_ai4i_telemetry_predictions.py
+```
+
+Persistence consumes only the generated explanation JSONL. It does not calculate SHAP, run model inference, retrain models, update predictions, create alerts, or modify anomaly/drift state.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/persist_ai4i_explanations.py
+.\.venv\Scripts\python.exe scripts/inspect_ai4i_explanation_state.py
+.\.venv\Scripts\python.exe scripts/check_ai4i_operational_explainability.py
+```
+
+The stable explanation identity is:
+
+```text
+model_prediction_id + explainer_name + explainer_version + explanation_config_hash
+```
+
+Repeated persistence is idempotent. If an existing stable identity has different immutable explanation values, persistence fails instead of overwriting history.
 
 Telemetry anomaly persistence consumes only `data/anomalies/telemetry_anomalies.jsonl`. It does not score telemetry, refit the anomaly model, create alerts, modify AI4I predictions, or update `machine_health`.
 

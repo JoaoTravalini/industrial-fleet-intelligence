@@ -14,6 +14,7 @@ The dashboard runs as a local Vite application and consumes the FastAPI API thro
 - Vite for development and build tooling.
 - React Router for SPA navigation.
 - TanStack Query for read-only server state.
+- Recharts for responsive operational charts.
 - Browser `fetch` through a centralized typed API client.
 - Custom CSS for the visual system.
 - Vitest, jsdom, and Testing Library for unit tests.
@@ -37,7 +38,7 @@ The Vite development server defaults to `http://localhost:5173`.
 
 ## API Integration
 
-The dashboard consumes the existing local FastAPI service at `/health` and `/api/v1`. It expects the backend to expose read-only endpoints for fleet overview, machines, prediction history, anomaly history, drift monitoring, and alerts.
+The dashboard consumes the existing local FastAPI service at `/health` and `/api/v1`. It expects the backend to expose read-only endpoints for fleet overview, machines, prediction history, anomaly history, drift monitoring, persisted prediction explanations, and alerts.
 
 All operational data is loaded from the API at runtime. The frontend does not contain production fallback data, seeded machine lists, hard-coded fleet counts, or direct PostgreSQL credentials.
 
@@ -68,6 +69,10 @@ The overview page fetches `GET /api/v1/fleet/overview` and surfaces machine coun
 
 AI4I classifier outputs are labeled as model probabilities and decisions. They are not presented as observed failures, health scores, or factual future failures.
 
+## Visual Analytics
+
+The dashboard uses Recharts for compact, responsive charts that reflect API values only. Charts do not normalize all signals onto a single health scale, and the frontend does not invent runtime data for visual impact.
+
 ## Machines
 
 The machine list fetches `GET /api/v1/machines` with server-side `limit` and `offset`. Pagination state is kept in URL search parameters, and machine codes link to their detail pages.
@@ -80,6 +85,20 @@ The machine detail page fetches the machine record plus small recent slices from
 
 Anomaly score is displayed as a detector score, not a probability.
 
+## Failure Probability History
+
+The machine detail page shows recent `failure_probability` values over event time using the prediction history API. Values are formatted as percentages because they are model probabilities.
+
+When prediction rows include the frozen threshold, the chart shows it as `Model decision threshold`. A threshold crossing is a model decision rule, not an observed failure event.
+
+## Operational Sensor Monitoring
+
+The machine detail page visualizes recent anomaly audit feature values from the anomaly API. `vibration_mm_s` and `pressure_bar` are shown with their own unit-aware value formatting so their physical scales are not collapsed into an arbitrary score.
+
+## Anomaly Score History
+
+Anomaly scores are visualized separately from vibration and pressure values. The score remains a decimal detector score and is not formatted as a percentage. Flagged points are labeled so color is not the only indicator.
+
 ## Alerts
 
 The alerts page fetches `GET /api/v1/alerts` with supported server-side filters for status, severity, alert type, and machine code. It displays severity, alert type, linked machine code, message, status, and source/event time.
@@ -91,6 +110,26 @@ The page is read-only and does not expose acknowledge, resolve, create, or delet
 The drift page fetches `GET /api/v1/drift/latest` and keeps the AI4I model-input scope separate from the operational anomaly-input scope. It displays overall status, feature name, feature type, PSI, feature status, reference/current counts, and concise diagnostics.
 
 Distribution shift is described as input monitoring, not model performance measurement.
+
+## Drift PSI Visualization
+
+The drift page includes separate PSI bar charts for AI4I model inputs and operational anomaly inputs. The `0.10` watch band and `0.25` drift band are displayed as heuristic monitoring bands, not statistical guarantees.
+
+## Prediction Explainability
+
+The machine detail page selects the latest prediction by default and requests:
+
+```text
+GET /api/v1/machines/{machine_code}/predictions/{event_id}/explanation
+```
+
+Selecting another recent prediction row updates the selected event and fetches the matching persisted explanation. If the explanation is unavailable, the page displays `Explanation not materialized for this prediction.` and does not calculate SHAP in the browser.
+
+## SHAP Interpretation
+
+The explanation panel shows all six semantic AI4I features, actual event feature values, and signed SHAP contributions. Positive SHAP values point toward higher model failure-risk output, and negative SHAP values point toward lower model failure-risk output.
+
+SHAP values are decimal model attributions. They are not probabilities, causal effects, physical root causes, confirmed failure labels, or maintenance recommendations.
 
 ## Loading / Error / Empty States
 
@@ -116,11 +155,7 @@ npm run test
 
 ## Current Limitations
 
-This first frontend phase intentionally omits advanced telemetry charts, SHAP visualizations, AI copilot features, authentication, frontend mutations, Dockerized frontend services, and deployment configuration.
-
-## Future Visual Analytics
-
-A later phase can add deliberate charting for prediction history, anomaly history, drift trends, and richer fleet analysis after the core API integration and dashboard architecture are stable.
+This frontend phase intentionally omits AI copilot features, authentication, frontend mutations, Dockerized frontend services, deployment configuration, and general raw-telemetry database browsing.
 
 ## Future AI Copilot
 

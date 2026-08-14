@@ -64,6 +64,7 @@ data/silver/*
 data/gold/*
 data/model_input/
 data/predictions/
+data/explanations/
 data/anomalies/
 data/drift/
 ml/artifacts/*

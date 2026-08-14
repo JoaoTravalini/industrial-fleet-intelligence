@@ -8,12 +8,21 @@ from fastapi import APIRouter, Depends, Query
 
 from apps.api.db import DatabaseUnavailableError
 from apps.api.dependencies import get_repository
-from apps.api.repositories.platform import MachineNotFoundError, PlatformRepository
-from apps.api.routes.common import machine_not_found, unavailable
+from apps.api.repositories.platform import (
+    MachineNotFoundError,
+    PlatformRepository,
+    PredictionExplanationNotFoundError,
+)
+from apps.api.routes.common import (
+    machine_not_found,
+    prediction_explanation_not_found,
+    unavailable,
+)
 from apps.api.schemas import (
     AnomalyListResponse,
     MachineDetailResponse,
     MachineListResponse,
+    PredictionExplanationResponse,
     PredictionListResponse,
 )
 
@@ -58,6 +67,25 @@ def list_predictions(
         return repository.list_machine_predictions(machine_code, limit=limit, offset=offset)
     except MachineNotFoundError as exc:
         raise machine_not_found(exc) from exc
+    except DatabaseUnavailableError as exc:
+        raise unavailable(exc) from exc
+
+
+@router.get(
+    "/{machine_code}/predictions/{event_id}/explanation",
+    response_model=PredictionExplanationResponse,
+)
+def get_prediction_explanation(
+    machine_code: str,
+    event_id: str,
+    repository: Repository,
+) -> dict[str, object]:
+    try:
+        return repository.get_prediction_explanation(machine_code, event_id)
+    except MachineNotFoundError as exc:
+        raise machine_not_found(exc) from exc
+    except PredictionExplanationNotFoundError as exc:
+        raise prediction_explanation_not_found(exc) from exc
     except DatabaseUnavailableError as exc:
         raise unavailable(exc) from exc
 

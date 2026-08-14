@@ -72,6 +72,41 @@ export interface PredictionListResponse {
   total: number
 }
 
+export interface ExplanationFeatureContribution {
+  feature_name: string
+  feature_value: string | number
+  shap_value: number
+}
+
+export interface PredictionExplanationResponse {
+  prediction_explanation_id: number
+  model_prediction_id: number
+  event_id: string
+  machine_code: string
+  event_time: ISODateTime
+  failure_probability: number
+  failure_prediction: boolean
+  decision_semantics: 'model_decision_not_observed_failure'
+  frozen_threshold: number
+  model_name: string
+  model_version: string
+  final_config_hash: string
+  model_input_sha256: string
+  explainer_name: string
+  explainer_version: string
+  explanation_config_hash: string
+  output_semantics: 'positive_class_failure_risk_model_output'
+  attribution_semantics: 'shap_model_attribution_not_causality'
+  positive_contribution_semantics: 'positive_shap_pushes_model_output_toward_higher_failure_risk'
+  negative_contribution_semantics: 'negative_shap_pushes_model_output_toward_lower_failure_risk'
+  base_value: number
+  model_output_value: number
+  contribution_sum: number
+  additivity_error: number
+  feature_contributions: ExplanationFeatureContribution[]
+  lineage: SourceLineage
+}
+
 export interface AnomalyResponse {
   anomaly_id: number
   event_id: string | null

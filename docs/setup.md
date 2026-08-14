@@ -635,6 +635,36 @@ Validate persistence and idempotency:
 .\.venv\Scripts\python.exe scripts/check_ai4i_prediction_persistence.py
 ```
 
+## Operational AI4I Explainability
+
+Operational explanations are materialized offline for already-created telemetry predictions. The process reuses the trusted packaged AI4I model and existing SHAP semantics, validates `model_input_sha256` alignment with canonical adapter records, and does not retrain the model or change the frozen threshold.
+
+Generate operational explanations:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/explain_ai4i_telemetry_predictions.py
+```
+
+Persist explanations to PostgreSQL:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/persist_ai4i_explanations.py
+```
+
+Inspect persisted explanation state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/inspect_ai4i_explanation_state.py
+```
+
+Validate generation, persistence, idempotency, and API access:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_operational_explainability.py
+```
+
+Generated explanation JSONL is runtime state under `data/explanations/` and is ignored by Git. The API serves persisted explanations from PostgreSQL and does not calculate SHAP during requests.
+
 ## Operational Telemetry Anomaly Detection
 
 The operational telemetry anomaly detector is independent from the AI4I failure-risk classifier. It uses only `vibration_mm_s` and `pressure_bar` from canonical Silver telemetry, packages a frozen synthetic reference baseline with `IsolationForest`, writes runtime anomaly JSONL, and persists auditable detector outputs in `anomalies`. It does not create alerts, update `machine_health`, calculate drift, implement API routes, or modify AI4I.
@@ -824,6 +854,8 @@ npm run test
 npm run lint
 npm run build
 ```
+
+The visual analytics phase uses Recharts for frontend charts. Frontend dependencies remain isolated under `apps/web`; no frontend packages are installed globally or into Python.
 
 Run the local dashboard with the API in two terminals.
 

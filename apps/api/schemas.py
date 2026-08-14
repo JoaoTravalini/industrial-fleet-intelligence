@@ -89,6 +89,45 @@ class PredictionListResponse(BaseModel):
     total: int
 
 
+class ExplanationFeatureContribution(BaseModel):
+    feature_name: str
+    feature_value: str | float
+    shap_value: float
+
+
+class PredictionExplanationResponse(BaseModel):
+    prediction_explanation_id: int
+    model_prediction_id: int
+    event_id: str
+    machine_code: str
+    event_time: datetime
+    failure_probability: float
+    failure_prediction: bool
+    decision_semantics: Literal["model_decision_not_observed_failure"]
+    frozen_threshold: float
+    model_name: str
+    model_version: str
+    final_config_hash: str
+    model_input_sha256: str
+    explainer_name: str
+    explainer_version: str
+    explanation_config_hash: str
+    output_semantics: Literal["positive_class_failure_risk_model_output"]
+    attribution_semantics: Literal["shap_model_attribution_not_causality"]
+    positive_contribution_semantics: Literal[
+        "positive_shap_pushes_model_output_toward_higher_failure_risk"
+    ]
+    negative_contribution_semantics: Literal[
+        "negative_shap_pushes_model_output_toward_lower_failure_risk"
+    ]
+    base_value: float
+    model_output_value: float
+    contribution_sum: float
+    additivity_error: float
+    feature_contributions: list[ExplanationFeatureContribution]
+    lineage: SourceLineage
+
+
 class AnomalyResponse(BaseModel):
     anomaly_id: int
     event_id: str | None = None

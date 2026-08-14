@@ -1,24 +1,65 @@
 import { Link, useParams } from 'react-router'
+import { useEffect, useMemo, useState } from 'react'
 
 import { ApiError } from '../api/client'
-import { useMachineAnomalies, useMachineDetail, useMachinePredictions } from '../api/queries'
-import { EmptyState, ErrorState, KpiCard, LoadingState, PageHeader, Section, StatusBadge } from '../components'
+import {
+  useMachineAnomalies,
+  useMachineDetail,
+  useMachinePredictions,
+  usePredictionExplanation,
+} from '../api/queries'
+import {
+  AnomalyMonitoringCharts,
+  EmptyState,
+  ErrorState,
+  KpiCard,
+  LoadingState,
+  PageHeader,
+  PredictionProbabilityChart,
+  Section,
+  ShapContributionChart,
+  StatusBadge,
+} from '../components'
 import {
   formatAnomalyScore,
   formatDate,
+  formatDecision,
   formatInteger,
   formatProbability,
   formatPsi,
+  formatShapValue,
   formatTimestamp,
 } from '../utils/format'
 
-const HISTORY_LIMIT = 5
+const CHART_HISTORY_LIMIT = 100
+const TABLE_HISTORY_LIMIT = 5
 
 export function MachineDetailPage() {
   const { machineCode } = useParams()
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
   const machine = useMachineDetail(machineCode)
-  const predictions = useMachinePredictions(machineCode, HISTORY_LIMIT)
-  const anomalies = useMachineAnomalies(machineCode, HISTORY_LIMIT)
+  const predictions = useMachinePredictions(machineCode, CHART_HISTORY_LIMIT)
+  const anomalies = useMachineAnomalies(machineCode, CHART_HISTORY_LIMIT)
+  const latestPredictionEventId = predictions.data?.items.find((prediction) => prediction.event_id)?.event_id
+  const explanation = usePredictionExplanation(machineCode, selectedEventId)
+  const recentPredictionRows = useMemo(
+    () => predictions.data?.items.slice(0, TABLE_HISTORY_LIMIT) ?? [],
+    [predictions.data?.items],
+  )
+  const recentAnomalyRows = useMemo(
+    () => anomalies.data?.items.slice(0, TABLE_HISTORY_LIMIT) ?? [],
+    [anomalies.data?.items],
+  )
+
+  useEffect(() => {
+    setSelectedEventId(null)
+  }, [machineCode])
+
+  useEffect(() => {
+    if (!selectedEventId && latestPredictionEventId) {
+      setSelectedEventId(latestPredictionEventId)
+    }
+  }, [latestPredictionEventId, selectedEventId])
 
   if (machine.isLoading) {
     return <LoadingState message="Loading machine detail" />
@@ -108,7 +149,87 @@ export function MachineDetailPage() {
         )}
       </Section>
 
-      <Section title="Recent Predictions" description={`Latest ${HISTORY_LIMIT} persisted model outputs.`}>
+      <Section
+        title="Prediction History Analytics"
+        description={`Latest ${CHART_HISTORY_LIMIT} persisted model outputs requested for charting.`}
+      >
+        {predictions.isLoading ? <LoadingState message="Loading prediction history chart" /> : null}
+        {predictions.isError ? (
+          <ErrorState
+            title="Unable to load prediction history chart"
+            error={predictions.error}
+            onRetry={() => void predictions.refetch()}
+          />
+        ) : null}
+        {predictions.data && predictions.data.total === 0 ? (
+          <EmptyState title="No prediction history" message="No model prediction rows exist for this machine." />
+        ) : null}
+        {predictions.data && predictions.data.total > 0 ? (
+          <PredictionProbabilityChart predictions={predictions.data.items} />
+        ) : null}
+      </Section>
+
+      <Section
+        title="Model Explanation"
+        description="Persisted SHAP attribution for the selected prediction; values are not probabilities."
+      >
+        {selectedEventId === null ? (
+          <EmptyState title="No prediction selected" message="Select a prediction row to inspect its explanation." />
+        ) : null}
+        {selectedEventId !== null && explanation.isLoading ? (
+          <LoadingState message="Loading materialized explanation" />
+        ) : null}
+        {selectedEventId !== null && explanation.isError ? (
+          explanation.error instanceof ApiError && explanation.error.status === 404 ? (
+            <EmptyState
+              title="Explanation not materialized"
+              message="Explanation not materialized for this prediction."
+            />
+          ) : (
+            <ErrorState
+              title="Unable to load prediction explanation"
+              error={explanation.error}
+              onRetry={() => void explanation.refetch()}
+            />
+          )
+        ) : null}
+        {explanation.data ? (
+          <div className="section-stack">
+            <div className="detail-grid">
+              <div className="metric-row">
+                <span>Selected event</span>
+                <strong className="mono-text">{explanation.data.event_id}</strong>
+              </div>
+              <div className="metric-row">
+                <span>Failure probability</span>
+                <strong>{formatProbability(explanation.data.failure_probability)}</strong>
+              </div>
+              <div className="metric-row">
+                <span>Model decision</span>
+                <strong>{formatDecision(explanation.data.failure_prediction)}</strong>
+              </div>
+              <div className="metric-row">
+                <span>Base value</span>
+                <strong>{formatShapValue(explanation.data.base_value)}</strong>
+              </div>
+              <div className="metric-row">
+                <span>Model output value</span>
+                <strong>{formatProbability(explanation.data.model_output_value)}</strong>
+              </div>
+              <div className="metric-row">
+                <span>Additivity error</span>
+                <strong>{formatShapValue(explanation.data.additivity_error)}</strong>
+              </div>
+            </div>
+            <ShapContributionChart contributions={explanation.data.feature_contributions} />
+          </div>
+        ) : null}
+      </Section>
+
+      <Section
+        title="Recent Predictions"
+        description={`Latest ${TABLE_HISTORY_LIMIT} persisted model outputs. Select a row to update the explanation panel.`}
+      >
         {predictions.isLoading ? <LoadingState message="Loading recent predictions" /> : null}
         {predictions.isError ? (
           <ErrorState
@@ -134,9 +255,22 @@ export function MachineDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {predictions.data.items.map((prediction) => (
-                  <tr key={prediction.model_prediction_id}>
-                    <td data-label="ID">{prediction.model_prediction_id}</td>
+                {recentPredictionRows.map((prediction) => (
+                  <tr
+                    className={prediction.event_id === selectedEventId ? 'is-selected-row' : undefined}
+                    key={prediction.model_prediction_id}
+                  >
+                    <td data-label="ID">
+                      <button
+                        className="table-action"
+                        type="button"
+                        aria-pressed={prediction.event_id === selectedEventId}
+                        disabled={!prediction.event_id}
+                        onClick={() => setSelectedEventId(prediction.event_id)}
+                      >
+                        {prediction.model_prediction_id}
+                      </button>
+                    </td>
                     <td data-label="Event time">{formatTimestamp(prediction.event_time)}</td>
                     <td data-label="Failure probability">{formatProbability(prediction.failure_probability)}</td>
                     <td data-label="Model decision">
@@ -151,6 +285,26 @@ export function MachineDetailPage() {
               </tbody>
             </table>
           </div>
+        ) : null}
+      </Section>
+
+      <Section
+        title="Operational Sensor Monitoring"
+        description={`Latest ${CHART_HISTORY_LIMIT} anomaly audit rows requested for sensor and detector-score charting.`}
+      >
+        {anomalies.isLoading ? <LoadingState message="Loading anomaly monitoring charts" /> : null}
+        {anomalies.isError ? (
+          <ErrorState
+            title="Unable to load anomaly monitoring charts"
+            error={anomalies.error}
+            onRetry={() => void anomalies.refetch()}
+          />
+        ) : null}
+        {anomalies.data && anomalies.data.total === 0 ? (
+          <EmptyState title="No anomaly audit rows" message="No anomaly audit rows exist for this machine." />
+        ) : null}
+        {anomalies.data && anomalies.data.total > 0 ? (
+          <AnomalyMonitoringCharts anomalies={anomalies.data.items} />
         ) : null}
       </Section>
 
@@ -183,7 +337,7 @@ export function MachineDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {anomalies.data.items.map((anomaly) => (
+                {recentAnomalyRows.map((anomaly) => (
                   <tr key={anomaly.anomaly_id}>
                     <td data-label="ID">{anomaly.anomaly_id}</td>
                     <td data-label="Event time">{formatTimestamp(anomaly.event_time)}</td>

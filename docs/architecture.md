@@ -120,6 +120,10 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Latest per-machine ML prediction projection in PostgreSQL `machine_health`.
 - Deterministic latest prediction selection using event time plus Kafka/source lineage ordering.
 - Data Engineering -> ML -> operational PostgreSQL integration for persisted AI4I telemetry predictions.
+- Operational per-prediction AI4I SHAP materialization for persisted telemetry predictions.
+- Model-input hash alignment validation between persisted predictions and canonical adapter records.
+- Persisted prediction explanations in PostgreSQL `prediction_explanations`.
+- Read-only FastAPI prediction explanation endpoint.
 - Independent operational telemetry anomaly detector for canonical Silver telemetry.
 - Vibration/pressure anomaly feature contract using exactly `vibration_mm_s` and `pressure_bar`.
 - Frozen synthetic anomaly reference baseline for model version `1.0.0`.
@@ -144,6 +148,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Anomaly history API endpoint.
 - Drift monitoring API endpoint.
 - Alert read API endpoints.
+- Prediction explanation read API endpoint.
 - FastAPI OpenAPI documentation.
 - Local frontend CORS configuration for `http://localhost:5173`.
 - React + TypeScript frontend application shell.
@@ -156,18 +161,23 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Recent AI4I prediction and operational anomaly read views.
 - Operational alert monitoring UI with supported API filters.
 - Drift monitoring UI for AI4I model inputs and operational anomaly inputs.
+- Prediction probability history visualization.
+- Vibration and pressure telemetry visualization from anomaly audit history.
+- Anomaly-score history visualization.
+- PSI drift visualization for AI4I and anomaly input scopes.
+- Interactive machine prediction explanation UX backed by persisted SHAP attributions.
 - Responsive dashboard application shell with custom CSS.
 ## Planned Component Areas
 
 - `apps/api`: Implemented PostgreSQL-backed FastAPI backend for read-oriented operational APIs.
-- `apps/web`: Implemented React, TypeScript, and Vite read-only dashboard for fleet overview, machine monitoring, alert monitoring, and drift monitoring. Advanced visual analytics remain planned.
+- `apps/web`: Implemented React, TypeScript, and Vite read-only dashboard for fleet overview, machine monitoring, alert monitoring, drift monitoring, operational charts, and persisted prediction explanations.
 - Maintenance history generation is planned for a later phase.
 - Alert lifecycle mutation and automated resolution are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Streaming anomaly detection is planned for a later phase.
 - Additional production feature engineering workflows are planned for a later phase.
-- MLflow Model Registry, registered deployment model, automated drift workflows, and explanation exposure through API are planned for later phases.
-- `services/database`: Implemented reusable AI4I prediction persistence helpers and telemetry anomaly persistence helpers for PostgreSQL validation and idempotency.
+- MLflow Model Registry, registered deployment model, and automated drift workflows are planned for later phases.
+- `services/database`: Implemented reusable AI4I prediction persistence, prediction explanation persistence, telemetry anomaly persistence, and drift persistence helpers for PostgreSQL validation and idempotency.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -201,7 +211,7 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, train-only 5-fold OOF model development, class-weight imbalance comparison, threshold trade-off analysis, fixed-configuration Logistic Regression, Random Forest, and XGBoost model-family comparison, deterministic train OOF Average Precision-based candidate selection, targeted Random Forest hyperparameter tuning with nested train-only cross-validation, train-derived tuned threshold strategy, validation-only reporting, frozen final classifier specification, final train + validation refit, locked test holdout evaluation, final test performance reporting, local final model packaging, artifact integrity metadata, strict inference input/output contracts, single/batch local inference, local retrospective MLflow tracking, and SHAP explainability for the packaged Random Forest.
 
-The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, API integration, dashboard integration, or explanation exposure through API has been implemented.
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, live API model serving, browser-side inference, or browser-side SHAP calculation has been implemented.
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
@@ -233,10 +243,10 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 12. The implemented drift monitor compares frozen AI4I and anomaly input references against current operational inputs.
 13. The implemented PostgreSQL drift persistence step stores deterministic monitoring snapshots without creating alerts.
 14. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
-15. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
+15. Implemented AI4I SHAP reports support local model interpretation, and operational per-prediction explanations can be materialized, persisted, and exposed separately from predictions.
 16. The implemented FastAPI backend exposes local platform capabilities to the implemented web dashboard.
-17. The implemented React dashboard visualizes fleet overview, machine projections, recent prediction/anomaly history, alerts, and drift monitoring without browser-side inference.
-18. Advanced telemetry visualizations, prediction/anomaly charts, richer explainability UX, and final CI/demo polish remain planned.
+17. The implemented React dashboard visualizes fleet overview, machine projections, recent prediction/anomaly history, alerts, drift monitoring, visual analytics, and persisted SHAP attribution details without browser-side inference.
+18. Final CI/demo polish remains planned.
 19. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
@@ -259,6 +269,6 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-The current completed scope includes the read-oriented PostgreSQL-backed FastAPI backend and the first React, TypeScript, and Vite operational dashboard phase. It does not implement advanced telemetry charts, SHAP frontend UX, the local AI copilot, authentication, Dockerized frontend/API services, model retraining, runtime inference in API requests, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.
+The current completed scope includes operational AI4I SHAP materialization for persisted telemetry predictions, PostgreSQL explanation persistence, a read-only explanation API, Recharts-based operational visual analytics, and an interactive machine prediction explanation UX. It does not implement the local AI copilot, authentication, Dockerized frontend/API services, model retraining, runtime inference or SHAP calculation in API requests, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.
 
 

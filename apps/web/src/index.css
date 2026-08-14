@@ -381,9 +381,14 @@ button:disabled {
 }
 
 .metric-list,
-.detail-grid {
+.detail-grid,
+.section-stack {
   display: grid;
   gap: 10px;
+}
+
+.section-stack {
+  gap: 18px;
 }
 
 .detail-grid {
@@ -549,6 +554,27 @@ tr:last-child td {
   outline: none;
 }
 
+.table-action {
+  min-height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--info);
+  font-weight: 850;
+}
+
+.table-action:hover:not(:disabled),
+.table-action:focus-visible,
+.table-action[aria-pressed="true"] {
+  border-color: var(--info);
+  box-shadow: 0 0 0 3px rgb(46 111 145 / 14%);
+  outline: none;
+}
+
+.is-selected-row td {
+  background: var(--info-bg);
+}
+
 .table-detail {
   margin-top: 4px;
   color: var(--text-muted);
@@ -630,6 +656,86 @@ tr:last-child td {
   font-size: 0.82rem;
 }
 
+.chart-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.chart-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.chart-panel {
+  min-width: 0;
+}
+
+.chart-heading h3,
+.chart-heading p,
+.chart-summary,
+.chart-legend-note,
+.contribution-row small {
+  margin: 0;
+}
+
+.chart-heading h3 {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.chart-heading p,
+.chart-summary,
+.chart-legend-note {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.chart-heading p {
+  margin-top: 4px;
+}
+
+.chart-frame {
+  min-height: 220px;
+  margin-top: 12px;
+}
+
+.chart-summary,
+.chart-legend-note {
+  font-size: 0.9rem;
+}
+
+.chart-legend-note {
+  margin-top: 10px;
+  font-weight: 750;
+}
+
+.chart-summary {
+  margin-top: 10px;
+}
+
+.contribution-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.contribution-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.contribution-row span {
+  display: grid;
+  gap: 2px;
+}
+
+.contribution-row small {
+  color: var(--text-muted);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -685,6 +791,10 @@ tr:last-child td {
   .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .chart-grid--three {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -717,7 +827,8 @@ tr:last-child td {
   .filter-grid,
   .kpi-grid,
   .snapshot-strip,
-  .toolbar {
+  .toolbar,
+  .chart-grid--three {
     grid-template-columns: 1fr;
   }
 

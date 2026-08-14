@@ -1,7 +1,16 @@
 import { Link } from 'react-router'
 
 import { useFleetOverview } from '../api/queries'
-import { EmptyState, ErrorState, KpiCard, LoadingState, PageHeader, Section, StatusBadge } from '../components'
+import {
+  EmptyState,
+  ErrorState,
+  KpiCard,
+  LoadingState,
+  OverviewStateChart,
+  PageHeader,
+  Section,
+  StatusBadge,
+} from '../components'
 import { formatInteger, formatProbability } from '../utils/format'
 
 export function OverviewPage() {
@@ -77,6 +86,13 @@ export function OverviewPage() {
           tone={data.open_alert_count > 0 ? 'warning' : 'success'}
         />
       </section>
+
+      <Section
+        title="Visual Analytics"
+        description="Compact count view based only on materialized API data."
+      >
+        <OverviewStateChart overview={data} />
+      </Section>
 
       <div className="two-column-grid">
         <Section

@@ -1,0 +1,27 @@
+{
+  "anomaly_score_semantics": "Decimal detector score, not a probability or percentage.",
+  "charting_library": {
+    "name": "recharts",
+    "version": "3.10.1"
+  },
+  "explanation_api_source": "/api/v1/machines/{machine_code}/predictions/{event_id}/explanation",
+  "implemented_chart_types": [
+    "failure_probability_line_chart",
+    "vibration_line_chart",
+    "pressure_line_chart",
+    "anomaly_score_line_chart",
+    "psi_horizontal_bar_chart",
+    "shap_horizontal_contribution_chart",
+    "overview_state_count_bar_chart"
+  ],
+  "pages_enhanced": [
+    "/",
+    "/machines/{machineCode}",
+    "/drift"
+  ],
+  "prediction_probability_semantics": "Failure probability is displayed as a model output percentage with the frozen model decision threshold.",
+  "psi_semantics": "PSI values are drift diagnostics with heuristic monitoring bands at 0.10 and 0.25.",
+  "responsive_policy": "Charts use responsive containers and stack on narrow layouts.",
+  "shap_semantics": "SHAP values are signed decimal model attributions, not probabilities or physical effects.",
+  "test_strategy": "Vitest and Testing Library verify user-visible chart sections, units, explanation states, and interaction without asserting Recharts internals."
+}

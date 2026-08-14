@@ -45,6 +45,32 @@ export function formatAnomalyScore(value: number | null | undefined): string {
   return value === null || value === undefined ? 'No score' : decimalFormatter.format(value)
 }
 
+export function formatSignedDecimal(value: number | null | undefined, digits = 4): string {
+  if (value === null || value === undefined) {
+    return 'No data'
+  }
+
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+    signDisplay: 'always',
+  }).format(value)
+
+  return Object.is(value, -0) ? formatted.replace('-', '+') : formatted
+}
+
+export function formatShapValue(value: number | null | undefined): string {
+  return formatSignedDecimal(value, 4)
+}
+
+export function formatSensorValue(
+  value: number | null | undefined,
+  unit: string,
+  digits = 3,
+): string {
+  return value === null || value === undefined ? 'No data' : `${formatDecimal(value, digits)} ${unit}`
+}
+
 export function formatTimestamp(value: string | null | undefined): string {
   if (!value) {
     return 'No timestamp'
@@ -56,6 +82,19 @@ export function formatTimestamp(value: string | null | undefined): string {
   }
 
   return `${utcFormatter.format(parsed)} UTC`
+}
+
+export function formatShortTimestamp(value: string | null | undefined): string {
+  if (!value) {
+    return 'No timestamp'
+  }
+
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return 'Invalid timestamp'
+  }
+
+  return utcFormatter.format(parsed)
 }
 
 export function formatDate(value: string | null | undefined): string {

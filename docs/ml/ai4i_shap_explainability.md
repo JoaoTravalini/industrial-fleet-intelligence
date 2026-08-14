@@ -52,5 +52,7 @@ Use these artifacts to understand how the packaged model behaves on synthetic AI
 ## Limitations
 AI4I is a public synthetic dataset. The explanations do not prove real industrial generalization and do not imply that any feature physically causes machine failure. The grouped `Type` view is for readability and is not a newly trained feature representation.
 
-## Future API Integration
-Future FastAPI or dashboard phases may expose explanation data alongside predictions. Prediction and explanation should remain separate concepts, and SHAP must not change prediction outputs or business thresholds.
+## Operational Explanation Access
+Operational telemetry prediction explanations can now be materialized separately from these development reports, persisted in PostgreSQL, and served through the read-only FastAPI dashboard API. That operational path explains already-created telemetry predictions from `data/predictions/ai4i/telemetry_predictions.jsonl` and validates `model_input_sha256` alignment with the canonical adapter records.
+
+Prediction and explanation remain separate concepts. SHAP does not change prediction outputs, binary decisions, the frozen threshold, or business alert policy, and FastAPI does not calculate SHAP during requests.
