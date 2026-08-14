@@ -65,6 +65,7 @@ data/gold/*
 data/model_input/
 data/predictions/
 data/anomalies/
+data/drift/
 ml/artifacts/*
 !ml/artifacts/README.md
 ml/artifacts/anomaly/

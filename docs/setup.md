@@ -235,7 +235,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, drift monitoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +281,7 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement streaming ML inference, streaming anomaly scoring, drift monitoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+This phase does not implement streaming ML inference, streaming anomaly scoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Silver Processing
 
@@ -679,6 +679,44 @@ ml/artifacts/anomaly/
 
 The anomaly score is not a probability. The current data has no anomaly labels, so no supervised anomaly metrics are calculated.
 
+## Data Drift Monitoring
+
+Data drift monitoring compares input-feature distributions against two frozen references: the AI4I train + validation development reference and the operational anomaly vibration/pressure baseline. PSI thresholds are heuristic monitoring bands and are not model-performance metrics.
+
+Build frozen drift references explicitly:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/build_drift_reference_profiles.py
+```
+
+Building the frozen reference profile is a baseline-management action. Normal monitoring must not silently rebuild it from newer Silver data.
+
+Run current drift monitoring:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/monitor_data_drift.py
+```
+
+Persist the latest drift report:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/persist_drift_report.py
+```
+
+Inspect persisted monitoring state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/inspect_drift_state.py
+```
+
+Validate drift monitoring and idempotency:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_data_drift_monitoring.py
+```
+
+Runtime drift reports are Git-ignored under `data/drift/`. Frozen reference profiles and static policy summaries are tracked under `reports/drift/`.
+
 Install declared development, data, modeling, and local MLOps dependencies after MLflow is added:
 
 ```powershell
@@ -749,4 +787,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, or the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, deterministic data drift monitoring helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, drift runtime reports, or the real 10,000-row AI4I dataset.

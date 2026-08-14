@@ -1,0 +1,119 @@
+{
+  "drift_is_not_model_performance": true,
+  "monitor_version": "1.0.0",
+  "no_alert_created_by_monitoring": true,
+  "no_automatic_retraining": true,
+  "numeric_bins": 10,
+  "persistence_tables": [
+    "drift_snapshots",
+    "drift_feature_metrics"
+  ],
+  "primary_metric": "Population Stability Index",
+  "psi_epsilon": 1e-06,
+  "psi_monitoring_bands": {
+    "drift": "PSI >= 0.25",
+    "stable": "PSI < 0.10",
+    "watch": "0.10 <= PSI < 0.25"
+  },
+  "runtime_report_path": "data/drift/latest_drift_report.json",
+  "stable_snapshot_identity": [
+    "monitor_version",
+    "reference_profile_sha256",
+    "ai4i_current_data_hash",
+    "anomaly_current_data_hash"
+  ],
+  "supplemental_diagnostics": [
+    "reference_count",
+    "current_count",
+    "reference_mean",
+    "current_mean",
+    "reference_std",
+    "current_std",
+    "reference_min",
+    "reference_max",
+    "current_min",
+    "current_max",
+    "standardized_mean_shift",
+    "outside_reference_range_count",
+    "outside_reference_range_rate",
+    "categorical_proportions",
+    "unexpected_category_count"
+  ],
+  "monitor_scopes": {
+    "ai4i_model_input": {
+      "features": [
+        "Type",
+        "Air temperature [K]",
+        "Process temperature [K]",
+        "Rotational speed [rpm]",
+        "Torque [Nm]",
+        "Tool wear [min]"
+      ],
+      "reference_identity": {
+        "reference_name": "ai4i_train_validation_development",
+        "reference_policy": "AI4I train + validation only; test.csv is forbidden for drift reference construction.",
+        "training_data_policy": "train + validation",
+        "model_name": "ai4i-failure-risk-random-forest",
+        "model_version": "1.0.0",
+        "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+        "source_paths": [
+          "data/processed/ai4i/train.csv",
+          "data/processed/ai4i/validation.csv"
+        ],
+        "forbidden_source_paths": [
+          "data/processed/ai4i/test.csv"
+        ],
+        "features": [
+          "Type",
+          "Air temperature [K]",
+          "Process temperature [K]",
+          "Rotational speed [rpm]",
+          "Torque [Nm]",
+          "Tool wear [min]"
+        ],
+        "categorical_features": [
+          "Type"
+        ],
+        "numeric_features": [
+          "Air temperature [K]",
+          "Process temperature [K]",
+          "Rotational speed [rpm]",
+          "Torque [Nm]",
+          "Tool wear [min]"
+        ],
+        "categories": {
+          "Type": [
+            "L",
+            "M",
+            "H"
+          ]
+        }
+      }
+    },
+    "operational_anomaly_inputs": {
+      "features": [
+        "vibration_mm_s",
+        "pressure_bar"
+      ],
+      "reference_identity": {
+        "reference_name": "telemetry_isolation_forest_v1_baseline",
+        "reference_policy": "Frozen 106-event operational anomaly input baseline used to package telemetry-isolation-forest v1.0.0.",
+        "model_name": "telemetry-isolation-forest",
+        "model_version": "1.0.0",
+        "model_config_hash": "ed15d8f041a1ee0783f59a2b910d6aac4660a1e658054e49fa88ed1c05b7018d",
+        "baseline_event_id_sha256": "34e648e4e16fc4f137d9d02a3d2c4040e30e17241c9ada410cfb300685e2f3f8",
+        "baseline_feature_data_sha256": "178b77e8f465d4fe4098e15ba18880cedd7994c232733e68cd469543f8185012",
+        "source_layer": "silver",
+        "source_path": "data/silver/telemetry",
+        "features": [
+          "vibration_mm_s",
+          "pressure_bar"
+        ],
+        "numeric_features": [
+          "vibration_mm_s",
+          "pressure_bar"
+        ]
+      }
+    }
+  }
+}

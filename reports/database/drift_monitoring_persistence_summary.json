@@ -1,0 +1,19 @@
+{
+  "conflict_policy": "Identical snapshot identities with different immutable values fail.",
+  "feature_metric_identity": [
+    "drift_snapshot_id",
+    "monitor_scope",
+    "feature_name"
+  ],
+  "persistence_tables": [
+    "drift_snapshots",
+    "drift_feature_metrics"
+  ],
+  "stable_snapshot_identity": [
+    "monitor_version",
+    "reference_profile_sha256",
+    "ai4i_current_data_hash",
+    "anomaly_current_data_hash"
+  ],
+  "transactional": true
+}

@@ -129,3 +129,8 @@ This bridge is deterministic local batch inference over the current canonical Si
 ## Future API Integration
 
 A later FastAPI phase may expose prediction records and optional explanation workflows to the web dashboard. Prediction serving endpoints, SHAP-on-demand integration, frontend views, alerts, and local GenAI copilot behavior are planned separately.
+## Model-Input Drift Monitoring
+
+The adapted Silver model-input records are now used by a downstream data drift monitoring phase. That monitor compares the current adapter output against the frozen AI4I train + validation development reference using exactly the six frozen model input features.
+
+Drift monitoring does not read AI4I `test.csv`, does not run prediction scoring, does not calculate model performance, and does not trigger automatic retraining or threshold changes.

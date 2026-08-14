@@ -79,3 +79,8 @@ Alert creation remains a separate future policy/service concern.
 ## Future Drift Monitoring
 
 Population drift monitoring and baseline refresh policy are planned future work.
+## Input Drift Monitoring
+
+The frozen vibration/pressure anomaly baseline is now monitored for input distribution drift by the data drift monitoring phase. The drift monitor compares current canonical Silver `vibration_mm_s` and `pressure_bar` values against the frozen baseline hashes recorded for `telemetry-isolation-forest` version `1.0.0`.
+
+This does not change anomaly score semantics, anomaly flags, the Isolation Forest artifact, or the baseline decision boundary. Drift monitoring observes input distributions only and does not create alerts or repackage the anomaly detector.

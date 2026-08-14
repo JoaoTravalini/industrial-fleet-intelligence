@@ -128,7 +128,14 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Anomaly detector provenance in PostgreSQL `anomalies`, including model identity, baseline hashes, feature values, flag, score, and Kafka/source lineage.
 - Idempotent anomaly ingestion using `event_id`, `model_name`, `model_version`, and `model_config_hash`.
 - AI4I/anomaly semantic separation with no combined health score, no alert creation, and no AI4I feature modification.
-
+- Frozen AI4I model-input reference profile using train + validation only.
+- Frozen anomaly-input reference profile tied to the anomaly baseline hashes.
+- PSI feature drift monitoring for AI4I model inputs and anomaly input features.
+- Numeric range and standardized mean-shift diagnostics for monitored inputs.
+- Categorical product-quality / AI4I `Type` drift diagnostics.
+- Deterministic current-population hashing for monitored input records.
+- PostgreSQL drift history in `drift_snapshots` and `drift_feature_metrics`.
+- Idempotent monitoring snapshot persistence with immutable conflict detection.
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
@@ -136,10 +143,9 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Maintenance history generation is planned for a later phase.
 - Prediction-driven alerts are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
-- Drift monitoring is planned for a later phase.
 - Streaming anomaly detection is planned for a later phase.
 - Additional production feature engineering workflows are planned for a later phase.
-- MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
+- MLflow Model Registry, registered deployment model, automated drift workflows, and explanation exposure through API are planned for later phases.
 - `services/database`: Implemented reusable AI4I prediction persistence helpers and telemetry anomaly persistence helpers for PostgreSQL validation and idempotency.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
@@ -174,7 +180,7 @@ A deterministic fictional development seed populates `machines` with 100 generic
 
 AI4I is an external public synthetic dataset used for data-science and predictive-maintenance portfolio development. Implemented work currently includes acquisition, structural validation, descriptive EDA, leakage-safe modeling feature policy, deterministic stratified train/validation/test split creation, read-only validation of generated modeling artifacts, training-only preprocessing fit for baseline classifiers, Dummy baseline evaluation, Logistic Regression baseline evaluation, train-only 5-fold OOF model development, class-weight imbalance comparison, threshold trade-off analysis, fixed-configuration Logistic Regression, Random Forest, and XGBoost model-family comparison, deterministic train OOF Average Precision-based candidate selection, targeted Random Forest hyperparameter tuning with nested train-only cross-validation, train-derived tuned threshold strategy, validation-only reporting, frozen final classifier specification, final train + validation refit, locked test holdout evaluation, final test performance reporting, local final model packaging, artifact integrity metadata, strict inference input/output contracts, single/batch local inference, local retrospective MLflow tracking, and SHAP explainability for the packaged Random Forest.
 
-The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, drift monitoring, API integration, dashboard integration, or explanation exposure through API has been implemented.
+The modeling dataset uses `source_udi` only for traceability. `Product ID` is excluded as an identifier, and `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` are excluded because they are target-adjacent failure-mode flags. Baseline and imbalance-strategy preprocessing is fitted on training data only or inside train-only CV fold pipelines. Validation data is transformed through fitted pipelines after candidate selection. Non-linear model-family comparison and targeted Random Forest tuning are implemented with constrained train-only development protocols. The final holdout phase freezes the fixed Random Forest configuration and threshold before opening the test split for final evaluation only. The local packaging phase fits the frozen pipeline on train + validation only and does not reuse the test split. No feature selection, MLflow Model Registry, registered deployment model, API integration, dashboard integration, or explanation exposure through API has been implemented.
 
 Generated files under `data/processed/ai4i/` are reproducible modeling artifacts derived from the external AI4I dataset and are ignored by Git. They are separate from the implemented `data/bronze`, `data/silver`, and `data/gold` telemetry lakehouse layers.
 
@@ -203,11 +209,13 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 9. The implemented telemetry anomaly feature extraction reads canonical Silver telemetry for `vibration_mm_s` and `pressure_bar`.
 10. The implemented local anomaly detector writes deterministic runtime anomaly outputs.
 11. The implemented PostgreSQL anomaly persistence step stores auditable detector outputs without creating alerts.
-12. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
-13. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-14. The FastAPI backend will expose local platform capabilities to the web dashboard.
-15. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
-16. The copilot service will use a local Ollama model for natural-language assistance.
+12. The implemented drift monitor compares frozen AI4I and anomaly input references against current operational inputs.
+13. The implemented PostgreSQL drift persistence step stores deterministic monitoring snapshots without creating alerts.
+14. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
+15. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
+16. The FastAPI backend will expose local platform capabilities to the web dashboard.
+17. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
+18. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
 

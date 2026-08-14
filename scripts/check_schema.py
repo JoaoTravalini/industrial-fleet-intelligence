@@ -14,6 +14,7 @@ EXPECTED_MIGRATIONS = {
     "001_initial_operational_schema.sql",
     "002_ai4i_prediction_persistence.sql",
     "003_telemetry_anomaly_persistence.sql",
+    "004_data_drift_monitoring.sql",
 }
 EXPECTED_TABLES = {
     "schema_migrations",
@@ -23,6 +24,8 @@ EXPECTED_TABLES = {
     "anomalies",
     "alerts",
     "machine_health",
+    "drift_snapshots",
+    "drift_feature_metrics",
 }
 EXPECTED_FOREIGN_KEYS = {
     "fk_maintenance_records_machine",
@@ -33,6 +36,7 @@ EXPECTED_FOREIGN_KEYS = {
     "fk_alerts_anomaly",
     "fk_machine_health_machine",
     "fk_machine_health_latest_model_prediction",
+    "fk_drift_feature_metrics_snapshot",
 }
 EXPECTED_CONSTRAINTS = {
     "uq_machines_machine_identifier",
@@ -77,6 +81,18 @@ EXPECTED_CONSTRAINTS = {
     "ck_machine_health_latest_source_kafka_offset",
     "ck_machine_health_latest_source_kafka_key_not_blank",
     "ck_machine_health_latest_payload_sha256_format",
+    "ck_drift_snapshots_monitor_version_not_blank",
+    "ck_drift_snapshots_reference_profile_hash_format",
+    "ck_drift_snapshots_current_hash_format",
+    "ck_drift_snapshots_status",
+    "ck_drift_snapshots_counts",
+    "ck_drift_feature_metrics_scope",
+    "ck_drift_feature_metrics_type",
+    "ck_drift_feature_metrics_status",
+    "ck_drift_feature_metrics_psi",
+    "ck_drift_feature_metrics_counts",
+    "ck_drift_feature_metrics_range_rate",
+    "ck_drift_feature_metrics_numeric_fields",
 }
 EXPECTED_INDEXES = {
     "uq_machines_machine_identifier",
@@ -89,6 +105,10 @@ EXPECTED_INDEXES = {
     "idx_anomalies_telemetry_model_scope",
     "idx_alerts_machine_status_severity",
     "idx_machine_health_latest_prediction",
+    "uq_drift_snapshots_business_identity",
+    "idx_drift_snapshots_reference",
+    "uq_drift_feature_metrics_identity",
+    "idx_drift_feature_metrics_status",
 }
 FORBIDDEN_RAW_TELEMETRY_TABLES = {
     "telemetry",

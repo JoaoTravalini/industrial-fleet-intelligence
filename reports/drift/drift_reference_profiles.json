@@ -1,0 +1,290 @@
+{
+  "ai4i_model_input": {
+    "features": [
+      {
+        "categories": [
+          "L",
+          "M",
+          "H"
+        ],
+        "feature_name": "Type",
+        "feature_type": "categorical",
+        "reference_count": 8500,
+        "reference_proportions": {
+          "L": 0.601764705882353,
+          "M": 0.29705882352941176,
+          "H": 0.1011764705882353
+        }
+      },
+      {
+        "bin_edges": [
+          295.3,
+          297.4,
+          298.1,
+          298.7,
+          299.2,
+          300.1,
+          300.6,
+          301.1,
+          302.0,
+          302.7,
+          304.5
+        ],
+        "feature_name": "Air temperature [K]",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.08329411764705882,
+          0.11176470588235295,
+          0.09976470588235294,
+          0.09129411764705882,
+          0.10517647058823529,
+          0.09823529411764706,
+          0.10129411764705883,
+          0.10835294117647058,
+          0.09788235294117648,
+          0.10294117647058823
+        ],
+        "reference_count": 8500,
+        "reference_max": 304.5,
+        "reference_mean": 300.014905882353,
+        "reference_min": 295.3,
+        "reference_std": 2.004632911230614
+      },
+      {
+        "bin_edges": [
+          305.7,
+          308.1,
+          308.6,
+          309.1,
+          309.6,
+          310.1,
+          310.5,
+          310.9,
+          311.3,
+          311.9,
+          313.8
+        ],
+        "feature_name": "Process temperature [K]",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.09341176470588235,
+          0.09552941176470588,
+          0.10341176470588236,
+          0.10329411764705883,
+          0.10070588235294117,
+          0.09058823529411765,
+          0.11294117647058824,
+          0.08964705882352941,
+          0.10164705882352941,
+          0.10882352941176471
+        ],
+        "reference_count": 8500,
+        "reference_max": 313.8,
+        "reference_mean": 310.0090117647059,
+        "reference_min": 305.7,
+        "reference_std": 1.4868082553230881
+      },
+      {
+        "bin_edges": [
+          1168.0,
+          1364.0,
+          1405.0,
+          1439.0,
+          1470.0,
+          1504.0,
+          1542.0,
+          1588.0,
+          1647.0,
+          1748.0,
+          2886.0
+        ],
+        "feature_name": "Rotational speed [rpm]",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.09905882352941177,
+          0.09941176470588235,
+          0.0988235294117647,
+          0.10011764705882353,
+          0.09988235294117646,
+          0.10152941176470588,
+          0.10058823529411764,
+          0.10023529411764706,
+          0.09988235294117646,
+          0.10047058823529412
+        ],
+        "reference_count": 8500,
+        "reference_max": 2886.0,
+        "reference_mean": 1540.2017647058824,
+        "reference_min": 1168.0,
+        "reference_std": 180.53668976090978
+      },
+      {
+        "bin_edges": [
+          3.8,
+          27.1,
+          31.3,
+          34.6,
+          37.4,
+          40.0,
+          42.540000000000056,
+          45.3,
+          48.3,
+          52.6,
+          76.6
+        ],
+        "feature_name": "Torque [Nm]",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.09847058823529412,
+          0.09870588235294117,
+          0.10094117647058823,
+          0.10152941176470588,
+          0.09870588235294117,
+          0.10164705882352941,
+          0.09741176470588235,
+          0.10188235294117647,
+          0.10011764705882353,
+          0.10058823529411764
+        ],
+        "reference_count": 8500,
+        "reference_max": 76.6,
+        "reference_mean": 39.9132,
+        "reference_min": 3.8,
+        "reference_std": 10.008257760822252
+      },
+      {
+        "bin_edges": [
+          0.0,
+          20.0,
+          42.0,
+          63.0,
+          86.0,
+          108.0,
+          129.0,
+          151.0,
+          173.0,
+          195.0,
+          253.0
+        ],
+        "feature_name": "Tool wear [min]",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.09729411764705882,
+          0.10247058823529412,
+          0.09682352941176471,
+          0.10235294117647059,
+          0.10058823529411764,
+          0.0971764705882353,
+          0.09941176470588235,
+          0.09976470588235294,
+          0.10235294117647059,
+          0.10176470588235294
+        ],
+        "reference_count": 8500,
+        "reference_max": 253.0,
+        "reference_mean": 107.712,
+        "reference_min": 0.0,
+        "reference_std": 63.637975136936994
+      }
+    ],
+    "reference_identity": {
+      "final_config_hash": "77ef02979677bf541bdf160b39879fae5e30a479b84926a6e083053bc2f90f2a",
+      "forbidden_source_paths": [
+        "data/processed/ai4i/test.csv"
+      ],
+      "model_name": "ai4i-failure-risk-random-forest",
+      "model_version": "1.0.0",
+      "reference_name": "ai4i_train_validation_development",
+      "source_paths": [
+        "data/processed/ai4i/train.csv",
+        "data/processed/ai4i/validation.csv"
+      ],
+      "training_data_policy": "train + validation"
+    },
+    "reference_row_count": 8500
+  },
+  "monitor_version": "1.0.0",
+  "operational_anomaly_inputs": {
+    "features": [
+      {
+        "bin_edges": [
+          0.914,
+          1.2585000000000002,
+          1.47,
+          1.943,
+          2.674,
+          2.7409999999999997,
+          3.21,
+          3.669,
+          4.206,
+          4.2825,
+          4.479
+        ],
+        "feature_name": "vibration_mm_s",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.10377358490566038
+        ],
+        "reference_count": 106,
+        "reference_max": 4.479,
+        "reference_mean": 2.8544433962264155,
+        "reference_min": 0.914,
+        "reference_std": 1.1327499772442975
+      },
+      {
+        "bin_edges": [
+          4.017,
+          4.2955,
+          4.377,
+          4.47,
+          4.524,
+          4.7955000000000005,
+          5.859,
+          5.9375,
+          7.696,
+          8.612,
+          8.651
+        ],
+        "feature_name": "pressure_bar",
+        "feature_type": "numeric",
+        "reference_bin_proportions": [
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.09433962264150944,
+          0.10377358490566038,
+          0.10377358490566038
+        ],
+        "reference_count": 106,
+        "reference_max": 8.651,
+        "reference_mean": 5.735103773584905,
+        "reference_min": 4.017,
+        "reference_std": 1.7040571837404572
+      }
+    ],
+    "reference_identity": {
+      "baseline_event_id_sha256": "34e648e4e16fc4f137d9d02a3d2c4040e30e17241c9ada410cfb300685e2f3f8",
+      "baseline_feature_data_sha256": "178b77e8f465d4fe4098e15ba18880cedd7994c232733e68cd469543f8185012",
+      "model_config_hash": "ed15d8f041a1ee0783f59a2b910d6aac4660a1e658054e49fa88ed1c05b7018d",
+      "model_name": "telemetry-isolation-forest",
+      "model_version": "1.0.0",
+      "reference_name": "telemetry_isolation_forest_v1_baseline",
+      "source_layer": "silver",
+      "source_path": "data/silver/telemetry"
+    },
+    "reference_row_count": 106
+  }
+}

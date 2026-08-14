@@ -13,10 +13,12 @@ PostgreSQL is not the primary storage layer for the full raw telemetry stream. H
 - `anomalies`: Stores auditable telemetry anomaly detector outputs, including model identity, baseline hashes, anomaly score, flag, feature values, and source lineage.
 - `alerts`: Stores actionable operational alerts that may reference predictions, anomalies, or future rule systems.
 - `machine_health`: Stores one current row per machine. The AI4I persistence phase uses it as a latest-prediction projection and does not invent health labels or raw telemetry history.
+- `drift_snapshots`: Stores deterministic input data drift monitoring snapshots for one monitor/reference/current-data identity.
+- `drift_feature_metrics`: Stores one PSI feature metric per drift snapshot, monitor scope, and feature.
 
 ## AI4I Prediction Persistence
 
-Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. Migration `003_telemetry_anomaly_persistence.sql` additively extends `anomalies` for independent telemetry anomaly detector outputs. These migrations do not drop, recreate, truncate, or delete existing tables.
+Migration `002_ai4i_prediction_persistence.sql` adds AI4I prediction provenance columns to `model_predictions` and latest-prediction projection columns to `machine_health`. Migration `003_telemetry_anomaly_persistence.sql` additively extends `anomalies` for independent telemetry anomaly detector outputs. Migration `004_data_drift_monitoring.sql` creates drift monitoring history tables. These migrations do not drop, recreate, truncate, or delete existing tables.
 
 The stable AI4I prediction identity is:
 
@@ -37,6 +39,22 @@ The persistence commands are:
 These commands consume only `data/predictions/ai4i/telemetry_predictions.jsonl`. They do not run model inference, create alerts, or create anomaly records.
 
 Telemetry anomaly persistence consumes only `data/anomalies/telemetry_anomalies.jsonl`. It does not score telemetry, refit the anomaly model, create alerts, modify AI4I predictions, or update `machine_health`.
+
+Data drift persistence consumes only `data/drift/latest_drift_report.json`. It does not calculate drift inside the database layer, create alerts, modify AI4I predictions, modify anomaly audit rows, or update `machine_health`.
+
+The stable drift snapshot identity is:
+
+```text
+monitor_version + reference_profile_sha256 + ai4i_current_data_hash + anomaly_current_data_hash
+```
+
+Each feature metric identity is:
+
+```text
+drift_snapshot_id + monitor_scope + feature_name
+```
+
+Repeated persistence of the same logical report is idempotent. If an existing drift identity has different immutable values, persistence fails instead of overwriting monitoring history.
 
 ## Migration Convention
 
