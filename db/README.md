@@ -11,7 +11,7 @@ PostgreSQL is not the primary storage layer for the full raw telemetry stream. H
 - `maintenance_records`: Stores historical or planned maintenance activity for each machine.
 - `model_predictions`: Stores auditable model prediction outputs. AI4I telemetry predictions include event identity, model identity, frozen threshold, probability, decision, model-input hash, and Kafka/source lineage.
 - `anomalies`: Stores auditable telemetry anomaly detector outputs, including model identity, baseline hashes, anomaly score, flag, feature values, and source lineage.
-- `alerts`: Stores actionable operational alerts that may reference predictions, anomalies, or future rule systems.
+- `alerts`: Stores actionable operational alerts that may reference persisted model predictions or anomaly audit rows.
 - `machine_health`: Stores one current row per machine. The AI4I persistence phase uses it as a latest-prediction projection and does not invent health labels or raw telemetry history.
 - `drift_snapshots`: Stores deterministic input data drift monitoring snapshots for one monitor/reference/current-data identity.
 - `drift_feature_metrics`: Stores one PSI feature metric per drift snapshot, monitor scope, and feature.
@@ -55,6 +55,25 @@ drift_snapshot_id + monitor_scope + feature_name
 ```
 
 Repeated persistence of the same logical report is idempotent. If an existing drift identity has different immutable values, persistence fails instead of overwriting monitoring history.
+
+## Operational Alert Identity
+
+Migration `005_operational_alert_identity.sql` adds partial unique indexes for deterministic source-derived alerts:
+
+```text
+model_failure_risk: alert_type + model_prediction_id
+telemetry_anomaly: alert_type + anomaly_id
+```
+
+The migration is additive. It does not create alerts, update alert lifecycle fields, alter predictions, alter anomalies, alter drift monitoring history, or modify `machine_health`.
+
+Alert materialization is performed by:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/materialize_operational_alerts.py
+```
+
+The materializer consumes already-persisted PostgreSQL prediction and anomaly rows only. It does not run model inference, anomaly scoring, SHAP, Spark, Kafka consumers, or drift calculations.
 
 ## Migration Convention
 

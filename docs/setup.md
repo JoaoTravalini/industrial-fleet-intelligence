@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, and Kafka streaming dependency groups are installed only into the project `.venv`. Spark runs inside the pinned Docker image, so no host `pyspark` dependency is installed. No API, frontend, or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, Kafka streaming, and FastAPI backend dependency groups are installed only into the project `.venv`. Spark runs inside the pinned Docker image, so no host `pyspark` dependency is installed. No frontend or remote model-serving application dependencies have been introduced yet.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The Kafka client dependency is optional and belongs only in `.venv`; Spark/PySpark execution is provided by Docker, not the host Python environment. No API, frontend, or remote model-serving dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The Kafka client dependency is optional and belongs only in `.venv`; Spark/PySpark execution is provided by Docker, not the host Python environment. FastAPI backend dependencies are available through the optional `api` group. No frontend or remote model-serving dependencies have been introduced yet.
 
 ## PostgreSQL Local Infrastructure
 
@@ -235,7 +235,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +281,7 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement streaming ML inference, streaming anomaly scoring, PostgreSQL telemetry writes, FastAPI routes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+This phase does not implement streaming ML inference, streaming anomaly scoring, PostgreSQL telemetry writes, frontend components, Ollama/GenAI behavior, or Databricks integration.
 
 ## Spark Silver Processing
 
@@ -769,6 +769,45 @@ Validate SHAP explainability artifacts:
 
 The explainability phase uses the packaged Random Forest and train + validation development data only. It does not retrain the model, does not read the locked final holdout split, and does not change the prediction contract.
 
+## FastAPI Operational API
+
+Install the declared development, data, modeling, local MLOps, explainability, Kafka streaming, and API dependency groups into `.venv` only:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,data,ml,mlops,explainability,streaming,api]"
+```
+
+The `api` group adds FastAPI and Psycopg for the local read-oriented backend. The API runs on the Windows host and connects to PostgreSQL through `127.0.0.1:5432`; it is not run as a Docker Compose service in this phase.
+
+Apply migrations after PostgreSQL is healthy:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\apply_migrations.py
+```
+
+Materialize deterministic operational alerts from already-persisted prediction and anomaly state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\materialize_operational_alerts.py
+```
+
+Validate the API with PostgreSQL-backed checks:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\check_api.py
+```
+
+Run the API locally:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+API: `http://127.0.0.1:8000`
+OpenAPI docs: `/docs`
+OpenAPI JSON: `/openapi.json`
+
+The API serves materialized PostgreSQL state only. It does not run Spark, consume Kafka, execute model inference, calculate SHAP, calculate drift, implement React, implement Ollama, or implement authentication.
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -787,4 +826,4 @@ The project uses pytest for Python tests from the project virtual environment:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, deterministic data drift monitoring helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, drift runtime reports, or the real 10,000-row AI4I dataset.
+The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, deterministic data drift monitoring helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers, FastAPI response contracts, and operational alert policy helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, drift runtime reports, or the real 10,000-row AI4I dataset.

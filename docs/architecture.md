@@ -136,12 +136,22 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Deterministic current-population hashing for monitored input records.
 - PostgreSQL drift history in `drift_snapshots` and `drift_feature_metrics`.
 - Idempotent monitoring snapshot persistence with immutable conflict detection.
+- Deterministic operational alert materialization from persisted model/anomaly state.
+- PostgreSQL-backed FastAPI backend for local read APIs.
+- Fleet overview API endpoint.
+- Machine list and detail API endpoints.
+- Prediction history API endpoint.
+- Anomaly history API endpoint.
+- Drift monitoring API endpoint.
+- Alert read API endpoints.
+- FastAPI OpenAPI documentation.
+- Local frontend CORS configuration for `http://localhost:5173`.
 ## Planned Component Areas
 
-- `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
+- `apps/api`: Implemented PostgreSQL-backed FastAPI backend for read-oriented operational APIs.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Prediction-driven alerts are planned for a later phase.
+- Alert lifecycle mutation and automated resolution are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Streaming anomaly detection is planned for a later phase.
 - Additional production feature engineering workflows are planned for a later phase.
@@ -213,7 +223,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 13. The implemented PostgreSQL drift persistence step stores deterministic monitoring snapshots without creating alerts.
 14. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
 15. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-16. The FastAPI backend will expose local platform capabilities to the web dashboard.
+16. The implemented FastAPI backend exposes local platform capabilities to the future web dashboard.
 17. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
 18. The copilot service will use a local Ollama model for natural-language assistance.
 
@@ -222,9 +232,9 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - Python 3.12
 - JDK 17
 - Node.js 24 LTS
-- FastAPI
+- FastAPI backend is implemented for local read APIs.
 - React, TypeScript, and Vite
-- PostgreSQL local infrastructure and the initial operational schema are implemented; application data access is planned.
+- PostgreSQL local infrastructure, the operational schema, and FastAPI read access are implemented.
 - Apache Kafka local infrastructure is implemented.
 - Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, Gold descriptive analytics, and the AI4I feature adapter are implemented.
 - scikit-learn and XGBoost
@@ -237,4 +247,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements independent operational telemetry anomaly detection for canonical Silver `vibration_mm_s` and `pressure_bar`, packages a frozen synthetic reference baseline, writes runtime anomaly JSONL, and persists auditable detector outputs in `anomalies`. This phase does not implement prediction-driven alerts, drift monitoring, streaming anomaly detection, streaming ML inference, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements deterministic operational alert materialization over already-persisted AI4I prediction and telemetry anomaly state, plus a read-oriented PostgreSQL-backed FastAPI backend. It does not implement React, Ollama, authentication, Docker API services, model retraining, runtime inference, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.

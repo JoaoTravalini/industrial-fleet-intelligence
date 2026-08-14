@@ -15,6 +15,7 @@ EXPECTED_MIGRATIONS = {
     "002_ai4i_prediction_persistence.sql",
     "003_telemetry_anomaly_persistence.sql",
     "004_data_drift_monitoring.sql",
+    "005_operational_alert_identity.sql",
 }
 EXPECTED_TABLES = {
     "schema_migrations",
@@ -104,6 +105,8 @@ EXPECTED_INDEXES = {
     "uq_anomalies_telemetry_business_identity",
     "idx_anomalies_telemetry_model_scope",
     "idx_alerts_machine_status_severity",
+    "uq_alerts_model_prediction_policy_identity",
+    "uq_alerts_anomaly_policy_identity",
     "idx_machine_health_latest_prediction",
     "uq_drift_snapshots_business_identity",
     "idx_drift_snapshots_reference",

@@ -1,0 +1,30 @@
+{
+  "api_version": "1.0.0",
+  "authentication": "Not implemented in local portfolio API v1.",
+  "cors_default_origin": "http://localhost:5173",
+  "database_source": "PostgreSQL materialized operational state",
+  "endpoint_inventory": [
+    "GET /health",
+    "GET /api/v1/fleet/overview",
+    "GET /api/v1/machines",
+    "GET /api/v1/machines/{machine_code}",
+    "GET /api/v1/machines/{machine_code}/predictions",
+    "GET /api/v1/machines/{machine_code}/anomalies",
+    "GET /api/v1/drift/latest",
+    "GET /api/v1/alerts",
+    "GET /api/v1/alerts/{alert_id}"
+  ],
+  "framework": "FastAPI",
+  "no_runtime_inference": true,
+  "pagination_policy": {
+    "default_limit": 50,
+    "max_limit": 200,
+    "offset_minimum": 0
+  },
+  "route_prefix": "/api/v1",
+  "alert_policy_types": [
+    "model_failure_risk",
+    "telemetry_anomaly"
+  ],
+  "state_policy": "API requests read operational materialized PostgreSQL state only."
+}

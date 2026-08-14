@@ -1,1 +1,1 @@
-"""Package marker for the planned FastAPI application."""
+"""FastAPI backend package for the local industrial fleet platform."""

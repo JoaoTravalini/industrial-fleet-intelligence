@@ -30,6 +30,10 @@ explainability = [
 streaming = [
     "confluent-kafka==2.15.0",
 ]
+api = [
+    "fastapi[standard]==0.139.2",
+    "psycopg[binary]==3.3.4",
+]
 
 [tool.setuptools]
 packages = []

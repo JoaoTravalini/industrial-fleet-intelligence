@@ -1,0 +1,25 @@
+{
+  "alert_semantics": "An alert is an operational interpretation of persisted model or detector output, not a confirmed failure.",
+  "automatic_resolution_policy": "New alerts use status=open. Automatic resolution is outside this phase.",
+  "drift_fleet_alert_decision": "The current alerts table requires machine_id, while drift monitoring is population-level state. Drift is exposed through /api/v1/drift/latest instead.",
+  "eligible_source_types": {
+    "model_failure_risk": "Persisted AI4I prediction with failure_prediction=true.",
+    "telemetry_anomaly": "Persisted telemetry anomaly with anomaly_flag=true."
+  },
+  "idempotency_policy": "Repeated execution reuses existing identical source-derived alerts.",
+  "score_policy": "AI4I and anomaly scores are never combined by this alert policy.",
+  "severity_mapping": {
+    "model_failure_risk": "warning",
+    "telemetry_anomaly": "warning"
+  },
+  "stable_identity_strategy": {
+    "model_failure_risk": [
+      "alert_type",
+      "model_prediction_id"
+    ],
+    "telemetry_anomaly": [
+      "alert_type",
+      "anomaly_id"
+    ]
+  }
+}
