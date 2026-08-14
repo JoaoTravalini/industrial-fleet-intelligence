@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The AI4I telemetry inference bridge connects canonical Silver telemetry events to the existing frozen AI4I Random Forest predictor through an explicit, auditable feature adapter. It produces local deterministic failure-risk prediction records for each valid Silver event without retraining the model and without writing predictions to PostgreSQL.
+The AI4I telemetry inference bridge connects canonical Silver telemetry events to the existing frozen AI4I Random Forest predictor through an explicit, auditable feature adapter. It produces local deterministic failure-risk prediction records for each valid Silver event without retraining the model. A downstream PostgreSQL persistence step now consumes the generated prediction JSONL and stores auditable prediction history plus a latest per-machine projection.
 
 ## Architecture
 
@@ -12,6 +12,7 @@ Canonical Silver telemetry
 -> model-compatible event records
 -> trusted packaged AI4I predictor
 -> telemetry failure-risk predictions
+-> PostgreSQL prediction persistence
 ```
 
 Spark performs only feature adaptation. Host-side Python loads the trusted local packaged model and writes deterministic prediction JSONL output.
@@ -96,6 +97,12 @@ data/predictions/ai4i/telemetry_predictions.jsonl
 
 Each prediction includes event identity, failure probability, binary prediction, frozen threshold, model identity, final configuration hash, adapter version, model-input hash, and source lineage. It does not include `Machine failure`, observed outcomes, ground-truth labels, SHAP values, anomaly labels, or anomaly scores.
 
+## PostgreSQL Persistence
+
+`scripts/persist_ai4i_predictions.py` consumes the existing runtime JSONL output and writes AI4I prediction records into PostgreSQL `model_predictions`. It also updates `machine_health` with the deterministic latest prediction per machine. This persistence step does not run model inference, retrain models, calculate SHAP values, create anomaly rows, or create alerts.
+
+The detailed persistence contract is documented in `docs/data/postgres_prediction_persistence.md`.
+
 ## Lineage And Auditability
 
 Adapter records preserve source identity separately from model features. Prediction records retain:
@@ -119,10 +126,6 @@ Telemetry predictions are model outputs, not observed equipment failures. The sy
 
 This bridge is deterministic local batch inference over the current canonical Silver snapshot. It is not streaming inference, model monitoring, drift detection, anomaly detection, API serving, dashboard integration, or a production MLOps deployment.
 
-## Future PostgreSQL Persistence
-
-A later dedicated phase may persist selected prediction outputs to PostgreSQL operational tables. This phase intentionally does not insert or update `model_predictions`, `machine_health`, alerts, or any database state.
-
 ## Future API Integration
 
-A later FastAPI phase may expose prediction records and optional explanation workflows to the web dashboard. Prediction serving, SHAP-on-demand integration, frontend views, and local GenAI copilot behavior are planned separately.
+A later FastAPI phase may expose prediction records and optional explanation workflows to the web dashboard. Prediction serving endpoints, SHAP-on-demand integration, frontend views, alerts, and local GenAI copilot behavior are planned separately.

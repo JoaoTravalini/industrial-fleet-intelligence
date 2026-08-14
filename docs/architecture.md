@@ -114,18 +114,25 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Deterministic model-input audit hashing with `model_input_sha256`.
 - Runtime telemetry prediction output at `data/predictions/ai4i/telemetry_predictions.jsonl`.
 - Data Engineering -> ML integration from canonical Silver events to local model predictions.
+- AI4I telemetry prediction persistence into PostgreSQL `model_predictions`.
+- Model prediction provenance in PostgreSQL, including model identity, model-input hash, and Kafka/source lineage.
+- Idempotent prediction ingestion using `event_id`, `model_name`, `model_version`, and `final_config_hash`.
+- Latest per-machine ML prediction projection in PostgreSQL `machine_health`.
+- Deterministic latest prediction selection using event time plus Kafka/source lineage ordering.
+- Data Engineering -> ML -> operational PostgreSQL integration for persisted AI4I telemetry predictions.
 
 ## Planned Component Areas
 
 - `apps/api`: Planned FastAPI backend for serving platform APIs and model-facing endpoints.
 - `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
 - Maintenance history generation is planned for a later phase.
-- Prediction persistence is planned for a later phase.
+- Prediction-driven alerts are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
 - Drift monitoring is planned for a later phase.
 - Anomaly detection is planned for a later phase.
 - Additional production feature engineering workflows are planned for a later phase.
 - MLflow Model Registry, registered deployment model, drift monitoring workflows, and explanation exposure through API are planned for later phases.
+- `services/database`: Implemented reusable AI4I prediction persistence helpers for PostgreSQL validation, idempotency, and latest projection logic.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Planned local generative AI copilot integration through Ollama only.
@@ -183,7 +190,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 5. The implemented Gold job derives descriptive machine, time-window, and fleet analytics.
 6. The implemented Spark AI4I feature adapter maps canonical Silver events into the frozen six-feature model contract.
 7. The implemented host inference bridge writes deterministic telemetry failure-risk predictions locally.
-8. Future phases may persist selected prediction outputs to PostgreSQL operational tables.
+8. The implemented PostgreSQL persistence step stores AI4I prediction history and updates the latest per-machine ML prediction projection.
 9. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
 10. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
 11. The FastAPI backend will expose local platform capabilities to the web dashboard.
@@ -210,4 +217,4 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements the local canonical Silver telemetry -> AI4I feature adapter -> trusted packaged predictor -> deterministic telemetry prediction bridge. `product_quality_type` is treated as an event-level synthetic telemetry attribute and maps to AI4I `Type` only for each individual event. Gold descriptive aggregates, operational PostgreSQL `machine_type`, `vibration_mm_s`, and `pressure_bar` are not model inputs. This phase does not implement PostgreSQL prediction persistence, machine-health projections, alerts, streaming ML inference, drift monitoring, anomaly detection, API routes, frontend components, GenAI behavior, or Databricks integration.
+This phase implements PostgreSQL persistence for the existing AI4I telemetry prediction JSONL output and maintains a deterministic latest ML prediction projection per machine in `machine_health`. The persistence layer consumes existing predictions only and does not run model inference or retraining. This phase does not implement prediction-driven alerts, anomaly detection, drift monitoring, streaming ML inference, API routes, frontend components, GenAI behavior, or Databricks integration.

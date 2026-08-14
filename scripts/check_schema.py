@@ -10,7 +10,10 @@ from enum import StrEnum
 SERVICE_NAME = "postgres"
 DEFAULT_TIMEOUT_SECONDS = 20
 EXEC_TIMEOUT_SECONDS = 60
-EXPECTED_MIGRATION = "001_initial_operational_schema.sql"
+EXPECTED_MIGRATIONS = {
+    "001_initial_operational_schema.sql",
+    "002_ai4i_prediction_persistence.sql",
+}
 EXPECTED_TABLES = {
     "schema_migrations",
     "machines",
@@ -28,11 +31,24 @@ EXPECTED_FOREIGN_KEYS = {
     "fk_alerts_model_prediction",
     "fk_alerts_anomaly",
     "fk_machine_health_machine",
+    "fk_machine_health_latest_model_prediction",
 }
 EXPECTED_CONSTRAINTS = {
     "uq_machines_machine_identifier",
     "ck_machines_operational_status",
     "ck_model_predictions_confidence",
+    "ck_model_predictions_ai4i_required_fields",
+    "ck_model_predictions_failure_probability",
+    "ck_model_predictions_failure_prediction_consistency",
+    "ck_model_predictions_frozen_threshold",
+    "ck_model_predictions_final_config_hash_format",
+    "ck_model_predictions_adapter_version_not_blank",
+    "ck_model_predictions_model_input_sha256_format",
+    "ck_model_predictions_source_kafka_topic_not_blank",
+    "ck_model_predictions_source_kafka_partition",
+    "ck_model_predictions_source_kafka_offset",
+    "ck_model_predictions_source_kafka_key_not_blank",
+    "ck_model_predictions_payload_sha256_format",
     "ck_anomalies_score",
     "ck_alerts_severity",
     "ck_alerts_status",
@@ -41,13 +57,29 @@ EXPECTED_CONSTRAINTS = {
     "ck_machine_health_failure_risk",
     "ck_machine_health_anomaly_score",
     "ck_machine_health_classification",
+    "ck_machine_health_latest_prediction_required_fields",
+    "ck_machine_health_latest_failure_probability",
+    "ck_machine_health_latest_failure_prediction_consistency",
+    "ck_machine_health_latest_frozen_threshold",
+    "ck_machine_health_latest_model_name_not_blank",
+    "ck_machine_health_latest_model_version_not_blank",
+    "ck_machine_health_latest_final_config_hash_format",
+    "ck_machine_health_latest_model_input_sha256_format",
+    "ck_machine_health_latest_source_kafka_topic_not_blank",
+    "ck_machine_health_latest_source_kafka_partition",
+    "ck_machine_health_latest_source_kafka_offset",
+    "ck_machine_health_latest_source_kafka_key_not_blank",
+    "ck_machine_health_latest_payload_sha256_format",
 }
 EXPECTED_INDEXES = {
     "uq_machines_machine_identifier",
+    "uq_model_predictions_ai4i_business_identity",
     "idx_maintenance_records_machine_timestamp",
     "idx_model_predictions_machine_timestamp",
+    "idx_model_predictions_ai4i_latest",
     "idx_anomalies_machine_timestamp",
     "idx_alerts_machine_status_severity",
+    "idx_machine_health_latest_prediction",
 }
 FORBIDDEN_RAW_TELEMETRY_TABLES = {
     "telemetry",
@@ -244,25 +276,25 @@ def check_schema_migrations_exists() -> CheckResult:
     return CheckResult("Migration Table", Status.FAIL, "schema_migrations does not exist.")
 
 
-def check_migration_recorded() -> CheckResult:
+def check_migrations_recorded() -> CheckResult:
     result = run_psql_query(
-        f"""
-        SELECT EXISTS (
-            SELECT 1
-            FROM schema_migrations
-            WHERE filename = '{EXPECTED_MIGRATION}'
-        );
+        """
+        SELECT filename
+        FROM schema_migrations
+        ORDER BY filename;
         """
     )
     if not result.succeeded:
         return CheckResult(
-            "Migration 001",
+            "Migrations",
             Status.FAIL,
-            f"Could not inspect applied migration: {command_failure_message(result)}",
+            f"Could not inspect applied migrations: {command_failure_message(result)}",
         )
-    if parse_bool(result.output) is True:
-        return CheckResult("Migration 001", Status.PASS, f"{EXPECTED_MIGRATION} is recorded.")
-    return CheckResult("Migration 001", Status.FAIL, f"{EXPECTED_MIGRATION} is not recorded.")
+    return evaluate_expected_items(
+        "Migrations",
+        EXPECTED_MIGRATIONS,
+        set(parse_lines(result.output)),
+    )
 
 
 def check_tables() -> CheckResult:
@@ -367,7 +399,7 @@ def run_checks() -> list[CheckResult]:
     return [
         check_database_reachable(),
         check_schema_migrations_exists(),
-        check_migration_recorded(),
+        check_migrations_recorded(),
         check_tables(),
         check_foreign_keys(),
         check_constraints(),

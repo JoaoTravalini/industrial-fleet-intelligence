@@ -589,6 +589,52 @@ data/predictions/ai4i/telemetry_predictions.jsonl
 
 Both runtime locations are Git-ignored.
 
+## AI4I PostgreSQL Prediction Persistence
+
+The persistence step consumes only the existing runtime prediction JSONL output. It does not regenerate predictions, run model inference, create alerts, or create anomaly records.
+
+Ensure PostgreSQL is running:
+
+```powershell
+docker compose up -d postgres
+```
+
+Validate PostgreSQL:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_postgres.py
+```
+
+Apply any pending schema migrations:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/apply_migrations.py
+```
+
+Generate and validate telemetry predictions if the runtime prediction file is missing:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_telemetry_inference.py
+```
+
+Persist the current prediction batch:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/persist_ai4i_predictions.py
+```
+
+Inspect current persisted prediction state:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/inspect_ai4i_prediction_state.py
+```
+
+Validate persistence and idempotency:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_ai4i_prediction_persistence.py
+```
+
 Install declared development, data, modeling, and local MLOps dependencies after MLflow is added:
 
 ```powershell

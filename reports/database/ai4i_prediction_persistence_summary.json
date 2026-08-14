@@ -1,0 +1,32 @@
+{
+  "source_prediction_path": "data/predictions/ai4i/telemetry_predictions.jsonl",
+  "target_prediction_table": "model_predictions",
+  "target_latest_projection_table": "machine_health",
+  "stable_prediction_business_identity": [
+    "event_id",
+    "model_name",
+    "model_version",
+    "final_config_hash"
+  ],
+  "model_identity_dimensions": [
+    "model_name",
+    "model_version",
+    "final_config_hash"
+  ],
+  "idempotency_policy": "Identical prediction identity is reused without duplicate rows.",
+  "conflict_policy": "Existing identical business identity with different immutable values fails.",
+  "latest_projection_ordering": [
+    "event_time DESC",
+    "source_kafka_timestamp DESC",
+    "source_kafka_topic DESC",
+    "source_kafka_partition DESC",
+    "source_kafka_offset DESC",
+    "event_id DESC"
+  ],
+  "transaction_policy": "Prediction history inserts and machine_health projection updates share one transaction.",
+  "machine_lookup_policy": "machine_code must resolve to an existing machines row.",
+  "runtime_counts": "intentionally excluded from tracked summary",
+  "alerts_policy": "No alerts are created by this persistence phase.",
+  "anomaly_policy": "No anomaly records are created by this persistence phase.",
+  "model_execution_policy": "Persistence consumes existing prediction JSONL only."
+}
