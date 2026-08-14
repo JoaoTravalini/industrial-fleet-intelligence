@@ -1,0 +1,26 @@
+{
+  "frontend_framework": "React",
+  "language": "TypeScript",
+  "build_tool": "Vite",
+  "routing_library": "react-router",
+  "server_state_library": "@tanstack/react-query",
+  "api_source": "FastAPI /api/v1 read-only endpoints",
+  "api_environment_variable": "VITE_API_BASE_URL",
+  "default_api_base_url": "http://127.0.0.1:8000",
+  "implemented_routes": [
+    "/",
+    "/machines",
+    "/machines/:machineCode",
+    "/alerts",
+    "/drift",
+    "*"
+  ],
+  "pagination_strategy": "Server-side limit and offset parameters with page state represented in URL search parameters where applicable.",
+  "test_strategy": "Vitest with jsdom and Testing Library; browser fetch is mocked at the API boundary so tests do not require backend services.",
+  "frontend_performs_model_inference": false,
+  "frontend_has_direct_database_access": false,
+  "frontend_implements_mutations": false,
+  "advanced_visual_analytics_deferred": true,
+  "shap_visualizations_deferred": true,
+  "local_ai_copilot_deferred": true
+}

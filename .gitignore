@@ -98,3 +98,9 @@ Desktop.ini
 .vscode/
 *.swp
 *.swo
+
+# Frontend workspace runtime and build artifacts
+apps/web/node_modules/
+apps/web/dist/
+apps/web/.env
+apps/web/coverage/

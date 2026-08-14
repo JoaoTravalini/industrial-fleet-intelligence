@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, Kafka streaming, and FastAPI backend dependency groups are installed only into the project `.venv`. Spark runs inside the pinned Docker image, so no host `pyspark` dependency is installed. No frontend or remote model-serving application dependencies have been introduced yet.
+This project is in incremental local-first development. Optional development, data-analysis, modeling, local model-packaging, local MLOps, explainability, Kafka streaming, and FastAPI backend dependency groups are installed only into the project `.venv`. Spark runs inside the pinned Docker image, so no host `pyspark` dependency is installed. Frontend dependencies are managed separately with npm under `apps/web`; no remote model-serving application dependencies have been introduced.
 
 ## Required Tools
 
@@ -69,7 +69,7 @@ Apply Ruff formatting:
 .\.venv\Scripts\python.exe -m ruff format .
 ```
 
-Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The Kafka client dependency is optional and belongs only in `.venv`; Spark/PySpark execution is provided by Docker, not the host Python environment. FastAPI backend dependencies are available through the optional `api` group. No frontend or remote model-serving dependencies have been introduced yet.
+Never install project dependencies into Anaconda or any global Python environment. The `.venv` directory must never be committed. Once `.venv` exists, automated project commands should use `.venv\Scripts\python.exe` explicitly so they do not resolve to a global Python installation such as Anaconda. Developers may use `python` only after activating `.venv` in an interactive shell. The Kafka client dependency is optional and belongs only in `.venv`; Spark/PySpark execution is provided by Docker, not the host Python environment. FastAPI backend dependencies are available through the optional `api` group. Frontend dependencies are installed with npm only under `apps/web`; never install them into Python, Anaconda, or a global Python environment.
 
 ## PostgreSQL Local Infrastructure
 
@@ -808,6 +808,41 @@ OpenAPI docs: `/docs`
 OpenAPI JSON: `/openapi.json`
 
 The API serves materialized PostgreSQL state only. It does not run Spark, consume Kafka, execute model inference, calculate SHAP, calculate drift, implement React, implement Ollama, or implement authentication.
+## React Operational Dashboard
+
+Install frontend dependencies from the frontend workspace:
+
+```powershell
+cd apps\web
+npm install
+```
+
+Run frontend quality checks from `apps/web`:
+
+```powershell
+npm run test
+npm run lint
+npm run build
+```
+
+Run the local dashboard with the API in two terminals.
+
+Terminal A from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Terminal B:
+
+```powershell
+cd apps\web
+npm run dev
+```
+
+Open `http://localhost:5173` in the browser.
+
+The dashboard consumes already-materialized FastAPI state. Normal dashboard browsing does not require Spark or Kafka to be running when PostgreSQL already contains the materialized operational state.
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:
@@ -827,3 +862,4 @@ The project uses pytest for Python tests from the project virtual environment:
 ```
 
 The current tests cover environment validation logic, local infrastructure helpers, synthetic telemetry simulator helpers, AI4I data validation, EDA helpers, AI4I modeling-data preparation logic, AI4I baseline modeling helpers, AI4I imbalance/threshold strategy helpers, model-family comparison helpers, Random Forest tuning helpers, final holdout evaluation helpers, local AI4I packaging/inference helpers, AI4I telemetry inference bridge helpers, telemetry anomaly detection helpers, deterministic data drift monitoring helpers, local MLflow retrospective tracking helpers, and AI4I SHAP explainability helpers, FastAPI response contracts, and operational alert policy helpers. Synthetic unit tests do not depend on Docker, PostgreSQL, Spark, real anomaly artifacts, drift runtime reports, or the real 10,000-row AI4I dataset.
+

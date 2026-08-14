@@ -146,10 +146,21 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Alert read API endpoints.
 - FastAPI OpenAPI documentation.
 - Local frontend CORS configuration for `http://localhost:5173`.
+- React + TypeScript frontend application shell.
+- Vite development and production build tooling for the web dashboard.
+- Typed FastAPI fetch client configured by `VITE_API_BASE_URL`.
+- TanStack Query read-only server-state integration.
+- React Router frontend routing for overview, machines, machine detail, alerts, drift monitoring, and Not Found pages.
+- Fleet overview dashboard consuming materialized API state.
+- Machine list and machine detail views with server-side pagination and recent history slices.
+- Recent AI4I prediction and operational anomaly read views.
+- Operational alert monitoring UI with supported API filters.
+- Drift monitoring UI for AI4I model inputs and operational anomaly inputs.
+- Responsive dashboard application shell with custom CSS.
 ## Planned Component Areas
 
 - `apps/api`: Implemented PostgreSQL-backed FastAPI backend for read-oriented operational APIs.
-- `apps/web`: Planned React, TypeScript, and Vite dashboard for fleet monitoring and analysis.
+- `apps/web`: Implemented React, TypeScript, and Vite read-only dashboard for fleet overview, machine monitoring, alert monitoring, and drift monitoring. Advanced visual analytics remain planned.
 - Maintenance history generation is planned for a later phase.
 - Alert lifecycle mutation and automated resolution are planned for a later phase.
 - Streaming ML inference over telemetry is planned for a later phase.
@@ -223,9 +234,10 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 13. The implemented PostgreSQL drift persistence step stores deterministic monitoring snapshots without creating alerts.
 14. Historical AI4I experiment reports are tracked locally with MLflow; future live training workflows may extend this pattern.
 15. Implemented AI4I SHAP reports support local model interpretation; future APIs may expose explanation data separately from predictions.
-16. The implemented FastAPI backend exposes local platform capabilities to the future web dashboard.
-17. The React dashboard will visualize fleet health, alerts, predictions, and model insights.
-18. The copilot service will use a local Ollama model for natural-language assistance.
+16. The implemented FastAPI backend exposes local platform capabilities to the implemented web dashboard.
+17. The implemented React dashboard visualizes fleet overview, machine projections, recent prediction/anomaly history, alerts, and drift monitoring without browser-side inference.
+18. Advanced telemetry visualizations, prediction/anomaly charts, richer explainability UX, and final CI/demo polish remain planned.
+19. The copilot service will use a local Ollama model for natural-language assistance.
 
 ## Planned Local Technology Stack
 
@@ -233,7 +245,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - JDK 17
 - Node.js 24 LTS
 - FastAPI backend is implemented for local read APIs.
-- React, TypeScript, and Vite
+- React, TypeScript, and Vite dashboard tooling is implemented
 - PostgreSQL local infrastructure, the operational schema, and FastAPI read access are implemented.
 - Apache Kafka local infrastructure is implemented.
 - Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, Gold descriptive analytics, and the AI4I feature adapter are implemented.
@@ -247,4 +259,6 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-This phase implements deterministic operational alert materialization over already-persisted AI4I prediction and telemetry anomaly state, plus a read-oriented PostgreSQL-backed FastAPI backend. It does not implement React, Ollama, authentication, Docker API services, model retraining, runtime inference, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.
+The current completed scope includes the read-oriented PostgreSQL-backed FastAPI backend and the first React, TypeScript, and Vite operational dashboard phase. It does not implement advanced telemetry charts, SHAP frontend UX, the local AI copilot, authentication, Dockerized frontend/API services, model retraining, runtime inference in API requests, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.
+
+

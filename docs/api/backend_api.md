@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The API exposes already-materialized operational platform state from local PostgreSQL for the independent Industrial Fleet Intelligence portfolio project. It is read-oriented and designed to support a future React dashboard without running data pipelines, models, or drift calculations inside request handlers.
+The API exposes already-materialized operational platform state from local PostgreSQL for the independent Industrial Fleet Intelligence portfolio project. It is read-oriented and supports the local React dashboard without running data pipelines, models, or drift calculations inside request handlers.
 
 ## Architecture
 
@@ -84,7 +84,7 @@ FastAPI OpenAPI JSON is available at `/openapi.json`, and interactive docs are a
 
 ## CORS
 
-Local CORS defaults to `http://localhost:5173` for the future React/Vite dashboard. The API does not use wildcard origins with credentials.
+Local CORS defaults to `http://localhost:5173` for the React/Vite dashboard. The API does not use wildcard origins with credentials.
 
 ## No Runtime Model Execution
 
@@ -94,10 +94,11 @@ Request handlers do not import or execute AI4I prediction, Isolation Forest scor
 
 This local portfolio API does not implement authentication, authorization, production hardening, alert lifecycle mutation, registered model serving, or external cloud services.
 
-## Future Frontend
+## Frontend Dashboard
 
-A React, TypeScript, and Vite dashboard is planned for a later phase and will consume these read endpoints.
+A React, TypeScript, and Vite dashboard consumes these read endpoints through `VITE_API_BASE_URL`. Advanced telemetry charts, SHAP visualizations, and copilot interactions remain planned for later phases.
 
 ## Future Authentication
 
 Authentication is a future production concern. This local v1 uses fictional and synthetic data and intentionally avoids JWT, OAuth, users, roles, and API keys.
+
