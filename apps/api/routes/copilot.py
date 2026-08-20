@@ -31,7 +31,12 @@ router = APIRouter(prefix="/api/v1/copilot", tags=["copilot"])
 Copilot = Annotated[CopilotService, Depends(get_copilot_service)]
 
 
-@router.get("/health", response_model=CopilotHealthResponse)
+@router.get(
+    "/health",
+    response_model=CopilotHealthResponse,
+    summary="Check local Copilot availability",
+    description="Checks local Ollama reachability and configured model availability.",
+)
 def copilot_health() -> dict[str, object]:
     settings = get_copilot_settings()
     client = OllamaClient(settings)
@@ -74,7 +79,12 @@ def copilot_health() -> dict[str, object]:
     }
 
 
-@router.post("/chat", response_model=CopilotChatResponse)
+@router.post(
+    "/chat",
+    response_model=CopilotChatResponse,
+    summary="Ask the local read-only Copilot",
+    description="Returns a source-grounded local Ollama answer using validated read-only tools.",
+)
 def copilot_chat(request: CopilotChatRequest, copilot: Copilot) -> dict[str, object]:
     history = [ChatMessage(role=item.role, content=item.content) for item in request.history]
     try:

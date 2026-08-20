@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the high-level architecture for the Industrial Fleet Intelligence Platform. Components are labeled as implemented or planned so the documentation does not imply that future phases already exist.
+This document describes the high-level architecture for the Industrial Fleet Intelligence Platform. Implemented components are described as implemented, and future ideas are explicitly separated so the documentation does not imply that planned work already exists.
 
 ## Architecture Principles
 
@@ -174,23 +174,17 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Prompt-injection defense through capability restriction and data-as-data policy.
 - React AI Copilot UI for current-session chat.
 - Responsive dashboard application shell with custom CSS.
-## Planned Component Areas
+## Component Areas
 
 - `apps/api`: Implemented PostgreSQL-backed FastAPI backend for read-oriented operational APIs.
 - `apps/web`: Implemented React, TypeScript, and Vite read-only dashboard for fleet overview, machine monitoring, alert monitoring, drift monitoring, operational charts, and persisted prediction explanations.
-- Maintenance history generation is planned for a later phase.
-- Alert lifecycle mutation and automated resolution are planned for a later phase.
-- Streaming ML inference over telemetry is planned for a later phase.
-- Streaming anomaly detection is planned for a later phase.
-- Additional production feature engineering workflows are planned for a later phase.
-- MLflow Model Registry, registered deployment model, and automated drift workflows are planned for later phases.
 - `services/database`: Implemented reusable AI4I prediction persistence, prediction explanation persistence, telemetry anomaly persistence, and drift persistence helpers for PostgreSQL validation and idempotency.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
 - `services/copilot`: Implemented local Ollama copilot configuration, standard-library Ollama client, deterministic knowledge retrieval, bounded tool loop, and validated read-only tool catalog.
 - `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics, the Spark AI4I feature adapter, and Silver-to-anomaly feature extraction; additional historical feature jobs are planned.
 - `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing.
-- `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
+- `ml/training`: Implemented local AI4I model-development workflows using scikit-learn and XGBoost comparison.
 - `ml/inference`: Implemented local AI4I inference utilities and Silver telemetry inference bridge; service integration is planned.
 - `ml/anomaly`: Implemented local operational telemetry anomaly detector utilities.
 - `ml/artifacts`: Implemented local output location for ignored generated model artifacts.
@@ -198,7 +192,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `docs`: Project documentation.
 - `tests`: Python test suite.
 - `scripts`: Local developer automation and validation scripts.
-- `.github/workflows`: Planned GitHub Actions CI configuration.
+- `.github/workflows`: Implemented service-free GitHub Actions CI for Python and frontend validation.
 
 ## Implemented PostgreSQL Infrastructure
 
@@ -234,7 +228,7 @@ The implemented telemetry inference bridge uses the frozen packaged AI4I predict
 
 AI4I is not inserted into PostgreSQL and is not treated as operational application state.
 
-## Planned Data Flow
+## Implemented Data Flow
 
 1. The implemented local simulator generates deterministic synthetic fleet telemetry samples.
 2. Telemetry events can now flow through the implemented local Apache Kafka broker.
@@ -253,16 +247,15 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 15. Implemented AI4I SHAP reports support local model interpretation, and operational per-prediction explanations can be materialized, persisted, and exposed separately from predictions.
 16. The implemented FastAPI backend exposes local platform capabilities to the implemented web dashboard.
 17. The implemented React dashboard visualizes fleet overview, machine projections, recent prediction/anomaly history, alerts, drift monitoring, visual analytics, and persisted SHAP attribution details without browser-side inference.
-18. Final CI/demo polish remains planned.
-19. The implemented copilot service uses local Ollama for source-grounded natural-language assistance over read-only materialized platform state.
+18. The implemented copilot service uses local Ollama for source-grounded natural-language assistance over read-only materialized platform state.
 
-## Planned Local Technology Stack
+## Local Technology Stack
 
 - Python 3.12
 - JDK 17
 - Node.js 24 LTS
 - FastAPI backend is implemented for local read APIs.
-- React, TypeScript, and Vite dashboard tooling is implemented
+- React, TypeScript, and Vite dashboard tooling is implemented.
 - PostgreSQL local infrastructure, the operational schema, and FastAPI read access are implemented.
 - Apache Kafka local infrastructure is implemented.
 - Apache Spark local Docker runtime, PySpark Structured Streaming Bronze ingestion, deterministic Silver processing, Gold descriptive analytics, and the AI4I feature adapter are implemented.
@@ -274,8 +267,10 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 - pytest and frontend test tooling
 - GitHub Actions
 
-## Current Phase Scope
+## Current Scope And Future Ideas
 
-The current completed scope includes operational AI4I SHAP materialization for persisted telemetry predictions, PostgreSQL explanation persistence, a read-only explanation API, Recharts-based operational visual analytics, an interactive machine prediction explanation UX, and a local Ollama-backed read-only AI Copilot. It does not implement authentication, Dockerized frontend/API services, model retraining, runtime inference or SHAP calculation in API requests, Spark execution in API requests, Kafka consumption in API requests, Databricks integration, final CI, final portfolio README polish, screenshots, video, or demo polish.
+The current implemented scope includes local data-platform infrastructure, Spark Bronze/Silver/Gold processing, AI4I model-development reports, local model packaging, telemetry inference utilities, anomaly and drift utilities, PostgreSQL persistence, a FastAPI read API, a React dashboard, persisted SHAP explanation views, a local Ollama-backed read-only AI Copilot, local developer validation scripts, demo documentation, and service-free GitHub Actions CI.
+
+Future ideas remain separate from the implemented architecture: authentication, alert lifecycle mutation, maintenance history generation, Dockerized frontend/API services, live API-time model inference, live API-time SHAP calculation, Spark execution inside API requests, Kafka consumption inside API requests, streaming ML inference, streaming anomaly detection, MLflow Model Registry, automated drift workflows, Databricks Free Edition experiments, screenshots, and video material.
 
 

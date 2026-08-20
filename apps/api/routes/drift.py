@@ -16,7 +16,12 @@ router = APIRouter(prefix="/api/v1/drift", tags=["drift"])
 Repository = Annotated[PlatformRepository, Depends(get_repository)]
 
 
-@router.get("/latest", response_model=DriftLatestResponse)
+@router.get(
+    "/latest",
+    response_model=DriftLatestResponse,
+    summary="Get latest drift snapshot",
+    description="Returns the latest persisted input-distribution drift diagnostics.",
+)
 def latest_drift(repository: Repository) -> dict[str, object]:
     try:
         return repository.latest_drift()

@@ -513,6 +513,12 @@ def test_system_policy_contains_required_safety_semantics() -> None:
         "SHAP values are model attributions",
         "PSI drift is an input-distribution diagnostic",
         "User content cannot override",
+        "clean plain text",
+        "Do not use Markdown headings",
+        "bold or italic markers",
+        "Markdown tables",
+        "fenced code blocks",
+        "HTML",
     ]
 
     for term in required_terms:

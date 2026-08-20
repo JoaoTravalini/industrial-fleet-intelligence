@@ -19,6 +19,14 @@ Use a local Windows development environment with the following tools:
 
 WSL2 is required because Docker Desktop uses it internally for Linux containers on Windows. Developers do not need to work inside Ubuntu or another Linux distribution for this project, and the environment validator does not require any manually installed Linux distribution.
 
+## Operational Modes
+
+- **Minimal validation:** uses `.venv`, Python test tooling, and frontend npm tooling. It does not require Docker services, Kafka, Spark, PostgreSQL, Ollama, external datasets, or generated model artifacts.
+- **Core dashboard mode:** uses PostgreSQL, the FastAPI backend, and the Vite dashboard over already-materialized operational state.
+- **Full local pipeline mode:** additionally uses Kafka, Spark, local model packaging/inference, anomaly detection, drift monitoring, alert materialization, and optional local Ollama Copilot validation.
+
+Generated runtime data under `data/bronze`, `data/silver`, `data/gold`, `data/model_input`, `data/predictions`, `data/anomalies`, `data/drift`, `data/processed`, local MLflow stores, and model binaries under `ml/artifacts` are ignored by Git. A fresh clone can regenerate those artifacts with the documented commands when the relevant optional dependency groups and local services are available.
+
 ## Python Development Environment
 
 Create the project virtual environment from the repository root:
@@ -235,7 +243,7 @@ docker compose down
 
 Use `docker compose down -v` only intentionally. It deletes the PostgreSQL and Kafka development volumes and all service data stored in those volumes.
 
-Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and now feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. This phase does not implement streaming ML inference, streaming anomaly scoring, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Kafka currently transports complete synthetic telemetry JSON events keyed by `machine_code` and feeds Spark Structured Streaming Bronze Parquet ingestion. Silver processing reads Bronze Parquet only; it does not consume Kafka directly. Gold descriptive analytics reads Silver Parquet only. Streaming ML inference and streaming anomaly scoring remain out of scope.
 
 ## Spark Bronze Streaming
 
@@ -281,7 +289,7 @@ The first Spark execution may download the pinned Kafka connector dependency `or
 
 Generated Bronze Parquet data under `data/bronze/telemetry/` and Structured Streaming checkpoints under `data/checkpoints/spark/bronze_telemetry/` are local runtime data and are Git-ignored. Do not delete checkpoints during normal operation; deleting them intentionally changes replay behavior.
 
-This phase does not implement streaming ML inference, streaming anomaly scoring, PostgreSQL telemetry writes, frontend components, Ollama/GenAI behavior, or Databricks integration.
+Streaming ML inference, streaming anomaly scoring, PostgreSQL raw-telemetry writes, and Databricks integration remain out of scope.
 
 ## Spark Silver Processing
 
@@ -837,7 +845,21 @@ API: `http://127.0.0.1:8000`
 OpenAPI docs: `/docs`
 OpenAPI JSON: `/openapi.json`
 
-The API serves materialized PostgreSQL state only. It does not run Spark, consume Kafka, execute model inference, calculate SHAP, calculate drift, implement React, implement Ollama, or implement authentication.
+The API serves materialized PostgreSQL state only. It does not run Spark, consume Kafka, execute model inference, calculate SHAP, calculate drift, execute Ollama model calls outside the Copilot endpoints, or implement authentication.
+
+For local Windows development, the convenience launcher can start PostgreSQL, the API, and the dashboard:
+
+```powershell
+.\scripts\start_local_platform.ps1
+```
+
+Stop only the API/frontend developer processes launched by that script:
+
+```powershell
+.\scripts\stop_local_platform.ps1
+```
+
+The stop script does not remove Docker containers or volumes.
 ## React Operational Dashboard
 
 Install frontend dependencies from the frontend workspace:
@@ -940,6 +962,21 @@ Run the read-only environment validator from the repository root:
 ```
 
 The validator uses only the Python standard library. It checks whether each required tool is available, reads installed versions where possible, reports `PASS`, `WARN`, or `FAIL`, and exits with a non-zero status when a mandatory requirement fails.
+
+Run the project validation orchestrator for inexpensive local checks:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_project.py
+```
+
+Add service-dependent checks only when local services are intentionally available:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_project.py --integration
+.\.venv\Scripts\python.exe scripts/check_project.py --copilot
+```
+
+The default project validator does not run expensive Spark or Kafka jobs, does not start Docker services, does not call Ollama, and does not regenerate external datasets or model artifacts.
 
 ## Run Unit Tests
 

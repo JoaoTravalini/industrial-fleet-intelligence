@@ -16,7 +16,12 @@ router = APIRouter(tags=["health"])
 Repository = Annotated[PlatformRepository, Depends(get_repository)]
 
 
-@router.get("/health", response_model=HealthResponse)
+@router.get(
+    "/health",
+    response_model=HealthResponse,
+    summary="Check API and database health",
+    description="Returns local API health after verifying that PostgreSQL is reachable.",
+)
 def health(repository: Repository) -> HealthResponse:
     try:
         repository.health_check()

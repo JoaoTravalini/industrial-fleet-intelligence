@@ -33,7 +33,12 @@ Offset = Annotated[int, Query(ge=0)]
 MachineStatus = Literal["active", "maintenance", "inactive"]
 
 
-@router.get("", response_model=MachineListResponse)
+@router.get(
+    "",
+    response_model=MachineListResponse,
+    summary="List machines",
+    description="Returns paginated fictional operational machines from PostgreSQL.",
+)
 def list_machines(
     repository: Repository,
     limit: Limit = 50,
@@ -46,7 +51,12 @@ def list_machines(
         raise unavailable(exc) from exc
 
 
-@router.get("/{machine_code}", response_model=MachineDetailResponse)
+@router.get(
+    "/{machine_code}",
+    response_model=MachineDetailResponse,
+    summary="Get machine detail",
+    description="Returns a machine detail projection with latest materialized health state.",
+)
 def get_machine(machine_code: str, repository: Repository) -> dict[str, object]:
     try:
         return repository.get_machine(machine_code)
@@ -56,7 +66,12 @@ def get_machine(machine_code: str, repository: Repository) -> dict[str, object]:
         raise unavailable(exc) from exc
 
 
-@router.get("/{machine_code}/predictions", response_model=PredictionListResponse)
+@router.get(
+    "/{machine_code}/predictions",
+    response_model=PredictionListResponse,
+    summary="List machine predictions",
+    description="Returns persisted AI4I failure-risk model estimates for a machine.",
+)
 def list_predictions(
     machine_code: str,
     repository: Repository,
@@ -74,6 +89,8 @@ def list_predictions(
 @router.get(
     "/{machine_code}/predictions/{event_id}/explanation",
     response_model=PredictionExplanationResponse,
+    summary="Get persisted prediction explanation",
+    description="Returns persisted SHAP model attributions for one machine prediction event.",
 )
 def get_prediction_explanation(
     machine_code: str,
@@ -90,7 +107,12 @@ def get_prediction_explanation(
         raise unavailable(exc) from exc
 
 
-@router.get("/{machine_code}/anomalies", response_model=AnomalyListResponse)
+@router.get(
+    "/{machine_code}/anomalies",
+    response_model=AnomalyListResponse,
+    summary="List machine anomalies",
+    description="Returns persisted anomaly detector scores and flags for a machine.",
+)
 def list_anomalies(
     machine_code: str,
     repository: Repository,

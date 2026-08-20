@@ -1,0 +1,39 @@
+{
+  "project": "Industrial Fleet Intelligence Platform",
+  "status": "In Development",
+  "identity": "Independent local-first portfolio project",
+  "data_policy": {
+    "operational_fleet": "fictional synthetic development data",
+    "ml_dataset": "AI4I 2020 Predictive Maintenance Dataset from the UCI Machine Learning Repository",
+    "proprietary_data_used": false,
+    "official_branding_used": false
+  },
+  "cost_policy": {
+    "paid_services_required": false,
+    "cloud_billing_required": false,
+    "local_ollama_only_for_genai": true
+  },
+  "final_model_report": {
+    "source": "reports/ai4i/final_test_metrics.json",
+    "model_family": "RandomForestClassifier",
+    "frozen_threshold": 0.14,
+    "test_roc_auc": 0.968707,
+    "test_average_precision": 0.770679,
+    "test_recall_at_threshold": 0.843137,
+    "test_precision_at_threshold": 0.462366,
+    "test_f2_at_threshold": 0.723906
+  },
+  "implemented_surfaces": [
+    "local environment validation",
+    "Docker Compose PostgreSQL and Kafka infrastructure",
+    "Spark Bronze/Silver/Gold processing",
+    "AI4I model development reports",
+    "local model packaging and inference utilities",
+    "SHAP explainability artifacts",
+    "anomaly and drift monitoring utilities",
+    "FastAPI read API",
+    "React dashboard",
+    "local read-only Ollama Copilot",
+    "GitHub Actions CI"
+  ]
+}

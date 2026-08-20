@@ -20,7 +20,12 @@ AlertStatus = Literal["open", "acknowledged", "resolved"]
 AlertSeverity = Literal["info", "warning", "critical"]
 
 
-@router.get("", response_model=AlertListResponse)
+@router.get(
+    "",
+    response_model=AlertListResponse,
+    summary="List operational alerts",
+    description="Returns persisted read-only operational alerts with optional filters.",
+)
 def list_alerts(
     repository: Repository,
     limit: Limit = 50,
@@ -43,7 +48,12 @@ def list_alerts(
         raise unavailable(exc) from exc
 
 
-@router.get("/{alert_id}", response_model=AlertResponse)
+@router.get(
+    "/{alert_id}",
+    response_model=AlertResponse,
+    summary="Get operational alert",
+    description="Returns one persisted operational alert by identifier.",
+)
 def get_alert(alert_id: int, repository: Repository) -> dict[str, object]:
     try:
         return repository.get_alert(alert_id)

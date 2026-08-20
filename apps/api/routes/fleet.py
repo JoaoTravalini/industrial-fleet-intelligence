@@ -16,7 +16,12 @@ router = APIRouter(prefix="/api/v1/fleet", tags=["fleet"])
 Repository = Annotated[PlatformRepository, Depends(get_repository)]
 
 
-@router.get("/overview", response_model=FleetOverviewResponse)
+@router.get(
+    "/overview",
+    response_model=FleetOverviewResponse,
+    summary="Get fleet overview",
+    description="Returns materialized fleet-level operational metrics from PostgreSQL.",
+)
 def overview(repository: Repository) -> dict[str, object]:
     try:
         return repository.fleet_overview()

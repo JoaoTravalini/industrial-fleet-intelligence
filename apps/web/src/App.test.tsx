@@ -49,6 +49,25 @@ afterEach(() => {
 })
 
 describe('dashboard routing and data states', () => {
+  it('shows a shared loading fallback while lazy routes resolve', () => {
+    renderWithProviders(<App />, { route: '/drift' })
+
+    expect(screen.getByText('Loading dashboard route')).toBeInTheDocument()
+  })
+
+  it.each([
+    ['/', 'Fleet Overview'],
+    ['/machines', 'Machines'],
+    ['/machines/MCH-0001', 'MCH-0001'],
+    ['/alerts', 'Alerts'],
+    ['/drift', 'Drift Monitoring'],
+    ['/copilot', 'AI Copilot'],
+  ])('renders the lazy route %s', async (route, heading) => {
+    renderWithProviders(<App />, { route })
+
+    expect(await screen.findByRole('heading', { name: heading }, { timeout: 15000 })).toBeInTheDocument()
+  })
+
   it('renders the drift route through application routing', async () => {
     renderWithProviders(<App />, { route: '/drift' })
 
