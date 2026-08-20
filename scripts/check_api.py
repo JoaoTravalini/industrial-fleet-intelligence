@@ -147,6 +147,7 @@ def validate_api_endpoints() -> CheckResult:
             ),
             ("drift", client.get("/api/v1/drift/latest"), 200),
             ("alerts", client.get("/api/v1/alerts", params={"limit": 5}), 200),
+            ("copilot health", client.get("/api/v1/copilot/health"), 200),
             ("unknown machine", client.get("/api/v1/machines/MCH-9999"), 404),
             ("invalid limit", client.get("/api/v1/machines", params={"limit": 0}), 422),
             ("openapi", client.get("/openapi.json"), 200),
@@ -165,8 +166,8 @@ def validate_api_endpoints() -> CheckResult:
                 "Forbidden causal language found in OpenAPI descriptions.",
             )
         cors = client.options(
-            "/api/v1/machines",
-            headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"},
+            "/api/v1/copilot/chat",
+            headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "POST"},
         )
         if cors.headers.get("access-control-allow-origin") != "http://localhost:5173":
             return CheckResult("API Endpoints", Status.FAIL, "Local CORS origin was not allowed.")

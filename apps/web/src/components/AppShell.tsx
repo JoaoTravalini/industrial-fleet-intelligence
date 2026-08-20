@@ -7,6 +7,7 @@ const navigationItems = [
   { label: 'Machines', path: '/machines' },
   { label: 'Alerts', path: '/alerts' },
   { label: 'Drift Monitoring', path: '/drift' },
+  { label: 'AI Copilot', path: '/copilot' },
 ]
 
 export function AppShell() {

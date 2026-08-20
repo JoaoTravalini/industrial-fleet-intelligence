@@ -1,4 +1,5 @@
 export * from './AlertsPage'
+export * from './CopilotPage'
 export * from './DriftPage'
 export * from './MachineDetailPage'
 export * from './MachinesPage'

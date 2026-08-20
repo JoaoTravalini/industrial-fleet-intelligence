@@ -17,6 +17,40 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
+class CopilotHealthResponse(BaseModel):
+    status: Literal["available", "unavailable"]
+    provider: Literal["ollama"]
+    model: str
+    local_only: Literal[True]
+    model_installed: bool
+    model_loaded: bool
+    message: str | None = None
+
+
+class CopilotHistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=4000)
+
+
+class CopilotChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+    history: list[CopilotHistoryMessage] = Field(default_factory=list)
+
+
+class CopilotSource(BaseModel):
+    type: Literal["tool", "knowledge"]
+    id: str
+    label: str
+
+
+class CopilotChatResponse(BaseModel):
+    answer: str
+    sources: list[CopilotSource]
+    model: str
+    local_only: Literal[True]
+    read_only: Literal[True]
+
+
 class LatestPredictionProjection(BaseModel):
     event_time: datetime | None = None
     failure_probability: float | None = None

@@ -3,6 +3,8 @@ import type {
   AlertResponse,
   AnomalyListResponse,
   AnomalyResponse,
+  CopilotChatResponse,
+  CopilotHealthResponse,
   DriftLatestResponse,
   FleetOverviewResponse,
   HealthResponse,
@@ -30,6 +32,34 @@ const lineage: SourceLineage = {
 export const healthFixture: HealthResponse = {
   status: 'ok',
   database: 'connected',
+}
+
+export const copilotHealthFixture: CopilotHealthResponse = {
+  status: 'available',
+  provider: 'ollama',
+  model: 'qwen3:4b-instruct',
+  local_only: true,
+  model_installed: true,
+  model_loaded: true,
+  message: null,
+}
+
+export const copilotUnavailableHealthFixture: CopilotHealthResponse = {
+  ...copilotHealthFixture,
+  status: 'unavailable',
+  model_loaded: false,
+  message: 'Local AI Copilot is unavailable. Start Ollama and try again.',
+}
+
+export const copilotChatFixture: CopilotChatResponse = {
+  answer: 'The fleet has 100 fictional machines and 5 open alerts.',
+  model: 'qwen3:4b-instruct',
+  local_only: true,
+  read_only: true,
+  sources: [
+    { type: 'tool', id: 'get_fleet_overview', label: 'Fleet overview' },
+    { type: 'knowledge', id: 'limitations.synthetic_data', label: 'Synthetic and fictional data' },
+  ],
 }
 
 export const fleetOverviewFixture: FleetOverviewResponse = {

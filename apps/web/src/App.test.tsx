@@ -6,6 +6,9 @@ import App from './App'
 import {
   alertListFixture,
   anomalyListFixture,
+  copilotChatFixture,
+  copilotHealthFixture,
+  copilotUnavailableHealthFixture,
   driftFixture,
   emptyAlertListFixture,
   eventTwo,
@@ -27,6 +30,10 @@ type FetchMode =
   | 'explanation-missing'
   | 'explanation-error'
   | 'explanation-loading'
+  | 'copilot-unavailable'
+  | 'copilot-error'
+  | 'copilot-timeout'
+  | 'copilot-loading'
 
 let fetchMode: FetchMode = 'default'
 let requestedPaths: string[] = []
@@ -47,6 +54,77 @@ describe('dashboard routing and data states', () => {
 
     expect(await screen.findByRole('heading', { name: 'Drift Monitoring' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument()
+  })
+
+  it('renders the copilot route with local and read-only status', async () => {
+    renderWithProviders(<App />, { route: '/copilot' })
+
+    expect(await screen.findByRole('heading', { name: 'AI Copilot' })).toBeInTheDocument()
+    expect(await screen.findByText('Local AI available')).toBeInTheDocument()
+    expect(screen.getByText('Runs locally with Ollama')).toBeInTheDocument()
+    expect(screen.getByText('Model loaded')).toBeInTheDocument()
+    expect(screen.getByText('Copilot is read-only and cannot change platform state.')).toBeInTheDocument()
+  })
+
+  it('shows copilot unavailable guidance', async () => {
+    fetchMode = 'copilot-unavailable'
+
+    renderWithProviders(<App />, { route: '/copilot' })
+
+    expect(await screen.findByText('Local AI unavailable')).toBeInTheDocument()
+    expect(screen.getByText('Start Ollama and ensure qwen3:4b-instruct is installed.')).toBeInTheDocument()
+  })
+
+  it('submits a suggested copilot question and shows sources', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<App />, { route: '/copilot' })
+
+    await user.click(await screen.findByRole('button', { name: 'Fleet overview' }))
+
+    expect(await screen.findByText('The fleet has 100 fictional machines and 5 open alerts.')).toBeInTheDocument()
+    expect(screen.getByText('Sources')).toBeInTheDocument()
+    expect(screen.getAllByText('Fleet overview').length).toBeGreaterThan(1)
+    expect(screen.getByText('Model: qwen3:4b-instruct')).toBeInTheDocument()
+  })
+
+  it('submits typed copilot messages and can clear the conversation', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<App />, { route: '/copilot' })
+
+    await screen.findByText('Local AI available')
+    await user.type(screen.getByLabelText('Copilot message'), 'What does anomaly score mean?')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('The fleet has 100 fictional machines and 5 open alerts.')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Clear conversation' }))
+    expect(screen.queryByText('The fleet has 100 fictional machines and 5 open alerts.')).not.toBeInTheDocument()
+  })
+
+  it('shows copilot loading and error states', async () => {
+    fetchMode = 'copilot-loading'
+    const loadingUser = userEvent.setup()
+    const loadingView = renderWithProviders(<App />, { route: '/copilot' })
+
+    await loadingUser.click(await screen.findByRole('button', { name: 'Fleet overview' }))
+    expect(await screen.findByText(/Local model is processing/)).toBeInTheDocument()
+    expect(screen.getByText(/Local inference can take longer on the first request/)).toBeInTheDocument()
+    loadingView.unmount()
+
+    fetchMode = 'copilot-error'
+    const errorUser = userEvent.setup()
+    const errorView = renderWithProviders(<App />, { route: '/copilot' })
+    await errorUser.click(await screen.findByRole('button', { name: 'Fleet overview' }))
+
+    expect(await screen.findByRole('heading', { name: 'Copilot unavailable' })).toBeInTheDocument()
+    errorView.unmount()
+
+    fetchMode = 'copilot-timeout'
+    const timeoutUser = userEvent.setup()
+    renderWithProviders(<App />, { route: '/copilot' })
+    await timeoutUser.click(await screen.findByRole('button', { name: 'Fleet overview' }))
+
+    expect(await screen.findByRole('heading', { name: 'Local model response timed out' })).toBeInTheDocument()
+    expect(screen.getByText('Verify Ollama is running, then try again after the model is warm.')).toBeInTheDocument()
   })
 
   it('renders the overview with real API response fields', async () => {
@@ -226,6 +304,26 @@ async function handleFetch(input: RequestInfo | URL): Promise<Response> {
 
   if (path === '/health') {
     return jsonResponse(healthFixture)
+  }
+
+  if (path === '/api/v1/copilot/health') {
+    return jsonResponse(fetchMode === 'copilot-unavailable' ? copilotUnavailableHealthFixture : copilotHealthFixture)
+  }
+
+  if (path === '/api/v1/copilot/chat') {
+    if (fetchMode === 'copilot-loading') {
+      return new Promise<Response>(() => undefined)
+    }
+
+    if (fetchMode === 'copilot-error') {
+      return jsonResponse({ detail: 'Local AI Copilot is unavailable. Start Ollama and try again.' }, 503)
+    }
+
+    if (fetchMode === 'copilot-timeout') {
+      return jsonResponse({ detail: 'Local model response timed out.' }, 504)
+    }
+
+    return jsonResponse(copilotChatFixture)
   }
 
   if (path === '/api/v1/fleet/overview') {

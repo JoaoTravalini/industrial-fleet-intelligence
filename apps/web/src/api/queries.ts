@@ -4,6 +4,9 @@ import { fetchJson } from './client'
 import type {
   AlertListResponse,
   AnomalyListResponse,
+  CopilotChatRequest,
+  CopilotChatResponse,
+  CopilotHealthResponse,
   DriftLatestResponse,
   FleetOverviewResponse,
   HealthResponse,
@@ -52,6 +55,7 @@ export const queryKeys = {
   ) => ['machines', machineCode, 'anomalies', { limit, offset, flaggedOnly }] as const,
   latestDrift: () => ['drift', 'latest'] as const,
   alerts: (params: AlertListParams) => ['alerts', params] as const,
+  copilotHealth: () => ['copilot', 'health'] as const,
 }
 
 export function useHealthStatus() {
@@ -172,6 +176,26 @@ export function useAlerts(params: AlertListParams) {
     queryFn: () => fetchJson<AlertListResponse>('/api/v1/alerts', { ...params }),
     staleTime: DEFAULT_STALE_TIME_MS,
     retry: false,
+  })
+}
+
+export function useCopilotHealth() {
+  return useQuery({
+    queryKey: queryKeys.copilotHealth(),
+    queryFn: () => fetchJson<CopilotHealthResponse>('/api/v1/copilot/health'),
+    staleTime: 30_000,
+    refetchInterval: HEALTH_REFETCH_INTERVAL_MS,
+    retry: false,
+  })
+}
+
+export function sendCopilotMessage(request: CopilotChatRequest) {
+  return fetchJson<CopilotChatResponse>('/api/v1/copilot/chat', {}, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
   })
 }
 

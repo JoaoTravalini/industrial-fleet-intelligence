@@ -96,12 +96,15 @@ def source_lineage_from_row(row: Mapping[str, Any]) -> dict[str, Any]:
 class PlatformRepository:
     """Small read-oriented DAL over PostgreSQL operational state."""
 
-    def __init__(self, settings: ApiSettings) -> None:
+    def __init__(self, settings: ApiSettings, *, read_only: bool = False) -> None:
         self._settings = settings
+        self._read_only = read_only
 
     def _fetch_one(self, sql: str, params: Sequence[Any] = ()) -> dict[str, Any] | None:
         try:
             with open_connection(self._settings) as connection:
+                if self._read_only:
+                    connection.execute("SET TRANSACTION READ ONLY;")
                 with connection.cursor() as cursor:
                     cursor.execute(sql, params)
                     return normalize_row(cursor.fetchone())
@@ -111,6 +114,8 @@ class PlatformRepository:
     def _fetch_all(self, sql: str, params: Sequence[Any] = ()) -> list[dict[str, Any]]:
         try:
             with open_connection(self._settings) as connection:
+                if self._read_only:
+                    connection.execute("SET TRANSACTION READ ONLY;")
                 with connection.cursor() as cursor:
                     cursor.execute(sql, params)
                     return normalize_rows(cursor.fetchall())
@@ -754,7 +759,8 @@ class PlatformRepository:
                 (SELECT count(*) FROM prediction_explanations) AS prediction_explanations,
                 (SELECT count(*) FROM anomalies) AS anomalies,
                 (SELECT count(*) FROM drift_snapshots) AS drift_snapshots,
-                (SELECT count(*) FROM drift_feature_metrics) AS drift_feature_metrics;
+                (SELECT count(*) FROM drift_feature_metrics) AS drift_feature_metrics,
+                (SELECT count(*) FROM alerts) AS alerts;
             """
         )
         return {key: int(value) for key, value in (row or {}).items()}

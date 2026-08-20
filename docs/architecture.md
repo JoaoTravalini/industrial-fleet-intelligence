@@ -166,6 +166,13 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - Anomaly-score history visualization.
 - PSI drift visualization for AI4I and anomaly input scopes.
 - Interactive machine prediction explanation UX backed by persisted SHAP attributions.
+- Local Ollama AI copilot with `qwen3:4b-instruct` as the default local model.
+- Deterministic lightweight project-knowledge retrieval for copilot grounding.
+- Bounded LLM tool calling with validated read-only operational tools.
+- PostgreSQL read-only copilot query execution.
+- Source-grounded copilot responses.
+- Prompt-injection defense through capability restriction and data-as-data policy.
+- React AI Copilot UI for current-session chat.
 - Responsive dashboard application shell with custom CSS.
 ## Planned Component Areas
 
@@ -180,7 +187,7 @@ This document describes the high-level architecture for the Industrial Fleet Int
 - `services/database`: Implemented reusable AI4I prediction persistence, prediction explanation persistence, telemetry anomaly persistence, and drift persistence helpers for PostgreSQL validation and idempotency.
 - `services/simulator`: Implemented deterministic synthetic industrial telemetry generator and Kafka producer integration.
 - `services/streaming`: Implemented local Apache Kafka configuration, producer, consumer, topic setup, and validation helpers.
-- `services/copilot`: Planned local generative AI copilot integration through Ollama only.
+- `services/copilot`: Implemented local Ollama copilot configuration, standard-library Ollama client, deterministic knowledge retrieval, bounded tool loop, and validated read-only tool catalog.
 - `pipelines/batch`: Implemented deterministic Spark Gold descriptive analytics, the Spark AI4I feature adapter, and Silver-to-anomaly feature extraction; additional historical feature jobs are planned.
 - `pipelines/streaming`: Implemented Spark Structured Streaming Kafka-to-Bronze ingestion and deterministic Bronze-to-Silver processing.
 - `ml/training`: Planned model training workflows using scikit-learn and XGBoost.
@@ -247,7 +254,7 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 16. The implemented FastAPI backend exposes local platform capabilities to the implemented web dashboard.
 17. The implemented React dashboard visualizes fleet overview, machine projections, recent prediction/anomaly history, alerts, drift monitoring, visual analytics, and persisted SHAP attribution details without browser-side inference.
 18. Final CI/demo polish remains planned.
-19. The copilot service will use a local Ollama model for natural-language assistance.
+19. The implemented copilot service uses local Ollama for source-grounded natural-language assistance over read-only materialized platform state.
 
 ## Planned Local Technology Stack
 
@@ -269,6 +276,6 @@ AI4I is not inserted into PostgreSQL and is not treated as operational applicati
 
 ## Current Phase Scope
 
-The current completed scope includes operational AI4I SHAP materialization for persisted telemetry predictions, PostgreSQL explanation persistence, a read-only explanation API, Recharts-based operational visual analytics, and an interactive machine prediction explanation UX. It does not implement the local AI copilot, authentication, Dockerized frontend/API services, model retraining, runtime inference or SHAP calculation in API requests, Spark execution in API requests, Kafka consumption in API requests, or Databricks integration.
+The current completed scope includes operational AI4I SHAP materialization for persisted telemetry predictions, PostgreSQL explanation persistence, a read-only explanation API, Recharts-based operational visual analytics, an interactive machine prediction explanation UX, and a local Ollama-backed read-only AI Copilot. It does not implement authentication, Dockerized frontend/API services, model retraining, runtime inference or SHAP calculation in API requests, Spark execution in API requests, Kafka consumption in API requests, Databricks integration, final CI, final portfolio README polish, screenshots, video, or demo polish.
 
 

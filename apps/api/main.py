@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.config import ApiSettings, get_settings
-from apps.api.routes import alerts, drift, fleet, health, machines
+from apps.api.routes import alerts, copilot, drift, fleet, health, machines
 
 API_TITLE = "Industrial Fleet Intelligence API"
 API_VERSION = "1.0.0"
@@ -24,7 +24,7 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
         CORSMiddleware,
         allow_origins=list(runtime_settings.cors_origins),
         allow_credentials=False,
-        allow_methods=["GET", "OPTIONS"],
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )
     app.include_router(health.router)
@@ -32,6 +32,7 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
     app.include_router(machines.router)
     app.include_router(drift.router)
     app.include_router(alerts.router)
+    app.include_router(copilot.router)
     return app
 
 

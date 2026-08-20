@@ -1,0 +1,52 @@
+[
+  {
+    "id": "limitations.synthetic_data",
+    "title": "Synthetic and fictional data",
+    "content": "The platform uses fictional machines and synthetic telemetry for a local portfolio project. It must not be treated as real industrial equipment state or official manufacturer data."
+  },
+  {
+    "id": "architecture.medallion",
+    "title": "Bronze Silver Gold architecture",
+    "content": "Telemetry flows through local Kafka into Spark Bronze Parquet, then deterministic Silver validation and deduplication, then Gold descriptive analytics. PostgreSQL stores curated operational records, not raw high-volume telemetry."
+  },
+  {
+    "id": "architecture.operational_api",
+    "title": "Materialized read API",
+    "content": "FastAPI serves already-materialized PostgreSQL state. API requests do not run Spark, Kafka, model inference, SHAP generation, anomaly scoring, or drift calculation."
+  },
+  {
+    "id": "semantics.ai4i.failure_probability",
+    "title": "AI4I failure probability",
+    "content": "failure_probability is the frozen AI4I model output for predicted failure risk. It is a model estimate, not an observed failure, and failure_prediction is a model decision using the frozen 0.14 threshold."
+  },
+  {
+    "id": "semantics.ai4i.threshold",
+    "title": "Frozen AI4I threshold",
+    "content": "The AI4I classifier uses a frozen decision threshold of 0.14. The threshold is part of the retained model policy and is not changed by the API, dashboard, alerts, or copilot."
+  },
+  {
+    "id": "semantics.anomaly.score",
+    "title": "Anomaly score",
+    "content": "anomaly_score is an Isolation Forest detector score where higher values are more anomalous. It is not a probability, and anomaly_flag is a detector decision, not a confirmed equipment failure."
+  },
+  {
+    "id": "semantics.drift.psi",
+    "title": "PSI drift monitoring",
+    "content": "PSI is a population stability index diagnostic for input distribution shift. PSI drift is not model accuracy, not model performance, and not automatic evidence that retraining is required."
+  },
+  {
+    "id": "semantics.shap.attribution",
+    "title": "SHAP model attribution",
+    "content": "SHAP values describe how model inputs contributed to one positive-class model output. Positive values push the model output toward higher predicted failure risk and negative values push it lower. SHAP is not causality or physical root-cause analysis."
+  },
+  {
+    "id": "semantics.alerts.operational",
+    "title": "Operational alerts",
+    "content": "Alerts are deterministic monitoring records derived from persisted prediction and anomaly rows. They are not confirmed failures and the local copilot cannot acknowledge, resolve, create, or delete alerts."
+  },
+  {
+    "id": "limitations.local_copilot",
+    "title": "Local copilot limitations",
+    "content": "The copilot runs locally with Ollama and uses read-only tools plus trusted knowledge retrieval. Natural-language responses can still make mistakes, so structured tool results are the authoritative platform evidence."
+  }
+]

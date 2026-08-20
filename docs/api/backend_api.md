@@ -46,6 +46,8 @@ Operational endpoints use `/api/v1`. The health endpoint remains `/health`.
 - `GET /api/v1/drift/latest`
 - `GET /api/v1/alerts`
 - `GET /api/v1/alerts/{alert_id}`
+- `GET /api/v1/copilot/health`
+- `POST /api/v1/copilot/chat`
 
 ## Fleet Overview
 
@@ -77,6 +79,14 @@ Anomaly history returns persisted telemetry anomaly detector audit rows. `anomal
 
 Alert endpoints are read-only. Alerts are materialized by `scripts/materialize_operational_alerts.py` from already-persisted prediction and anomaly rows. The API does not acknowledge, resolve, delete, or create alerts.
 
+## Local AI Copilot
+
+`GET /api/v1/copilot/health` reports optional local Ollama copilot availability without affecting the main `/health` endpoint. It checks provider reachability, configured model installation, and whether the model is currently loaded without triggering text generation.
+
+`POST /api/v1/copilot/chat` sends bounded non-streaming requests to local Ollama using deterministic project knowledge retrieval and a deterministic safe tool subset selected for the question. The endpoint returns an answer, grounding sources, model name, `local_only=true`, and `read_only=true`.
+
+The copilot is optional. The operational API remains usable when Ollama is offline. Chat requests return a controlled 503 response if local Ollama or the configured model is unavailable, and a controlled 504 response if local model generation exceeds the configured request deadline.
+
 ## Pagination
 
 List endpoints use `limit` and `offset`. Defaults are `limit=50` and `offset=0`. `limit` must be between 1 and 200, and `offset` must be zero or greater.
@@ -97,13 +107,15 @@ Local CORS defaults to `http://localhost:5173` for the React/Vite dashboard. The
 
 Request handlers do not import or execute AI4I prediction, Isolation Forest scoring, SHAP calculation, Spark, Kafka consumers, or PSI/drift computation. The explanation endpoint reads persisted `prediction_explanations` rows only and does not calculate missing explanations on demand.
 
+Copilot request handlers also do not expose arbitrary SQL, shell commands, filesystem tools, write tools, model training, model inference, SHAP generation, anomaly scoring, drift calculation, Spark, or Kafka. Copilot tools read materialized PostgreSQL state through predefined validated repository methods.
+
 ## Limitations
 
 This local portfolio API does not implement authentication, authorization, production hardening, alert lifecycle mutation, registered model serving, or external cloud services.
 
 ## Frontend Dashboard
 
-A React, TypeScript, and Vite dashboard consumes these read endpoints through `VITE_API_BASE_URL`. AI copilot interactions remain planned for a later phase.
+A React, TypeScript, and Vite dashboard consumes these read endpoints through `VITE_API_BASE_URL`, including the local read-only AI copilot route.
 
 ## Future Authentication
 

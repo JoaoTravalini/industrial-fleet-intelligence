@@ -875,6 +875,62 @@ npm run dev
 Open `http://localhost:5173` in the browser.
 
 The dashboard consumes already-materialized FastAPI state. Normal dashboard browsing does not require Spark or Kafka to be running when PostgreSQL already contains the materialized operational state.
+
+## Local AI Copilot
+
+The AI Copilot uses local Ollama only. It does not use OpenAI, Anthropic, Gemini, cloud AI services, API keys, or paid model APIs.
+
+Verify Ollama on Windows:
+
+```powershell
+ollama --version
+```
+
+Install the default local model explicitly:
+
+```powershell
+ollama pull qwen3:4b-instruct
+```
+
+Verify installed models:
+
+```powershell
+ollama list
+```
+
+The expected local API is:
+
+```text
+http://localhost:11434
+```
+
+Optionally warm the configured local model before demonstrating the Copilot:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/warm_copilot_model.py
+```
+
+The warmup command does not install software, download models, query PostgreSQL, or run project tools. It only checks local Ollama/model availability and sends one minimal bounded local request using the configured keep-alive policy.
+
+Run the project API as usual:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Validate the copilot integration when PostgreSQL, Ollama, and `qwen3:4b-instruct` are available:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/check_copilot.py
+```
+
+Open the dashboard route:
+
+```text
+http://localhost:5173/copilot
+```
+
+The copilot is read-only, does not persist conversations, does not download models automatically, and does not run pipelines, model inference, SHAP generation, anomaly scoring, or drift calculation.
 ## Validate The Environment
 
 Run the read-only environment validator from the repository root:

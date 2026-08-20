@@ -6,6 +6,40 @@ export interface HealthResponse {
   database: 'connected'
 }
 
+export interface CopilotHealthResponse {
+  status: 'available' | 'unavailable'
+  provider: 'ollama'
+  model: string
+  local_only: true
+  model_installed: boolean
+  model_loaded: boolean
+  message: string | null
+}
+
+export interface CopilotHistoryMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface CopilotChatRequest {
+  message: string
+  history: CopilotHistoryMessage[]
+}
+
+export interface CopilotSource {
+  type: 'tool' | 'knowledge'
+  id: string
+  label: string
+}
+
+export interface CopilotChatResponse {
+  answer: string
+  sources: CopilotSource[]
+  model: string
+  local_only: true
+  read_only: true
+}
+
 export interface LatestPredictionProjection {
   event_time: ISODateTime | null
   failure_probability: number | null
